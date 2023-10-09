@@ -1,6 +1,7 @@
 # chat_app3
 
-A new Flutter project.
+Chat app with streams
+
 
 ## Getting Started
 
