@@ -46,9 +46,9 @@ final class ChatCubit extends Cubit<ChatState> {
   final ChatRepository _repository;
   late final StreamSubscription<List<ChatMessage>> _subscription;
 
-  Future<void> sendMessage(String text) async {
+  Future<bool> sendMessage(String text) async {
     if (state.isSending || text.trim().isEmpty) {
-      return;
+      return false;
     }
 
     emit(state.copyWith(isSending: true, clearFailure: true));
@@ -56,8 +56,10 @@ final class ChatCubit extends Cubit<ChatState> {
     try {
       await _repository.sendMessage(text);
       emit(state.copyWith(isSending: false, clearFailure: true));
+      return true;
     } on AppFailure catch (failure) {
       emit(state.copyWith(isSending: false, failure: failure));
+      return false;
     } catch (error) {
       emit(
         state.copyWith(
@@ -68,6 +70,7 @@ final class ChatCubit extends Cubit<ChatState> {
           ),
         ),
       );
+      return false;
     }
   }
 

@@ -30,14 +30,29 @@ void main() {
     await repository.close();
   });
 
+  test('ChatCubit reports successful sends', () async {
+    final repository = _FakeChatRepository();
+    final cubit = ChatCubit(repository);
+
+    final didSend = await cubit.sendMessage('Hello');
+
+    expect(didSend, isTrue);
+    expect(cubit.state.isSending, isFalse);
+    expect(cubit.state.failure, isNull);
+
+    await cubit.close();
+    await repository.close();
+  });
+
   test('ChatCubit exposes send failures', () async {
     final repository = _FakeChatRepository(
       sendFailure: const AppFailure(kind: FailureKind.network),
     );
     final cubit = ChatCubit(repository);
 
-    await cubit.sendMessage('Hello');
+    final didSend = await cubit.sendMessage('Hello');
 
+    expect(didSend, isFalse);
     expect(cubit.state.isSending, isFalse);
     expect(cubit.state.failure?.kind, FailureKind.network);
 

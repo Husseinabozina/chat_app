@@ -7,7 +7,7 @@ class MessageComposer extends StatefulWidget {
     super.key,
   });
 
-  final Future<void> Function(String message) onSend;
+  final Future<bool> Function(String message) onSend;
   final bool isSending;
 
   @override
@@ -33,9 +33,9 @@ class _MessageComposerState extends State<MessageComposer> {
     }
 
     FocusScope.of(context).unfocus();
-    await widget.onSend(message);
+    final didSend = await widget.onSend(message);
 
-    if (!mounted) {
+    if (!mounted || !didSend) {
       return;
     }
 
