@@ -39,5 +39,9 @@
     "prettier": "3.9.9",
     "tsx": "4.23.15",
     "typescript": "^6.0.0"
+  },
+  "allowScripts": {
+    "argon2@0.45.1": true,
+    "esbuild@0.28.2": true
   }
 }
