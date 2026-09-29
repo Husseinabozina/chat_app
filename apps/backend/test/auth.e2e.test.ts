@@ -47,7 +47,10 @@ before(async () => {
     await AppDataSource.destroy();
 
     console.log('[e2e] setup: create Nest application');
-    app = await NestFactory.create(AppModule, { logger: false });
+    app = await NestFactory.create(AppModule, {
+      logger: false,
+      abortOnError: false,
+    });
     configureApp(app);
 
     console.log('[e2e] setup: listen on ephemeral port');
