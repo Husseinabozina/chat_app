@@ -6,9 +6,9 @@ import { after, before, test } from 'node:test';
 import { type INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
-import { AppModule } from '../src/app.module';
-import { configureApp } from '../src/bootstrap/configure-app';
-import { AppDataSource } from '../src/database/data-source';
+import { AppModule } from '../dist/app.module.js';
+import { configureApp } from '../dist/bootstrap/configure-app.js';
+import { AppDataSource } from '../dist/database/data-source.js';
 
 interface SessionResponse {
   accessToken: string;
