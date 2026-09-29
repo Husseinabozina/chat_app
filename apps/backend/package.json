@@ -5,7 +5,7 @@
   "description": "Backend API and realtime gateway for the messaging platform",
   "license": "UNLICENSED",
   "engines": {
-    "node": ">=24 <27"
+    "node": ">=24.9 <27"
   },
   "scripts": {
     "build": "nest build",
