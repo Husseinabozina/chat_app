@@ -12,7 +12,8 @@
     "start": "node dist/main.js",
     "start:dev": "nest start --watch",
     "start:prod": "node dist/main.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "npm run build && node dist/database/migrate.js"
   },
   "dependencies": {
     "@nestjs/common": "12.1.1",
