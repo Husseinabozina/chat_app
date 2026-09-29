@@ -82,5 +82,11 @@ jobs:
       - name: Run migrations
         run: node dist/database/migrate.js
 
+      - name: Verify Argon2 runtime
+        run: node -e "const argon2 = require('argon2'); console.log('argon2 runtime ok:', typeof argon2.hash)"
+
+      - name: Verify application module import
+        run: npx tsx -e "import('./src/app.module.ts').then(() => console.log('app module import ok')).catch((error) => { console.error(error); process.exit(1); })"
+
       - name: Test
-        run: npm test
+        run: node --import tsx --test --test-isolation=none --test-reporter=tap test/auth.e2e.test.ts
