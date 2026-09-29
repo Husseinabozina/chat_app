@@ -6,10 +6,18 @@ NestJS modular-monolith backend for the messaging platform.
 
 - Node.js 24 LTS baseline
 - NestJS 12
-- PostgreSQL
+- PostgreSQL 17
 - TypeORM
+- Jest + ts-jest for backend tests
+- ESLint + Prettier for static quality gates
 - WebSocket support will be introduced with the realtime module
 - S3-compatible object storage and FCM will be added at the relevant feature checkpoints
+
+## TypeScript baseline
+
+The backend deliberately uses the supported TypeScript 5.9 line rather than TypeScript 7 for now.
+
+The current TypeScript ESLint and ts-jest ecosystem does not yet support TypeScript 7 reliably. Keeping the compiler on a supported version gives us deterministic linting and test transforms while preserving strict TypeScript settings. This can be revisited when the ecosystem declares TypeScript 7 support.
 
 ## Setup
 
@@ -25,6 +33,16 @@ Start PostgreSQL from the repository root:
 docker compose -f infra/docker-compose.yml up -d
 ```
 
+## Quality commands
+
+```bash
+npm run format:check
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
 ## Health
 
 ```http
@@ -37,6 +55,7 @@ The endpoint verifies that the API can query PostgreSQL.
 
 ```text
 src/
+  bootstrap/
   database/
   health/
 ```

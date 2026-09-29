@@ -1,0 +1,82 @@
+name: Backend CI
+
+on:
+  pull_request:
+    paths:
+      - "apps/backend/**"
+      - ".github/workflows/backend-ci.yml"
+  push:
+    branches:
+      - master
+    paths:
+      - "apps/backend/**"
+      - ".github/workflows/backend-ci.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Format, lint, typecheck, test, and build
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: chat_app_test
+          POSTGRES_USER: chat_app
+          POSTGRES_PASSWORD: chat_app
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U chat_app -d chat_app_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://chat_app:chat_app@localhost:5432/chat_app_test
+
+    defaults:
+      run:
+        working-directory: apps/backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+
+      - name: Resolve dependencies
+        run: npm install
+
+      - name: Upload resolved lockfile
+        uses: actions/upload-artifact@v7
+        with:
+          name: backend-package-lock
+          path: apps/backend/package-lock.json
+          if-no-files-found: error
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
