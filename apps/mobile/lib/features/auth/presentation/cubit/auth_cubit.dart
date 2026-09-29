@@ -37,10 +37,7 @@ final class AuthCubit extends Cubit<AuthFormState> {
 
     try {
       if (isLogin) {
-        await _repository.signIn(
-          email: email,
-          password: password,
-        );
+        await _repository.signIn(email: email, password: password);
       } else {
         final imagePath = profileImagePath;
         if (imagePath == null) {
@@ -64,10 +61,7 @@ final class AuthCubit extends Cubit<AuthFormState> {
     } catch (error) {
       emit(
         AuthFormFailed(
-          AppFailure(
-            kind: FailureKind.unknown,
-            debugMessage: error.toString(),
-          ),
+          AppFailure(kind: FailureKind.unknown, debugMessage: error.toString()),
         ),
       );
     }

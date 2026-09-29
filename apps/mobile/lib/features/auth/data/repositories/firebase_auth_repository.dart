@@ -30,15 +30,9 @@ final class FirebaseAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> signIn({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> signIn({required String email, required String password}) async {
     try {
-      await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
     } on FirebaseException catch (error) {
       throw _mapFirebaseFailure(error);
     } catch (error) {
@@ -145,10 +139,7 @@ final class FirebaseAuthRepository implements AuthRepository {
       return null;
     }
 
-    return AuthUser(
-      id: user.uid,
-      email: user.email,
-    );
+    return AuthUser(id: user.uid, email: user.email);
   }
 
   AppFailure _mapFirebaseFailure(FirebaseException error) {
@@ -167,9 +158,6 @@ final class FirebaseAuthRepository implements AuthRepository {
       _ => FailureKind.unknown,
     };
 
-    return AppFailure(
-      kind: kind,
-      debugMessage: error.code,
-    );
+    return AppFailure(kind: kind, debugMessage: error.code);
   }
 }

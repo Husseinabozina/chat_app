@@ -28,9 +28,7 @@ class ChatPage extends StatelessWidget {
 }
 
 class _ChatView extends StatelessWidget {
-  const _ChatView({
-    required this.authRepository,
-  });
+  const _ChatView({required this.authRepository});
 
   final AuthRepository authRepository;
 
@@ -43,9 +41,7 @@ class _ChatView extends StatelessWidget {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not sign out. Please try again.'),
-        ),
+        const SnackBar(content: Text('Could not sign out. Please try again.')),
       );
     }
   }
@@ -63,9 +59,8 @@ class _ChatView extends StatelessWidget {
           return;
         }
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_failureMessage(failure))),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(_failureMessage(failure))));
         context.read<ChatCubit>().clearFailure();
       },
       child: Scaffold(
@@ -126,8 +121,7 @@ class _ChatView extends StatelessWidget {
         'That action conflicts with the current conversation state.',
       FailureKind.network =>
         'The network is unavailable. Please check your connection and retry.',
-      FailureKind.unknown =>
-        'Something went wrong. Please try again.',
+      FailureKind.unknown => 'Something went wrong. Please try again.',
     };
   }
 }

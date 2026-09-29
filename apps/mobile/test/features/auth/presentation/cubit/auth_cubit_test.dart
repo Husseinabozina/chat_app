@@ -37,19 +37,14 @@ void main() {
 
     final state = cubit.state;
     expect(state, isA<AuthFormFailed>());
-    expect(
-      (state as AuthFormFailed).failure.kind,
-      FailureKind.unauthorized,
-    );
+    expect((state as AuthFormFailed).failure.kind, FailureKind.unauthorized);
 
     await cubit.close();
   });
 }
 
 final class _FakeAuthRepository implements AuthRepository {
-  _FakeAuthRepository({
-    this.signInFailure,
-  });
+  _FakeAuthRepository({this.signInFailure});
 
   final AppFailure? signInFailure;
   String? lastSignedInEmail;
@@ -66,10 +61,7 @@ final class _FakeAuthRepository implements AuthRepository {
   }) async {}
 
   @override
-  Future<void> signIn({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> signIn({required String email, required String password}) async {
     final failure = signInFailure;
     if (failure != null) {
       throw failure;

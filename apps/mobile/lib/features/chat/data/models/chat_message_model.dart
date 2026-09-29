@@ -32,7 +32,9 @@ final class ChatMessageModel {
       username: data['username'] is String
           ? data['username'] as String
           : 'Unknown user',
-      imageUrl: data['userImage'] is String ? data['userImage'] as String : null,
+      imageUrl: data['userImage'] is String
+          ? data['userImage'] as String
+          : null,
       createdAt: timestamp is Timestamp
           ? timestamp.toDate()
           : DateTime.fromMillisecondsSinceEpoch(0),

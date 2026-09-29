@@ -19,10 +19,11 @@ final class FirebaseChatRepository implements ChatRepository {
   @override
   Stream<List<ChatMessage>> watchMessages() async* {
     try {
-      await for (final snapshot in _firestore
-          .collection('chat')
-          .orderBy('createdAt', descending: true)
-          .snapshots()) {
+      await for (final snapshot
+          in _firestore
+              .collection('chat')
+              .orderBy('createdAt', descending: true)
+              .snapshots()) {
         yield snapshot.docs
             .map(ChatMessageModel.fromFirestore)
             .map((model) => model.toEntity())
@@ -79,8 +80,7 @@ final class FirebaseChatRepository implements ChatRepository {
 
   AppFailure _mapFirebaseFailure(FirebaseException error) {
     final kind = switch (error.code) {
-      'permission-denied' ||
-      'unauthenticated' => FailureKind.unauthorized,
+      'permission-denied' || 'unauthenticated' => FailureKind.unauthorized,
       'invalid-argument' => FailureKind.validation,
       'already-exists' => FailureKind.conflict,
       'unavailable' ||
@@ -89,9 +89,6 @@ final class FirebaseChatRepository implements ChatRepository {
       _ => FailureKind.unknown,
     };
 
-    return AppFailure(
-      kind: kind,
-      debugMessage: error.code,
-    );
+    return AppFailure(kind: kind, debugMessage: error.code);
   }
 }

@@ -47,9 +47,7 @@ void main() {
 }
 
 final class _FakeChatRepository implements ChatRepository {
-  _FakeChatRepository({
-    this.sendFailure,
-  });
+  _FakeChatRepository({this.sendFailure});
 
   final AppFailure? sendFailure;
   final messages = StreamController<List<ChatMessage>>();

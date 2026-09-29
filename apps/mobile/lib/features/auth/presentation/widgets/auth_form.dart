@@ -11,11 +11,7 @@ typedef SubmitAuthForm = Future<void> Function({
 });
 
 class AuthForm extends StatefulWidget {
-  const AuthForm({
-    required this.onSubmit,
-    required this.isLoading,
-    super.key,
-  });
+  const AuthForm({required this.onSubmit, required this.isLoading, super.key});
 
   final SubmitAuthForm onSubmit;
   final bool isLoading;

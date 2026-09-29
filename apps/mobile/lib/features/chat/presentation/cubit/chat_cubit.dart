@@ -51,28 +51,13 @@ final class ChatCubit extends Cubit<ChatState> {
       return;
     }
 
-    emit(
-      state.copyWith(
-        isSending: true,
-        clearFailure: true,
-      ),
-    );
+    emit(state.copyWith(isSending: true, clearFailure: true));
 
     try {
       await _repository.sendMessage(text);
-      emit(
-        state.copyWith(
-          isSending: false,
-          clearFailure: true,
-        ),
-      );
+      emit(state.copyWith(isSending: false, clearFailure: true));
     } on AppFailure catch (failure) {
-      emit(
-        state.copyWith(
-          isSending: false,
-          failure: failure,
-        ),
-      );
+      emit(state.copyWith(isSending: false, failure: failure));
     } catch (error) {
       emit(
         state.copyWith(
@@ -94,28 +79,16 @@ final class ChatCubit extends Cubit<ChatState> {
 
   void _onMessages(List<ChatMessage> messages) {
     emit(
-      state.copyWith(
-        messages: messages,
-        isLoading: false,
-        clearFailure: true,
-      ),
+      state.copyWith(messages: messages, isLoading: false, clearFailure: true),
     );
   }
 
   void _onStreamError(Object error, StackTrace stackTrace) {
     final failure = error is AppFailure
         ? error
-        : AppFailure(
-            kind: FailureKind.unknown,
-            debugMessage: error.toString(),
-          );
+        : AppFailure(kind: FailureKind.unknown, debugMessage: error.toString());
 
-    emit(
-      state.copyWith(
-        isLoading: false,
-        failure: failure,
-      ),
-    );
+    emit(state.copyWith(isLoading: false, failure: failure));
   }
 
   @override

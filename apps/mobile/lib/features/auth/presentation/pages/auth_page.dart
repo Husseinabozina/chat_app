@@ -7,10 +7,7 @@ import '../cubit/auth_cubit.dart';
 import '../widgets/auth_form.dart';
 
 class AuthPage extends StatelessWidget {
-  const AuthPage({
-    required this.authRepository,
-    super.key,
-  });
+  const AuthPage({required this.authRepository, super.key});
 
   final AuthRepository authRepository;
 
@@ -45,21 +42,22 @@ class _AuthView extends StatelessWidget {
           backgroundColor: Colors.orange[700],
           body: AuthForm(
             isLoading: state is AuthFormSubmitting,
-            onSubmit: ({
-              required email,
-              required username,
-              required password,
-              required isLogin,
-              profileImagePath,
-            }) {
-              return context.read<AuthCubit>().submit(
-                email: email,
-                username: username,
-                password: password,
-                isLogin: isLogin,
-                profileImagePath: profileImagePath,
-              );
-            },
+            onSubmit:
+                ({
+                  required email,
+                  required username,
+                  required password,
+                  required isLogin,
+                  profileImagePath,
+                }) {
+                  return context.read<AuthCubit>().submit(
+                    email: email,
+                    username: username,
+                    password: password,
+                    isLogin: isLogin,
+                    profileImagePath: profileImagePath,
+                  );
+                },
           ),
         );
       },
@@ -76,8 +74,7 @@ class _AuthView extends StatelessWidget {
         'An account already exists for that email address.',
       FailureKind.network =>
         'The network is unavailable. Please check your connection and retry.',
-      FailureKind.unknown =>
-        'Something went wrong. Please try again.',
+      FailureKind.unknown => 'Something went wrong. Please try again.',
     };
   }
 }

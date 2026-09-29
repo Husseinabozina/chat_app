@@ -4,10 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImagePickerInput extends StatefulWidget {
-  const ImagePickerInput({
-    required this.onImagePicked,
-    super.key,
-  });
+  const ImagePickerInput({required this.onImagePicked, super.key});
 
   final ValueChanged<String> onImagePicked;
 

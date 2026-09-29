@@ -6,10 +6,7 @@ import '../features/chat/presentation/pages/chat_page.dart';
 import '../injection/app_dependencies.dart';
 
 class ChatApp extends StatelessWidget {
-  const ChatApp({
-    required this.dependencies,
-    super.key,
-  });
+  const ChatApp({required this.dependencies, super.key});
 
   final AppDependencies dependencies;
 
@@ -34,9 +31,7 @@ class ChatApp extends StatelessWidget {
             );
           }
 
-          return AuthPage(
-            authRepository: dependencies.authRepository,
-          );
+          return AuthPage(authRepository: dependencies.authRepository);
         },
       ),
     );

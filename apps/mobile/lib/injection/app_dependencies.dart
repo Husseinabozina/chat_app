@@ -23,10 +23,7 @@ final class AppDependencies {
         firestore: firestore,
         storage: FirebaseStorage.instance,
       ),
-      chatRepository: FirebaseChatRepository(
-        auth: auth,
-        firestore: firestore,
-      ),
+      chatRepository: FirebaseChatRepository(auth: auth, firestore: firestore),
     );
   }
 
