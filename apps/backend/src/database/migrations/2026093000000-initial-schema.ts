@@ -9,7 +9,7 @@ export class InitialSchema2026093000000 implements MigrationInterface {
       `CREATE TABLE "users" (
         "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         "email" varchar(320) NOT NULL,
-        "username" varchar(40) NOT NULL,
+        "username" varchar(40),
         "display_name" varchar(80),
         "bio" varchar(280),
         "avatar_url" text,
@@ -18,7 +18,7 @@ export class InitialSchema2026093000000 implements MigrationInterface {
         "updated_at" timestamptz NOT NULL DEFAULT now()
       )`,
       'CREATE UNIQUE INDEX "uq_users_email_ci" ON "users" (lower("email"))',
-      'CREATE UNIQUE INDEX "uq_users_username_ci" ON "users" (lower("username"))',
+      'CREATE UNIQUE INDEX "uq_users_username_ci" ON "users" (lower("username")) WHERE "username" IS NOT NULL',
       `CREATE TABLE "refresh_sessions" (
         "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         "user_id" uuid NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
