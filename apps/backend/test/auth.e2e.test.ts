@@ -21,72 +21,29 @@ interface SessionResponse {
   };
 }
 
-let app: INestApplication | undefined;
+let app: INestApplication;
 let baseUrl: string;
 
-process.on('uncaughtException', (error) => {
-  console.error('[e2e] uncaught exception', error);
-});
-
-process.on('unhandledRejection', (reason) => {
-  console.error('[e2e] unhandled rejection', reason);
-});
 
 before(async () => {
-  console.log('[e2e] setup: initialize data source');
+  await AppDataSource.initialize();
+  await AppDataSource.runMigrations();
+  await AppDataSource.query('TRUNCATE TABLE "users" CASCADE');
+  await AppDataSource.destroy();
 
-  try {
-    await AppDataSource.initialize();
-    console.log('[e2e] setup: run migrations');
-    await AppDataSource.runMigrations();
+  app = await NestFactory.create(AppModule, { logger: false });
+  configureApp(app);
+  await app.listen(0, '127.0.0.1');
 
-    console.log('[e2e] setup: truncate users');
-    await AppDataSource.query('TRUNCATE TABLE "users" CASCADE');
+  const address = app.getHttpServer().address() as {
+    port: number;
+  };
 
-    console.log('[e2e] setup: destroy setup data source');
-    await AppDataSource.destroy();
-
-    console.log('[e2e] setup: create Nest application');
-    app = await NestFactory.create(AppModule, {
-      logger: ['error'],
-      abortOnError: false,
-    });
-    configureApp(app);
-
-    console.log('[e2e] setup: listen on ephemeral port');
-    await app.listen(0, '127.0.0.1');
-
-    const address = app.getHttpServer().address() as {
-      port: number;
-    };
-
-    baseUrl = `http://127.0.0.1:${address.port}/v1`;
-    console.log('[e2e] setup: ready at', baseUrl);
-  } catch (error) {
-    console.error('[e2e] setup failed', error);
-
-    if (AppDataSource.isInitialized) {
-      await AppDataSource.destroy().catch((destroyError) => {
-        console.error('[e2e] setup cleanup failed', destroyError);
-      });
-    }
-
-    throw error;
-  }
+  baseUrl = `http://127.0.0.1:${address.port}/v1`;
 });
 
 after(async () => {
-  console.log('[e2e] teardown: start');
-
-  if (app) {
-    await app.close();
-  }
-
-  if (AppDataSource.isInitialized) {
-    await AppDataSource.destroy();
-  }
-
-  console.log('[e2e] teardown: complete');
+  await app.close();
 });
 
 test('auth lifecycle rotates refresh tokens and protects profile routes', async () => {
@@ -264,14 +221,6 @@ async function request<T>(
   });
 
   const text = await response.text();
-
-  if (!response.ok) {
-    console.error(
-      `[e2e] ${options.method} ${path} -> ${response.status}`,
-      text,
-    );
-  }
-
   const body = text.length === 0 ? undefined : JSON.parse(text);
 
   return {

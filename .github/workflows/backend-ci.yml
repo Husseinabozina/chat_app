@@ -13,7 +13,7 @@ on:
       - ".github/workflows/backend-ci.yml"
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: backend-ci-${{ github.ref }}
@@ -52,34 +52,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-        with:
-          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Set up Node
         uses: actions/setup-node@v5
         with:
           node-version: "24"
+          cache: npm
+          cache-dependency-path: apps/backend/package-lock.json
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
-
-      - name: Commit resolved lockfile
-        if: github.event_name == 'pull_request'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package-lock.json
-          if git diff --cached --quiet; then
-            echo "Lockfile already committed."
-          else
-            git commit -m "chore(backend): lock resolved dependencies"
-            git push origin HEAD:${GITHUB_HEAD_REF}
-          fi
+        run: npm ci --no-audit --no-fund
 
       - name: Check formatting
-        run: |
-          npm run format
-          git diff --exit-code -- src test
+        run: npm run format:check
 
       - name: Typecheck
         run: npm run typecheck
@@ -90,11 +75,5 @@ jobs:
       - name: Run migrations
         run: node dist/database/migrate.js
 
-      - name: Verify Argon2 runtime
-        run: node -e "const argon2 = require('argon2'); console.log('argon2 runtime ok:', typeof argon2.hash)"
-
-      - name: Verify application module import
-        run: npx tsx -e "import('./src/app.module.ts').then(() => console.log('app module import ok')).catch((error) => { console.error(error); process.exit(1); })"
-
       - name: Test
-        run: node --import tsx --test --test-isolation=none --test-reporter=tap test/auth.e2e.test.ts
+        run: npm test
