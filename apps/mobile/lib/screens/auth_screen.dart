@@ -91,10 +91,7 @@ class _AuthScreenState extends State<AuthScreen> {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.black87,
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.black87),
     );
   }
 
@@ -102,10 +99,7 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.orange[700],
-      body: AuthForm(
-        isLoading: _isLoading,
-        onSubmit: _submitUserForm,
-      ),
+      body: AuthForm(isLoading: _isLoading, onSubmit: _submitUserForm),
     );
   }
 }

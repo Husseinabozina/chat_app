@@ -12,11 +12,7 @@ typedef SubmitAuthForm = Future<void> Function({
 });
 
 class AuthForm extends StatefulWidget {
-  const AuthForm({
-    required this.onSubmit,
-    required this.isLoading,
-    super.key,
-  });
+  const AuthForm({required this.onSubmit, required this.isLoading, super.key});
 
   final SubmitAuthForm onSubmit;
   final bool isLoading;
@@ -69,10 +65,7 @@ class _AuthFormState extends State<AuthForm> {
   Widget build(BuildContext context) {
     return Center(
       child: Card(
-        margin: const EdgeInsets.symmetric(
-          horizontal: 15,
-          vertical: 8,
-        ),
+        margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
         child: Form(
           key: _formKey,
           child: Padding(
@@ -86,9 +79,7 @@ class _AuthFormState extends State<AuthForm> {
                   autofillHints: const [AutofillHints.email],
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'Email address',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Email address'),
                   validator: (value) {
                     final email = value?.trim() ?? '';
                     if (email.isEmpty || !email.contains('@')) {
@@ -104,9 +95,7 @@ class _AuthFormState extends State<AuthForm> {
                   TextFormField(
                     key: const ValueKey('username'),
                     textInputAction: TextInputAction.next,
-                    decoration: const InputDecoration(
-                      labelText: 'Username',
-                    ),
+                    decoration: const InputDecoration(labelText: 'Username'),
                     validator: (value) {
                       final username = value?.trim() ?? '';
                       if (username.length < 4) {
@@ -123,9 +112,7 @@ class _AuthFormState extends State<AuthForm> {
                   autofillHints: const [AutofillHints.password],
                   obscureText: true,
                   textInputAction: TextInputAction.done,
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Password'),
                   validator: (value) {
                     if ((value ?? '').length < 7) {
                       return 'Password must be at least 7 characters.';

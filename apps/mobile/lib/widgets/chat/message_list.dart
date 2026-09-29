@@ -22,15 +22,11 @@ class MessageList extends StatelessWidget {
           .snapshots(),
       builder: (context, chatSnapshot) {
         if (chatSnapshot.hasError) {
-          return const Center(
-            child: Text('Unable to load messages.'),
-          );
+          return const Center(child: Text('Unable to load messages.'));
         }
 
         if (!chatSnapshot.hasData) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         }
 
         final chatDocuments = chatSnapshot.data!.docs;

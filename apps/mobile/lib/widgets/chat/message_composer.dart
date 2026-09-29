@@ -95,9 +95,7 @@ class _MessageComposerState extends State<MessageComposer> {
                 });
               },
               onSubmitted: (_) => _sendMessage(),
-              decoration: const InputDecoration(
-                labelText: 'Send a message...',
-              ),
+              decoration: const InputDecoration(labelText: 'Send a message...'),
             ),
           ),
           IconButton(
