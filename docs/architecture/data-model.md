@@ -15,20 +15,24 @@ Key fields:
 ```text
 id
 email
-username
-display_name
-bio
-avatar_url
+email_normalized
 password_hash
+display_name
+username
+username_normalized
+bio
+avatar_storage_key
 created_at
 updated_at
 ```
 
 Constraints:
 
-- email unique
-- username unique
-- normalized username/email strategy defined explicitly
+- `email_normalized` is required, lowercase, and unique.
+- `username_normalized` is lowercase and unique when present.
+- `username`, `display_name`, `bio`, and avatar data may be null immediately after account registration because profile completion is a separate product step.
+- Avatar persistence stores an object-storage key rather than assuming a permanent public URL.
+- Password material is stored only as a password hash; raw passwords are never persisted.
 
 ---
 

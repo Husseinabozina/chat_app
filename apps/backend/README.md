@@ -43,6 +43,17 @@ npm test
 npm run build
 ```
 
+## Database migrations
+
+Schema changes are migration-driven. Runtime synchronization stays disabled.
+
+```bash
+npm run migration:run
+npm run migration:revert
+```
+
+The first identity migration creates `users` and `refresh_sessions`, including database-level uniqueness and foreign-key constraints.
+
 ## Health
 
 ```http
