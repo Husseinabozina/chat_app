@@ -83,4 +83,4 @@ jobs:
         run: node dist/database/migrate.js
 
       - name: Test
-        run: npm test
+        run: npx tsx test/auth.e2e.test.ts
