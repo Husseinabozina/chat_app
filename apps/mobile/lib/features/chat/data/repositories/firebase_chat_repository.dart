@@ -7,11 +7,10 @@ import '../../domain/repositories/chat_repository.dart';
 import '../models/chat_message_model.dart';
 
 final class FirebaseChatRepository implements ChatRepository {
-  FirebaseChatRepository({
-    required FirebaseAuth auth,
-    required FirebaseFirestore firestore,
-  }) : _auth = auth,
-       _firestore = firestore;
+  FirebaseChatRepository(
+    this._auth,
+    this._firestore,
+  );
 
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;

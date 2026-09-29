@@ -9,13 +9,11 @@ import '../../domain/entities/auth_user.dart';
 import '../../domain/repositories/auth_repository.dart';
 
 final class FirebaseAuthRepository implements AuthRepository {
-  FirebaseAuthRepository({
-    required FirebaseAuth auth,
-    required FirebaseFirestore firestore,
-    required FirebaseStorage storage,
-  }) : _auth = auth,
-       _firestore = firestore,
-       _storage = storage;
+  FirebaseAuthRepository(
+    this._auth,
+    this._firestore,
+    this._storage,
+  );
 
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;

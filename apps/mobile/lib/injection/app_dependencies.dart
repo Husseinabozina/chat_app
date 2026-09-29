@@ -19,11 +19,11 @@ final class AppDependencies {
 
     return AppDependencies(
       authRepository: FirebaseAuthRepository(
-        auth: auth,
-        firestore: firestore,
-        storage: FirebaseStorage.instance,
+        auth,
+        firestore,
+        FirebaseStorage.instance,
       ),
-      chatRepository: FirebaseChatRepository(auth: auth, firestore: firestore),
+      chatRepository: FirebaseChatRepository(auth, firestore),
     );
   }
 
