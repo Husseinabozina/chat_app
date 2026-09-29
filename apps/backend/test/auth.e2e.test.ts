@@ -48,7 +48,7 @@ before(async () => {
 
     console.log('[e2e] setup: create Nest application');
     app = await NestFactory.create(AppModule, {
-      logger: false,
+      logger: ['error'],
       abortOnError: false,
     });
     configureApp(app);
@@ -264,6 +264,14 @@ async function request<T>(
   });
 
   const text = await response.text();
+
+  if (!response.ok) {
+    console.error(
+      `[e2e] ${options.method} ${path} -> ${response.status}`,
+      text,
+    );
+  }
+
   const body = text.length === 0 ? undefined : JSON.parse(text);
 
   return {
