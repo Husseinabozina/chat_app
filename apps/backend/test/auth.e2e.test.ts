@@ -216,8 +216,7 @@ async function request<T>(
   const response = await fetch(`${baseUrl}${path}`, {
     method: options.method,
     headers,
-    body:
-      options.body === undefined ? undefined : JSON.stringify(options.body),
+    body: options.body === undefined ? undefined : JSON.stringify(options.body),
   });
 
   const text = await response.text();

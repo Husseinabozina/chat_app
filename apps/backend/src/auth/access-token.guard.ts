@@ -27,8 +27,9 @@ export class AccessTokenGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request =
-      context.switchToHttp().getRequest<RequestWithHeadersAndAuth>();
+    const request = context
+      .switchToHttp()
+      .getRequest<RequestWithHeadersAndAuth>();
     const authorization = request.headers.authorization;
 
     if (!authorization?.startsWith('Bearer ')) {

@@ -1,16 +1,7 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Patch,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
 
 import { AccessTokenGuard } from '../auth/access-token.guard';
-import {
-  CurrentAuth,
-  type AuthContext,
-} from '../auth/current-auth.decorator';
+import { CurrentAuth, type AuthContext } from '../auth/current-auth.decorator';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { type PublicUser, UsersService } from './users.service';
 

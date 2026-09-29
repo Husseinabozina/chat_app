@@ -4,18 +4,10 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
-import {
-  DataSource,
-  IsNull,
-  QueryFailedError,
-  Repository,
-} from 'typeorm';
+import { DataSource, IsNull, QueryFailedError, Repository } from 'typeorm';
 
 import { ApiException } from '../common/http/api-exception';
-import {
-  RefreshSessionEntity,
-  UserEntity,
-} from '../database/entities';
+import { RefreshSessionEntity, UserEntity } from '../database/entities';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 
