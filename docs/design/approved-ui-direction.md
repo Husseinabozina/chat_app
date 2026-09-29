@@ -273,3 +273,18 @@ After locking Chats Home and Chat Screen direction:
 9. Non-happy-state variants
 
 This order prioritizes the core social/messaging experience before secondary screens.
+
+
+---
+
+## 9. AI collaboration guardrail
+
+This is a standing project rule:
+
+- **Do not generate any image, mockup, moodboard, or visual board unless the user explicitly asks for an image.**
+- Approval of a visual direction does not imply permission to generate another image.
+- When the next project step is architecture, documentation, implementation, testing, or another non-visual task, proceed with that task instead of returning to image generation.
+- Repeated visual generation is treated as workflow drift, not progress.
+- If a visual artifact is needed later, generate only the specific screen/asset requested rather than a full-app collage unless the user explicitly asks for one.
+
+This guardrail exists to keep the AI workflow aligned with the project plan and prevent repeated visual work from replacing the actual next engineering task.
