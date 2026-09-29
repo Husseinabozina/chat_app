@@ -30,7 +30,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -42,8 +42,17 @@ jobs:
       - name: Resolve dependencies
         run: flutter pub get
 
+      - name: Upload resolved lockfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-pubspec-lock
+          path: apps/mobile/pubspec.lock
+          if-no-files-found: error
+
       - name: Check formatting
-        run: dart format --output=none --set-exit-if-changed lib test
+        run: |
+          dart format lib test
+          git diff --exit-code -- lib test
 
       - name: Analyze
         run: flutter analyze
