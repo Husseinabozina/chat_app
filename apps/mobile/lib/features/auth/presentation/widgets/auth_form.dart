@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
-import 'pickers/image_picker_input.dart';
+import 'image_picker_input.dart';
 
 typedef SubmitAuthForm = Future<void> Function({
   required String email,
   required String username,
   required String password,
   required bool isLogin,
-  XFile? image,
+  String? profileImagePath,
 });
 
 class AuthForm extends StatefulWidget {
-  const AuthForm({required this.onSubmit, required this.isLoading, super.key});
+  const AuthForm({
+    required this.onSubmit,
+    required this.isLoading,
+    super.key,
+  });
 
   final SubmitAuthForm onSubmit;
   final bool isLoading;
@@ -27,12 +30,8 @@ class _AuthFormState extends State<AuthForm> {
   String _userEmail = '';
   String _userName = '';
   String _userPassword = '';
+  String? _profileImagePath;
   bool _isLogin = false;
-  XFile? _selectedImage;
-
-  void _onImagePicked(XFile image) {
-    _selectedImage = image;
-  }
 
   Future<void> _trySubmit() async {
     final form = _formKey.currentState;
@@ -40,7 +39,7 @@ class _AuthFormState extends State<AuthForm> {
       return;
     }
 
-    if (!_isLogin && _selectedImage == null) {
+    if (!_isLogin && _profileImagePath == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Theme.of(context).colorScheme.secondary,
@@ -57,7 +56,7 @@ class _AuthFormState extends State<AuthForm> {
       username: _userName.trim(),
       password: _userPassword,
       isLogin: _isLogin,
-      image: _selectedImage,
+      profileImagePath: _profileImagePath,
     );
   }
 
@@ -73,7 +72,12 @@ class _AuthFormState extends State<AuthForm> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (!_isLogin) ImagePickerInput(onImagePicked: _onImagePicked),
+                if (!_isLogin)
+                  ImagePickerInput(
+                    onImagePicked: (path) {
+                      _profileImagePath = path;
+                    },
+                  ),
                 TextFormField(
                   key: const ValueKey('email'),
                   autofillHints: const [AutofillHints.email],
