@@ -1,8 +1,9 @@
 import { createHash, randomBytes } from 'node:crypto';
 
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { InjectDataSource } from '@nestjs/typeorm';
 import * as argon2 from 'argon2';
 import { DataSource, IsNull, QueryFailedError, Repository } from 'typeorm';
 
@@ -39,8 +40,11 @@ export class AuthService {
   private readonly refreshTokenTtlDays: number;
 
   constructor(
+    @InjectDataSource()
     private readonly dataSource: DataSource,
+    @Inject(JwtService)
     private readonly jwtService: JwtService,
+    @Inject(ConfigService)
     private readonly config: ConfigService,
   ) {
     this.accessTokenTtlSeconds = this.readPositiveNumber(
