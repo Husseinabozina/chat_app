@@ -64,7 +64,7 @@ jobs:
       - name: Commit resolved lockfile
         if: github.event_name == 'pull_request' && github.head_ref == 'chore/backend-quality-foundation'
         run: |
-          if git diff --quiet -- package-lock.json; then
+          if [ -z "$(git status --porcelain -- package-lock.json)" ]; then
             echo "package-lock.json is already committed"
             exit 0
           fi
