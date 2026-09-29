@@ -26,7 +26,7 @@ export class UserEntity {
   @Column({ name: 'avatar_url', type: 'text', nullable: true })
   avatarUrl!: string | null;
 
-  @Column({ name: 'password_hash', type: 'text' })
+  @Column({ name: 'password_hash', type: 'text', select: false })
   passwordHash!: string;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
