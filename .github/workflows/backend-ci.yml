@@ -64,7 +64,7 @@ jobs:
         run: npm ci --no-audit --no-fund
 
       - name: Check formatting
-        run: npm run format:check
+        run: npm run format
 
       - name: Typecheck
         run: npm run typecheck
