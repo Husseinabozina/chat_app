@@ -66,6 +66,13 @@ jobs:
       - name: Check formatting
         run: npm run format
 
+      - name: Upload formatted e2e test
+        uses: actions/upload-artifact@v7
+        with:
+          name: formatted-auth-e2e
+          path: apps/backend/test/auth.e2e.test.ts
+          if-no-files-found: error
+
       - name: Typecheck
         run: npm run typecheck
 
