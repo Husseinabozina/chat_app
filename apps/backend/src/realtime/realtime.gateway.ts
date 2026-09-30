@@ -146,9 +146,7 @@ export class RealtimeGateway
     }
 
     const conversationId =
-      typeof payload?.conversationId === 'string'
-        ? payload.conversationId
-        : '';
+      typeof payload?.conversationId === 'string' ? payload.conversationId : '';
 
     try {
       await command(auth, conversationId);

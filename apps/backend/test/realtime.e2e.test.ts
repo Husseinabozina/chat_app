@@ -130,12 +130,14 @@ test('realtime rejects invalid authentication and revoked sessions', async () =>
 
 test('REST message lifecycle publishes durable realtime events', async () => {
   const clientMessageId = randomUUID();
-  const aliceCreated = waitForEvent<
-    { message: MessageResponse }
-  >(aliceSocket, 'message.created');
-  const bobCreated = waitForEvent<
-    { message: MessageResponse }
-  >(bobSocket, 'message.created');
+  const aliceCreated = waitForEvent<{ message: MessageResponse }>(
+    aliceSocket,
+    'message.created',
+  );
+  const bobCreated = waitForEvent<{ message: MessageResponse }>(
+    bobSocket,
+    'message.created',
+  );
 
   const sent = await request<MessageResponse>(
     `/conversations/${conversationId}/messages`,
@@ -173,14 +175,12 @@ test('REST message lifecycle publishes durable realtime events', async () => {
   assert.equal(updated.data.message.text, 'hello edited realtime');
   assert.ok(updated.data.message.editedAt);
 
-  const readEvent = waitForEvent<
-    {
-      conversationId: string;
-      userId: string;
-      lastReadMessageId: string;
-      lastReadAt: string;
-    }
-  >(aliceSocket, 'read.updated');
+  const readEvent = waitForEvent<{
+    conversationId: string;
+    userId: string;
+    lastReadMessageId: string;
+    lastReadAt: string;
+  }>(aliceSocket, 'read.updated');
   const read = await request<unknown>(`/conversations/${conversationId}/read`, {
     method: 'POST',
     accessToken: bob.accessToken,
@@ -191,9 +191,10 @@ test('REST message lifecycle publishes durable realtime events', async () => {
   assert.equal(readUpdate.data.userId, bob.user.id);
   assert.equal(readUpdate.data.lastReadMessageId, sent.body.id);
 
-  const deletedEvent = waitForEvent<
-    { messageId: string; deletedAt: string }
-  >(bobSocket, 'message.deleted');
+  const deletedEvent = waitForEvent<{ messageId: string; deletedAt: string }>(
+    bobSocket,
+    'message.deleted',
+  );
   const deleted = await request<unknown>(`/messages/${sent.body.id}`, {
     method: 'DELETE',
     accessToken: alice.accessToken,
@@ -205,9 +206,11 @@ test('REST message lifecycle publishes durable realtime events', async () => {
 });
 
 test('typing is membership scoped and transient', async () => {
-  const started = waitForEvent<
-    { conversationId: string; userId: string; expiresAt: string }
-  >(bobSocket, 'typing.started');
+  const started = waitForEvent<{
+    conversationId: string;
+    userId: string;
+    expiresAt: string;
+  }>(bobSocket, 'typing.started');
 
   const startAck = await emitWithAck(aliceSocket, 'typing.start', {
     conversationId,
@@ -216,9 +219,10 @@ test('typing is membership scoped and transient', async () => {
   const startedEvent = await started;
   assert.equal(startedEvent.data.userId, alice.user.id);
 
-  const stopped = waitForEvent<
-    { conversationId: string; userId: string }
-  >(bobSocket, 'typing.stopped');
+  const stopped = waitForEvent<{ conversationId: string; userId: string }>(
+    bobSocket,
+    'typing.stopped',
+  );
   const stopAck = await emitWithAck(aliceSocket, 'typing.stop', {
     conversationId,
   });

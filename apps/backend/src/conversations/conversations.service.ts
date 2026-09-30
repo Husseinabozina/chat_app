@@ -324,8 +324,7 @@ export class ConversationsService {
   }
 
   async publishConversationSummaries(conversationId: string): Promise<void> {
-    const participantUserIds =
-      await this.getParticipantUserIds(conversationId);
+    const participantUserIds = await this.getParticipantUserIds(conversationId);
 
     for (const participantUserId of participantUserIds) {
       const summary = await this.getSummaryForUser(
@@ -461,9 +460,7 @@ export class ConversationsService {
     };
   }
 
-  private async publishSafely(
-    publish: () => Promise<void>,
-  ): Promise<void> {
+  private async publishSafely(publish: () => Promise<void>): Promise<void> {
     try {
       await publish();
     } catch (error) {

@@ -3,7 +3,10 @@ import { randomUUID } from 'node:crypto';
 import { Injectable, Logger } from '@nestjs/common';
 import { type Server } from 'socket.io';
 
-import { type ConversationSummary, type ReadStateResponse } from '../conversations/conversations.service';
+import {
+  type ConversationSummary,
+  type ReadStateResponse,
+} from '../conversations/conversations.service';
 import { type MessageResponse } from '../messages/messages.service';
 import {
   REALTIME_PROTOCOL_VERSION,
@@ -120,9 +123,7 @@ export class RealtimePublisher {
     }
 
     try {
-      server
-        .to(socketId)
-        .emit(type, this.envelope(type, conversationId, data));
+      server.to(socketId).emit(type, this.envelope(type, conversationId, data));
     } catch (error) {
       this.logPublicationError(type, error);
     }

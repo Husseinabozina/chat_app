@@ -273,9 +273,7 @@ export class MessagesService {
 
         message.text = null;
         message.deletedAt = new Date();
-        const saved = await manager
-          .getRepository(MessageEntity)
-          .save(message);
+        const saved = await manager.getRepository(MessageEntity).save(message);
 
         return this.toResponse(saved);
       },
@@ -287,63 +285,46 @@ export class MessagesService {
       );
     }
   }
-  private async publishMessageCreated(
-    message: MessageResponse,
-  ): Promise<void> {
+  private async publishMessageCreated(message: MessageResponse): Promise<void> {
     const participantUserIds =
       await this.conversationsService.getParticipantUserIds(
         message.conversationId,
       );
 
-    this.realtimePublisher.publishMessageCreated(
-      participantUserIds,
-      message,
-    );
+    this.realtimePublisher.publishMessageCreated(participantUserIds, message);
 
     await this.conversationsService.publishConversationSummaries(
       message.conversationId,
     );
   }
 
-  private async publishMessageUpdated(
-    message: MessageResponse,
-  ): Promise<void> {
+  private async publishMessageUpdated(message: MessageResponse): Promise<void> {
     const participantUserIds =
       await this.conversationsService.getParticipantUserIds(
         message.conversationId,
       );
 
-    this.realtimePublisher.publishMessageUpdated(
-      participantUserIds,
-      message,
-    );
+    this.realtimePublisher.publishMessageUpdated(participantUserIds, message);
 
     await this.conversationsService.publishConversationSummaries(
       message.conversationId,
     );
   }
 
-  private async publishMessageDeleted(
-    message: MessageResponse,
-  ): Promise<void> {
+  private async publishMessageDeleted(message: MessageResponse): Promise<void> {
     const participantUserIds =
       await this.conversationsService.getParticipantUserIds(
         message.conversationId,
       );
 
-    this.realtimePublisher.publishMessageDeleted(
-      participantUserIds,
-      message,
-    );
+    this.realtimePublisher.publishMessageDeleted(participantUserIds, message);
 
     await this.conversationsService.publishConversationSummaries(
       message.conversationId,
     );
   }
 
-  private async publishSafely(
-    publish: () => Promise<void>,
-  ): Promise<void> {
+  private async publishSafely(publish: () => Promise<void>): Promise<void> {
     try {
       await publish();
     } catch (error) {
