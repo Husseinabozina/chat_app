@@ -426,13 +426,10 @@ test('only senders can edit or soft-delete their messages', async () => {
   });
   assert.equal(deleted.status, 204);
 
-  const deletedAgain = await request<unknown>(
-    `/messages/${created.body.id}`,
-    {
-      method: 'DELETE',
-      accessToken: alice.accessToken,
-    },
-  );
+  const deletedAgain = await request<unknown>(`/messages/${created.body.id}`, {
+    method: 'DELETE',
+    accessToken: alice.accessToken,
+  });
   assert.equal(deletedAgain.status, 204);
 
   const history = await request<MessagePage>(
