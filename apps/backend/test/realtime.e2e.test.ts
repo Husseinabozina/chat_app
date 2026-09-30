@@ -6,6 +6,7 @@ import { after, before, test } from 'node:test';
 
 import { type INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { JwtService } from '@nestjs/jwt';
 import { io, type Socket } from 'socket.io-client';
 
 import { AppModule } from '../dist/app.module.js';
@@ -54,6 +55,7 @@ let bob: SessionResponse;
 let eve: SessionResponse;
 let mallory: SessionResponse;
 let conversationId: string;
+let firstMessageId: string;
 let aliceSocket: Socket;
 let bobSocket: Socket;
 let eveSocket: Socket;
@@ -115,6 +117,22 @@ test('realtime rejects invalid authentication and revoked sessions', async () =>
   assert.equal(error.data?.code, 'UNAUTHORIZED');
   invalid.disconnect();
 
+  const expiredToken = await app
+    .get(JwtService)
+    .signAsync(
+      { sub: alice.user.id, sid: randomUUID(), typ: 'access' },
+      { expiresIn: -1 },
+    );
+  const expired = io(realtimeUrl, {
+    autoConnect: false,
+    transports: ['websocket'],
+    auth: { accessToken: expiredToken },
+  });
+  const expiredError = waitForConnectError(expired);
+  expired.connect();
+  assert.equal((await expiredError).data?.code, 'UNAUTHORIZED');
+  expired.disconnect();
+
   const disconnected = waitForDisconnect(eveSocket);
   const logout = await request<unknown>('/auth/logout', {
     method: 'POST',
@@ -138,6 +156,17 @@ test('realtime rejects invalid authentication and revoked sessions', async () =>
 
 test('REST message lifecycle publishes durable realtime events', async () => {
   const clientMessageId = randomUUID();
+  const unrelatedEvents: string[] = [];
+  const onUnrelatedEvent = (eventName: string) => {
+    if (
+      eventName.startsWith('message.') ||
+      eventName === 'conversation.updated' ||
+      eventName === 'read.updated'
+    ) {
+      unrelatedEvents.push(eventName);
+    }
+  };
+  mallorySocket.onAny(onUnrelatedEvent);
   const aliceCreated = waitForEvent<{ message: MessageResponse }>(
     aliceSocket,
     'message.created',
@@ -169,6 +198,7 @@ test('REST message lifecycle publishes durable realtime events', async () => {
     },
   );
   assert.equal(sent.status, 201);
+  firstMessageId = sent.body.id;
 
   const [aliceEvent, bobEvent] = await Promise.all([aliceCreated, bobCreated]);
   assert.equal(aliceEvent.data.message.id, sent.body.id);
@@ -233,6 +263,76 @@ test('REST message lifecycle publishes durable realtime events', async () => {
   const deletedUpdate = await deletedEvent;
   assert.equal(deletedUpdate.data.messageId, sent.body.id);
   assert.ok(deletedUpdate.data.deletedAt);
+
+  // An acknowledgement on the unrelated socket follows any earlier packets
+  // on that connection, so this checks isolation without a timing delay.
+  await emitWithAck(mallorySocket, 'typing.stop', { conversationId });
+  assert.deepEqual(unrelatedEvents, []);
+  mallorySocket.offAny(onUnrelatedEvent);
+
+  bobSocket.disconnect();
+  bobSocket = await connectRealtime(bob.accessToken);
+  const resynced = await request<{ items: MessageResponse[] }>(
+    `/conversations/${conversationId}/messages`,
+    { method: 'GET', accessToken: bob.accessToken },
+  );
+  assert.equal(resynced.status, 200);
+  assert.equal(resynced.body.items[0]?.id, sent.body.id);
+  assert.equal(resynced.body.items[0]?.text, null);
+  assert.ok(resynced.body.items[0]?.deletedAt);
+});
+
+test('read pointer and read events never move backward', async () => {
+  const sent = await request<MessageResponse>(
+    `/conversations/${conversationId}/messages`,
+    {
+      method: 'POST',
+      accessToken: alice.accessToken,
+      body: {
+        clientMessageId: randomUUID(),
+        type: 'text',
+        text: 'newer message',
+        replyToMessageId: null,
+        attachments: [],
+      },
+    },
+  );
+  assert.equal(sent.status, 201);
+
+  const advancedEvent = waitForEvent<{ lastReadMessageId: string }>(
+    aliceSocket,
+    'read.updated',
+  );
+  const advanced = await request<{
+    lastReadMessageId: string;
+    lastReadAt: string;
+  }>(`/conversations/${conversationId}/read`, {
+    method: 'POST',
+    accessToken: bob.accessToken,
+    body: { upToMessageId: sent.body.id },
+  });
+  assert.equal(advanced.status, 200);
+  assert.equal((await advancedEvent).data.lastReadMessageId, sent.body.id);
+
+  let staleReadEvents = 0;
+  const onStaleReadEvent = () => {
+    staleReadEvents += 1;
+  };
+  aliceSocket.on('read.updated', onStaleReadEvent);
+  const stale = await request<{
+    lastReadMessageId: string;
+    lastReadAt: string;
+  }>(`/conversations/${conversationId}/read`, {
+    method: 'POST',
+    accessToken: bob.accessToken,
+    body: { upToMessageId: firstMessageId },
+  });
+  assert.equal(stale.status, 200);
+  assert.equal(stale.body.lastReadMessageId, sent.body.id);
+  assert.equal(stale.body.lastReadAt, advanced.body.lastReadAt);
+  await emitWithAck(aliceSocket, 'typing.stop', { conversationId });
+  assert.equal(staleReadEvents, 0);
+  aliceSocket.off('read.updated', onStaleReadEvent);
 });
 
 test('typing is membership scoped and transient', async () => {
