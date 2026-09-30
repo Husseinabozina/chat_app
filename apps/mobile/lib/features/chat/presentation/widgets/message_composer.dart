@@ -1,9 +1,14 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class MessageComposer extends StatefulWidget {
-  const MessageComposer({super.key});
+  const MessageComposer({
+    required this.onSend,
+    required this.isSending,
+    super.key,
+  });
+
+  final Future<bool> Function(String message) onSend;
+  final bool isSending;
 
   @override
   State<MessageComposer> createState() => _MessageComposerState();
@@ -11,10 +16,8 @@ class MessageComposer extends StatefulWidget {
 
 class _MessageComposerState extends State<MessageComposer> {
   final _messageController = TextEditingController();
-  final _chatCollection = FirebaseFirestore.instance.collection('chat');
 
   String _enteredMessage = '';
-  bool _isSending = false;
 
   @override
   void dispose() {
@@ -24,56 +27,22 @@ class _MessageComposerState extends State<MessageComposer> {
 
   Future<void> _sendMessage() async {
     final message = _enteredMessage.trim();
-    final user = FirebaseAuth.instance.currentUser;
 
-    if (message.isEmpty || user == null || _isSending) {
+    if (message.isEmpty || widget.isSending) {
       return;
     }
 
     FocusScope.of(context).unfocus();
+    final didSend = await widget.onSend(message);
 
-    setState(() {
-      _isSending = true;
-    });
-
-    try {
-      final userData = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-
-      await _chatCollection.add({
-        'text': message,
-        'createdAt': Timestamp.now(),
-        'userid': user.uid,
-        'username': userData.data()?['username'] ?? 'Unknown user',
-        'userImage': userData.data()?['imageUrl'],
-      });
-
-      _messageController.clear();
-
-      if (mounted) {
-        setState(() {
-          _enteredMessage = '';
-        });
-      }
-    } catch (_) {
-      if (!mounted) {
-        return;
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Message could not be sent. Please try again.'),
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isSending = false;
-        });
-      }
+    if (!mounted || !didSend) {
+      return;
     }
+
+    _messageController.clear();
+    setState(() {
+      _enteredMessage = '';
+    });
   }
 
   @override
@@ -99,10 +68,10 @@ class _MessageComposerState extends State<MessageComposer> {
             ),
           ),
           IconButton(
-            onPressed: _enteredMessage.trim().isEmpty || _isSending
+            onPressed: _enteredMessage.trim().isEmpty || widget.isSending
                 ? null
                 : _sendMessage,
-            icon: _isSending
+            icon: widget.isSending
                 ? const SizedBox.square(
                     dimension: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
