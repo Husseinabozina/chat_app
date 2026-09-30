@@ -1,6 +1,6 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource, QueryFailedError } from 'typeorm';
+import { DataSource, QueryFailedError, type EntityManager } from 'typeorm';
 
 import { ApiException } from '../common/http/api-exception';
 import {
@@ -14,6 +14,7 @@ import {
   MessageEntity,
   UserEntity,
 } from '../database/entities';
+import { RealtimeEventBus } from '../realtime/realtime-event-bus';
 
 export interface ConversationUserSummary {
   id: string;
@@ -71,7 +72,12 @@ interface ConversationSummaryRow {
 
 @Injectable()
 export class ConversationsService {
-  constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
+  constructor(
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
+    @Inject(RealtimeEventBus)
+    private readonly eventBus: RealtimeEventBus,
+  ) {}
 
   async createOrResolveDirect(
     userId: string,
@@ -188,12 +194,27 @@ export class ConversationsService {
     };
   }
 
+  async assertMember(userId: string, conversationId: string): Promise<void> {
+    const membership = await this.dataSource
+      .getRepository(ConversationMemberEntity)
+      .findOne({
+        where: {
+          conversationId,
+          userId,
+        },
+      });
+
+    if (!membership) {
+      throw this.conversationNotFound();
+    }
+  }
+
   async markRead(
     userId: string,
     conversationId: string,
     upToMessageId: string,
   ): Promise<ReadStateResponse> {
-    return this.dataSource.transaction(async (manager) => {
+    const result = await this.dataSource.transaction(async (manager) => {
       const members = manager.getRepository(ConversationMemberEntity);
       const messages = manager.getRepository(MessageEntity);
       const membership = await members
@@ -204,11 +225,7 @@ export class ConversationsService {
         .getOne();
 
       if (!membership) {
-        throw new ApiException(
-          HttpStatus.NOT_FOUND,
-          'CONVERSATION_NOT_FOUND',
-          'Conversation not found.',
-        );
+        throw this.conversationNotFound();
       }
 
       const targetMessage = await messages.findOne({
@@ -239,9 +256,13 @@ export class ConversationsService {
           this.isAtOrBefore(targetMessage, currentMessage)
         ) {
           return {
-            conversationId,
-            lastReadMessageId: currentMessage.id,
-            lastReadAt: membership.lastReadAt ?? new Date(),
+            advanced: false,
+            state: {
+              conversationId,
+              lastReadMessageId: currentMessage.id,
+              lastReadAt: membership.lastReadAt ?? currentMessage.createdAt,
+            },
+            participantUserIds: [] as string[],
           };
         }
       }
@@ -252,11 +273,31 @@ export class ConversationsService {
       await members.save(membership);
 
       return {
-        conversationId,
-        lastReadMessageId: targetMessage.id,
-        lastReadAt: readAt,
+        advanced: true,
+        state: {
+          conversationId,
+          lastReadMessageId: targetMessage.id,
+          lastReadAt: readAt,
+        },
+        participantUserIds: await this.participantUserIds(
+          manager,
+          conversationId,
+        ),
       };
     });
+
+    if (result.advanced) {
+      this.eventBus.publish({
+        kind: 'conversation.read',
+        conversationId,
+        participantUserIds: result.participantUserIds,
+        readerUserId: userId,
+        lastReadMessageId: result.state.lastReadMessageId,
+        lastReadAt: result.state.lastReadAt,
+      });
+    }
+
+    return result.state;
   }
 
   private async getSummary(
@@ -401,6 +442,27 @@ export class ConversationsService {
       unreadCount: Number(row.unread_count),
       updatedAt: new Date(row.updated_at),
     };
+  }
+
+  private async participantUserIds(
+    manager: EntityManager,
+    conversationId: string,
+  ): Promise<string[]> {
+    const memberships = await manager
+      .getRepository(ConversationMemberEntity)
+      .find({
+        where: { conversationId },
+      });
+
+    return memberships.map((membership) => membership.userId);
+  }
+
+  private conversationNotFound(): ApiException {
+    return new ApiException(
+      HttpStatus.NOT_FOUND,
+      'CONVERSATION_NOT_FOUND',
+      'Conversation not found.',
+    );
   }
 
   private isAtOrBefore(
