@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { RefreshSessionEntity, UserEntity } from '../database/entities';
 import { AccessTokenGuard } from './access-token.guard';
+import { AccessTokenVerifier } from './access-token.verifier';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 
@@ -33,7 +34,7 @@ import { AuthService } from './auth.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AccessTokenGuard],
-  exports: [AccessTokenGuard, JwtModule],
+  providers: [AuthService, AccessTokenVerifier, AccessTokenGuard],
+  exports: [AccessTokenGuard, AccessTokenVerifier, JwtModule],
 })
 export class AuthModule {}
