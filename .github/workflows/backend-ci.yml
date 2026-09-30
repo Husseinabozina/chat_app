@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   quality:
-    name: Format, typecheck, build, migrate, and test
+    name: Format, lint, typecheck, build, migrate, and test
     runs-on: ubuntu-latest
 
     services:
@@ -65,6 +65,9 @@ jobs:
 
       - name: Check formatting
         run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
 
       - name: Typecheck
         run: npm run typecheck
