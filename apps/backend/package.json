@@ -9,18 +9,23 @@
   },
   "scripts": {
     "build": "nest build",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node dist/main.js",
     "start:dev": "nest start --watch",
     "start:prod": "node dist/main.js",
-    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test --test-isolation=none test/auth.e2e.test.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.build.json",
     "db:migrate": "npm run build && node dist/database/migrate.js"
   },
   "dependencies": {
     "@nestjs/common": "12.1.1",
     "@nestjs/config": "12.0.1",
     "@nestjs/core": "12.1.1",
+    "@nestjs/jwt": "12.0.2",
     "@nestjs/platform-express": "12.1.1",
     "@nestjs/typeorm": "12.0.2",
+    "argon2": "0.45.1",
     "class-transformer": "0.5.1",
     "class-validator": "^0.14.2",
     "pg": "8.23.0",
@@ -31,6 +36,12 @@
   "devDependencies": {
     "@nestjs/cli": "12.0.8",
     "@types/node": "^24.0.0",
+    "prettier": "3.9.9",
+    "tsx": "4.23.15",
     "typescript": "^6.0.0"
+  },
+  "allowScripts": {
+    "argon2@0.45.1": true,
+    "esbuild@0.28.2": true
   }
 }

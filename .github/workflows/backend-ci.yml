@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   quality:
-    name: Typecheck, migrate, build, and health
+    name: Format, typecheck, build, migrate, and test
     runs-on: ubuntu-latest
 
     services:
@@ -40,8 +40,10 @@ jobs:
           --health-retries 10
 
     env:
-      DATABASE_URL: postgresql://chat_app:chat_app@localhost:5432/chat_app_test
-      PORT: 3000
+      DATABASE_URL: postgresql://chat_app:chat_app@127.0.0.1:5432/chat_app_test
+      ACCESS_TOKEN_SECRET: ci-only-secret-with-more-than-32-characters
+      ACCESS_TOKEN_TTL_SECONDS: 900
+      REFRESH_TOKEN_TTL_DAYS: 30
 
     defaults:
       run:
@@ -55,36 +57,23 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: "24"
+          cache: npm
+          cache-dependency-path: apps/backend/package-lock.json
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci --no-audit --no-fund
 
-      - name: Upload resolved lockfile
-        uses: actions/upload-artifact@v7
-        with:
-          name: backend-package-lock
-          path: apps/backend/package-lock.json
-          if-no-files-found: error
+      - name: Check formatting
+        run: npm run format:check
 
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Build
+        run: npm run build
+
       - name: Run migrations
-        run: npm run db:migrate
+        run: node dist/database/migrate.js
 
-      - name: Start API
-        run: |
-          npm run start:prod > /tmp/chat-api.log 2>&1 &
-          echo $! > /tmp/chat-api.pid
-
-      - name: Verify health
-        run: |
-          for attempt in {1..20}; do
-            if curl --fail --silent http://127.0.0.1:3000/v1/health; then
-              exit 0
-            fi
-            sleep 1
-          done
-
-          cat /tmp/chat-api.log
-          exit 1
+      - name: Test
+        run: npm test
