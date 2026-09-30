@@ -16,7 +16,7 @@
     "start": "node dist/main.js",
     "start:dev": "nest start --watch",
     "start:prod": "node dist/main.js",
-    "test": "npm run typecheck:test && node --import tsx --test --test-isolation=none test/health.e2e.test.ts && node --import tsx --test --test-isolation=none test/auth.e2e.test.ts && node --import tsx --test --test-isolation=none test/users.e2e.test.ts && node --import tsx --test --test-isolation=none test/messaging.e2e.test.ts",
+    "test": "npm run typecheck:test && node --import tsx --test --test-isolation=none test/health.e2e.test.ts && node --import tsx --test --test-isolation=none test/auth.e2e.test.ts && node --import tsx --test --test-isolation=none test/users.e2e.test.ts && node --import tsx --test --test-isolation=none test/messaging.e2e.test.ts && node --import tsx --test --test-isolation=none test/realtime.e2e.test.ts",
     "typecheck:test": "tsc --noEmit -p tsconfig.test.json",
     "typecheck": "tsc --noEmit -p tsconfig.build.json",
     "db:migrate": "npm run build && node dist/database/migrate.js"
