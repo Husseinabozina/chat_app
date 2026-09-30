@@ -3,21 +3,21 @@
 Update this file before closing each future project checkpoint. Verify branch heads and CI runs from GitHub before changing the status below.
 
 **Updated:** 2026-09-30
-**Current phase:** Backend stack reconciliation and quality checkpoint. Realtime/WebSocket implementation is deferred.
+**Current phase:** Backend stack reconciliation and quality checkpoint, verified and awaiting review. Realtime/WebSocket implementation is deferred.
 
-## Last verified baseline
+## Last verified implementation
 
-- Branch: `feat/backend-message-lifecycle`
-- Pull request: [#11 — read and message lifecycle](https://github.com/Husseinabozina/chat_app/pull/11)
-- Commit: `a2568595f42088193b3c15423e0cdca220891044`
-- Backend CI: [run #65](https://github.com/Husseinabozina/chat_app/actions/runs/36653806395), passed on that commit
-- Quality reconciliation branch: `chore/backend-quality-reconcile`, based directly on PR #11; verification is in progress.
+- Branch: `chore/backend-quality-reconcile`
+- Pull request: [#12 — backend quality reconciliation](https://github.com/Husseinabozina/chat_app/pull/12)
+- Verified implementation commit: `2c981c8fa4144ab97b83f7b3d6d694ff8f97b56b`
+- Backend CI: [run #66](https://github.com/Husseinabozina/chat_app/actions/runs/36718806255), passed on that commit with 12 E2E tests
+- Direct baseline: [#11 — read and message lifecycle](https://github.com/Husseinabozina/chat_app/pull/11), commit `a2568595f42088193b3c15423e0cdca220891044`, [CI run #65](https://github.com/Husseinabozina/chat_app/actions/runs/36653806395) passed.
 
 ## PR stack and dependencies
 
 The active dependency chain is:
 
-`master` → [#1 product/architecture docs](https://github.com/Husseinabozina/chat_app/pull/1) → [#2 monorepo](https://github.com/Husseinabozina/chat_app/pull/2) → [#3 mobile modernization](https://github.com/Husseinabozina/chat_app/pull/3) → [#4 mobile feature architecture](https://github.com/Husseinabozina/chat_app/pull/4) → [#6 database foundation](https://github.com/Husseinabozina/chat_app/pull/6) → [#7 auth/users](https://github.com/Husseinabozina/chat_app/pull/7) → [#9 conversations/messages](https://github.com/Husseinabozina/chat_app/pull/9) → [#10 user discovery](https://github.com/Husseinabozina/chat_app/pull/10) → [#11 read/message lifecycle](https://github.com/Husseinabozina/chat_app/pull/11) → this quality checkpoint.
+`master` → [#1 product/architecture docs](https://github.com/Husseinabozina/chat_app/pull/1) → [#2 monorepo](https://github.com/Husseinabozina/chat_app/pull/2) → [#3 mobile modernization](https://github.com/Husseinabozina/chat_app/pull/3) → [#4 mobile feature architecture](https://github.com/Husseinabozina/chat_app/pull/4) → [#6 database foundation](https://github.com/Husseinabozina/chat_app/pull/6) → [#7 auth/users](https://github.com/Husseinabozina/chat_app/pull/7) → [#9 conversations/messages](https://github.com/Husseinabozina/chat_app/pull/9) → [#10 user discovery](https://github.com/Husseinabozina/chat_app/pull/10) → [#11 read/message lifecycle](https://github.com/Husseinabozina/chat_app/pull/11) → [#12 quality reconciliation](https://github.com/Husseinabozina/chat_app/pull/12).
 
 [#5 backend quality foundation](https://github.com/Husseinabozina/chat_app/pull/5) and #6 both branch from #4. [#8 identity persistence](https://github.com/Husseinabozina/chat_app/pull/8) branches from #5. Neither #5 nor #8 is part of the active backend chain; leave both open while reviewing what has been superseded. Do not merge them into the chain without reconciling their changes.
 
@@ -54,7 +54,7 @@ The active dependency chain is:
 
 ## Current CI state
 
-The last verified backend baseline is PR #11 run #65. The quality branch is adding ESLint, a live PostgreSQL health E2E test, E2E typechecking, and updated development documentation. Its target sequence is `npm ci` → `format:check` → `lint` → `typecheck` → `build` → migrations → tests. The workflow keeps `contents: read` and no diagnostic artifact steps. Record the quality PR's final run and commit here when CI succeeds.
+PR #12 run #66 passed on its verified implementation commit. Its sequence is `npm ci` → `format:check` → `lint` → `typecheck` → `build` → migrations → tests. The test command first typechecks E2E sources, then runs health (1), auth (3), user discovery (3), and messaging (5) in separate processes: 12 passed, 0 failed. The workflow keeps `contents: read` and no diagnostic artifact steps. Documentation-only follow-up commits do not change the verified backend implementation; check the PR's latest Actions run for their final head status.
 
 ## Deferred features
 
@@ -76,4 +76,4 @@ The last verified backend baseline is PR #11 run #65. The quality branch is addi
 
 ## Exact next checkpoint
 
-Finish this quality PR with green CI and make it ready for review. Then review and integrate the active PR dependency chain in order, without merging #5 or #8. Defer any realtime implementation until that integration checkpoint is complete and separately authorized.
+Review PR #12 and integrate the active PR dependency chain in order, without merging #5 or #8. Defer any realtime implementation until that integration checkpoint is complete and separately authorized.
