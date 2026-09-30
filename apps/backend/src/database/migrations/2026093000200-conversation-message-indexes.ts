@@ -1,8 +1,6 @@
 import { type MigrationInterface, type QueryRunner } from 'typeorm';
 
-export class ConversationMessageIndexes2026093000200
-  implements MigrationInterface
-{
+export class ConversationMessageIndexes2026093000200 implements MigrationInterface {
   name = 'ConversationMessageIndexes2026093000200';
 
   async up(queryRunner: QueryRunner): Promise<void> {
