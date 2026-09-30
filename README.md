@@ -23,15 +23,9 @@ infra/
 
 ## Current status
 
-The project is currently in the foundation phase.
+[Current project state](docs/project/CURRENT_STATE.md) records the verified branch, PR stack, completed checkpoints, CI, deferred work, and exact next checkpoint. Keep that file updated before closing each checkpoint.
 
-- Product scope: documented
-- UI direction: documented
-- System architecture: documented
-- REST/realtime contracts: documented
-- Monorepo: initialized
-- Backend: bootstrapped
-- Flutter client: moved under `apps/mobile` and modernized to the Flutter 3.47 / Dart 3.13 baseline; feature-first refactoring is next
+The backend now has auth, user discovery, direct conversations, durable text messages, read pointers, and message lifecycle REST behavior. The Flutter client has a feature-first structure and still runs its legacy Firebase-backed chat behavior. Realtime/WebSocket transport has not been integrated into the active backend chain.
 
 ## Development
 
@@ -46,7 +40,8 @@ docker compose -f infra/docker-compose.yml up -d
 ```bash
 cd apps/backend
 cp .env.example .env
-npm install
+npm ci
+npm run db:migrate
 npm run start:dev
 ```
 
@@ -64,7 +59,7 @@ flutter pub get
 flutter run
 ```
 
-The mobile application still preserves the legacy Firebase feature behavior, but its SDK/dependency/platform baseline and code hygiene are being modernized before the feature-first architecture refactor.
+See the backend and mobile READMEs for current development and quality commands.
 
 ## Engineering workflow
 
