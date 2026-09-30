@@ -13,6 +13,7 @@ Update this file before closing each future project checkpoint. Verify branch he
 - Backend CI on that exact HEAD: [run #81](https://github.com/Husseinabozina/chat_app/actions/runs/36740459123), passed on Node 24 with PostgreSQL 17.
 - Last verified mobile branch/PR/code commit: `feat/mobile-api-realtime-foundation` / [PR #16](https://github.com/Husseinabozina/chat_app/pull/16) / `dab2bd3a70f3518f08341eac859274f18744d9a2`.
 - Mobile CI on that code commit: [run #13](https://github.com/Husseinabozina/chat_app/actions/runs/36753226755), passed on Flutter 3.47.5.
+- Final documentation HEAD `42fe888387728447723b3d691719af1b99c50085` also passed Mobile CI [run #14](https://github.com/Husseinabozina/chat_app/actions/runs/36753687572). PR #16 is ready for review.
 - Backend CI: [run #73](https://github.com/Husseinabozina/chat_app/actions/runs/36724138035), passed on the integrated backend baseline `c84e4ff5294867de0d6da392dccc071ca076901b`.
 - Latest mobile-changing master SHA: `e03d990fda545463ff259513fb668494dec8b1ec`
 - Mobile CI: [run #12](https://github.com/Husseinabozina/chat_app/actions/runs/36723604090), passed on that exact mobile-changing master SHA.
@@ -37,7 +38,7 @@ The active pre-realtime stack is integrated on `master` with merge commits:
 
 PR #5 and PR #8 are closed as superseded and their branches remain available for reference.
 
-Open stack: PR #15 (`feat/backend-realtime-foundation` → `master`) → PR #16 (`feat/mobile-api-realtime-foundation` → `feat/backend-realtime-foundation`). Neither PR has been merged.
+Open stack: PR #15 (`feat/backend-realtime-foundation` → `master`) → PR #16 (`feat/mobile-api-realtime-foundation` → `feat/backend-realtime-foundation`). Both are ready for review. Neither PR has been merged. Preserve ancestry with merge commits; after #15 merges, retarget #16 to `master` and recheck the diff/checks.
 
 ## Completed checkpoints
 
