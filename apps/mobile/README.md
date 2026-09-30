@@ -34,6 +34,14 @@ The UI now depends on domain repository contracts instead of Firebase SDK classe
 
 Cubit is used for asynchronous auth and chat state. The current visual design and legacy Firebase-backed behavior are intentionally preserved while architecture boundaries are introduced.
 
+## Backend data foundation
+
+`BackendDataDependencies` composes secure session storage, an authenticated REST client, direct-conversation REST datasources, and a Socket.IO realtime datasource. It reads the backend origin from `CHAT_API_BASE_URL` when instantiated (for example, `https://api.example.com`). The REST datasource uses `/v1`; the realtime datasource uses `/realtime`.
+
+The active `main.dart` composition still uses Firebase and the legacy single-room screen. The backend datasources are staged for the direct-conversation repository and UI rollout. The backend register endpoint currently accepts email/password; profile-image upload is outside that contract, so the legacy registration form is not routed to it.
+
+The realtime datasource emits typed domain events, refreshes the access token before connecting, and reconnects with bounded backoff. The next checkpoint must add repository-level REST resynchronization, event deduplication/ordering, auth lifecycle wiring, and direct-conversation screens before switching the app entrypoint.
+
 ## Development
 
 ```bash
