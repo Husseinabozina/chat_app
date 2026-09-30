@@ -44,6 +44,7 @@ jobs:
       ACCESS_TOKEN_SECRET: ci-only-secret-with-more-than-32-characters
       ACCESS_TOKEN_TTL_SECONDS: 900
       REFRESH_TOKEN_TTL_DAYS: 30
+      REALTIME_TYPING_TTL_MS: 250
 
     defaults:
       run:
@@ -61,7 +62,7 @@ jobs:
           cache-dependency-path: apps/backend/package-lock.json
 
       - name: Install dependencies
-        run: npm ci --no-audit --no-fund
+        run: npm install --no-audit --no-fund
 
       - name: Check formatting
         run: npm run format:check
