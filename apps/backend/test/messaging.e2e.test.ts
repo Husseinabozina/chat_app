@@ -93,11 +93,14 @@ after(async () => {
 });
 
 test('direct conversations resolve idempotently and validate participants', async () => {
-  const duplicate = await request<ConversationSummary>('/conversations/direct', {
-    method: 'POST',
-    accessToken: bob.accessToken,
-    body: { userId: alice.user.id },
-  });
+  const duplicate = await request<ConversationSummary>(
+    '/conversations/direct',
+    {
+      method: 'POST',
+      accessToken: bob.accessToken,
+      body: { userId: alice.user.id },
+    },
+  );
 
   assert.equal(duplicate.status, 200);
   assert.equal(duplicate.body.id, conversationId);
@@ -183,7 +186,9 @@ test('messages are idempotent, authorized, and cursor paginated', async () => {
   assert.ok(firstPage.body.nextCursor);
 
   const secondPage = await request<MessagePage>(
-    `/conversations/${conversationId}/messages?limit=2&before=${encodeURIComponent(firstPage.body.nextCursor!)}`,
+    `/conversations/${conversationId}/messages?limit=2&before=${encodeURIComponent(
+      firstPage.body.nextCursor!,
+    )}`,
     { method: 'GET', accessToken: alice.accessToken },
   );
   assert.equal(secondPage.status, 200);
@@ -221,11 +226,14 @@ test('messages are idempotent, authorized, and cursor paginated', async () => {
 });
 
 test('reply targets and client message ids cannot cross conversations', async () => {
-  const aliceEve = await request<ConversationSummary>('/conversations/direct', {
-    method: 'POST',
-    accessToken: alice.accessToken,
-    body: { userId: eve.user.id },
-  });
+  const aliceEve = await request<ConversationSummary>(
+    '/conversations/direct',
+    {
+      method: 'POST',
+      accessToken: alice.accessToken,
+      body: { userId: eve.user.id },
+    },
+  );
   assert.equal(aliceEve.status, 200);
 
   const otherMessage = await sendMessage(
