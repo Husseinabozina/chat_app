@@ -7,6 +7,7 @@ import { RefreshSessionEntity, UserEntity } from '../database/entities';
 import { AccessTokenGuard } from './access-token.guard';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { SessionRevocationService } from './session-revocation.service';
 
 @Module({
   imports: [
@@ -33,7 +34,7 @@ import { AuthService } from './auth.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AccessTokenGuard],
-  exports: [AccessTokenGuard, JwtModule],
+  providers: [AuthService, AccessTokenGuard, SessionRevocationService],
+  exports: [AccessTokenGuard, JwtModule, SessionRevocationService],
 })
 export class AuthModule {}

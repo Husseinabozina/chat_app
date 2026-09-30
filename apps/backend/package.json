@@ -16,7 +16,7 @@
     "start": "node dist/main.js",
     "start:dev": "nest start --watch",
     "start:prod": "node dist/main.js",
-    "test": "npm run typecheck:test && node --import tsx --test --test-isolation=none test/health.e2e.test.ts && node --import tsx --test --test-isolation=none test/auth.e2e.test.ts && node --import tsx --test --test-isolation=none test/users.e2e.test.ts && node --import tsx --test --test-isolation=none test/messaging.e2e.test.ts",
+    "test": "npm run typecheck:test && node --import tsx --test --test-isolation=none test/health.e2e.test.ts && node --import tsx --test --test-isolation=none test/auth.e2e.test.ts && node --import tsx --test --test-isolation=none test/users.e2e.test.ts && node --import tsx --test --test-isolation=none test/messaging.e2e.test.ts && node --import tsx --test --test-isolation=none test/realtime.e2e.test.ts",
     "typecheck:test": "tsc --noEmit -p tsconfig.test.json",
     "typecheck": "tsc --noEmit -p tsconfig.build.json",
     "db:migrate": "npm run build && node dist/database/migrate.js"
@@ -34,7 +34,10 @@
     "pg": "8.23.0",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.2",
-    "typeorm": "1.1.1"
+    "typeorm": "1.1.1",
+    "@nestjs/platform-socket.io": "12.1.1",
+    "@nestjs/websockets": "12.1.1",
+    "socket.io": "4.8.1"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
@@ -46,7 +49,8 @@
     "prettier": "3.9.9",
     "tsx": "4.23.15",
     "typescript": "^6.0.0",
-    "typescript-eslint": "8.71.0"
+    "typescript-eslint": "8.71.0",
+    "socket.io-client": "4.8.1"
   },
   "allowScripts": {
     "argon2@0.45.1": true,

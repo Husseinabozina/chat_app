@@ -11,6 +11,7 @@ import { ApiException } from '../common/http/api-exception';
 import { RefreshSessionEntity, UserEntity } from '../database/entities';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { SessionRevocationService } from './session-revocation.service';
 
 export interface AuthUserResponse {
   id: string;
@@ -46,6 +47,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
     @Inject(ConfigService)
     private readonly config: ConfigService,
+    @Inject(SessionRevocationService)
+    private readonly sessionRevocation: SessionRevocationService,
   ) {
     this.accessTokenTtlSeconds = this.readPositiveNumber(
       'ACCESS_TOKEN_TTL_SECONDS',
@@ -210,16 +213,25 @@ export class AuthService {
 
   async logout(refreshToken: string): Promise<void> {
     const tokenHash = this.hashRefreshToken(refreshToken);
+    const sessionId = await this.dataSource.transaction(async (manager) => {
+      const sessions = manager.getRepository(RefreshSessionEntity);
+      const session = await sessions.findOne({
+        where: { tokenHash, revokedAt: IsNull() },
+        lock: { mode: 'pessimistic_write' },
+      });
 
-    await this.dataSource.getRepository(RefreshSessionEntity).update(
-      {
-        tokenHash,
-        revokedAt: IsNull(),
-      },
-      {
-        revokedAt: new Date(),
-      },
-    );
+      if (!session) {
+        return null;
+      }
+
+      session.revokedAt = new Date();
+      await sessions.save(session);
+      return session.id;
+    });
+
+    if (sessionId) {
+      this.sessionRevocation.notify(sessionId);
+    }
   }
 
   private async createSession(

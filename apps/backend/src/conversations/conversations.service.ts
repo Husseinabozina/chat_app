@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, QueryFailedError } from 'typeorm';
 
@@ -14,6 +14,7 @@ import {
   MessageEntity,
   UserEntity,
 } from '../database/entities';
+import { RealtimePublisher } from '../realtime/realtime.publisher';
 
 export interface ConversationUserSummary {
   id: string;
@@ -71,7 +72,14 @@ interface ConversationSummaryRow {
 
 @Injectable()
 export class ConversationsService {
-  constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
+  private readonly logger = new Logger(ConversationsService.name);
+
+  constructor(
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
+    @Inject(RealtimePublisher)
+    private readonly realtimePublisher: RealtimePublisher,
+  ) {}
 
   async createOrResolveDirect(
     userId: string,
@@ -104,7 +112,7 @@ export class ConversationsService {
       .findOne({ where: { type: 'direct', directKey } });
 
     if (existing) {
-      return this.getSummary(userId, existing.id);
+      return this.getSummaryForUser(userId, existing.id);
     }
 
     try {
@@ -144,7 +152,11 @@ export class ConversationsService {
         },
       );
 
-      return this.getSummary(userId, conversationId);
+      await this.publishSafely(() =>
+        this.publishConversationSummaries(conversationId),
+      );
+
+      return this.getSummaryForUser(userId, conversationId);
     } catch (error) {
       if (!this.isUniqueViolation(error, 'uq_conversations_direct_key')) {
         throw error;
@@ -158,7 +170,7 @@ export class ConversationsService {
         throw error;
       }
 
-      return this.getSummary(userId, racedConversation.id);
+      return this.getSummaryForUser(userId, racedConversation.id);
     }
   }
 
@@ -193,7 +205,7 @@ export class ConversationsService {
     conversationId: string,
     upToMessageId: string,
   ): Promise<ReadStateResponse> {
-    return this.dataSource.transaction(async (manager) => {
+    const result = await this.dataSource.transaction(async (manager) => {
       const members = manager.getRepository(ConversationMemberEntity);
       const messages = manager.getRepository(MessageEntity);
       const membership = await members
@@ -239,9 +251,12 @@ export class ConversationsService {
           this.isAtOrBefore(targetMessage, currentMessage)
         ) {
           return {
-            conversationId,
-            lastReadMessageId: currentMessage.id,
-            lastReadAt: membership.lastReadAt ?? new Date(),
+            state: {
+              conversationId,
+              lastReadMessageId: currentMessage.id,
+              lastReadAt: membership.lastReadAt ?? new Date(),
+            },
+            advanced: false,
           };
         }
       }
@@ -252,14 +267,34 @@ export class ConversationsService {
       await members.save(membership);
 
       return {
-        conversationId,
-        lastReadMessageId: targetMessage.id,
-        lastReadAt: readAt,
+        state: {
+          conversationId,
+          lastReadMessageId: targetMessage.id,
+          lastReadAt: readAt,
+        },
+        advanced: true,
       };
     });
+
+    if (result.advanced) {
+      await this.publishSafely(async () => {
+        const participantUserIds =
+          await this.getParticipantUserIds(conversationId);
+
+        this.realtimePublisher.publishReadUpdated(participantUserIds, {
+          ...result.state,
+          userId,
+        });
+
+        const summary = await this.getSummaryForUser(userId, conversationId);
+        this.realtimePublisher.publishConversationUpdated(userId, summary);
+      });
+    }
+
+    return result.state;
   }
 
-  private async getSummary(
+  async getSummaryForUser(
     userId: string,
     conversationId: string,
   ): Promise<ConversationSummary> {
@@ -280,6 +315,28 @@ export class ConversationsService {
     return this.toSummary(row);
   }
 
+  async getParticipantUserIds(conversationId: string): Promise<string[]> {
+    const members = await this.dataSource
+      .getRepository(ConversationMemberEntity)
+      .find({ where: { conversationId } });
+
+    return members.map((member) => member.userId);
+  }
+
+  async publishConversationSummaries(conversationId: string): Promise<void> {
+    const participantUserIds = await this.getParticipantUserIds(conversationId);
+
+    for (const participantUserId of participantUserIds) {
+      const summary = await this.getSummaryForUser(
+        participantUserId,
+        conversationId,
+      );
+      this.realtimePublisher.publishConversationUpdated(
+        participantUserId,
+        summary,
+      );
+    }
+  }
   private async querySummaryRows(
     userId: string,
     options: {
@@ -401,6 +458,17 @@ export class ConversationsService {
       unreadCount: Number(row.unread_count),
       updatedAt: new Date(row.updated_at),
     };
+  }
+
+  private async publishSafely(publish: () => Promise<void>): Promise<void> {
+    try {
+      await publish();
+    } catch (error) {
+      this.logger.error(
+        'Post-commit realtime publication failed.',
+        error instanceof Error ? error.stack : undefined,
+      );
+    }
   }
 
   private isAtOrBefore(
