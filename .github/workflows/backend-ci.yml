@@ -64,8 +64,8 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Check formatting
-        run: npm run format:check
+      - name: Apply formatting
+        run: npm run format
 
       - name: Lint
         run: npm run lint
