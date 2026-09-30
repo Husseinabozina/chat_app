@@ -6,11 +6,11 @@ Primary V1 backend:
 
 - **NestJS**
 - **PostgreSQL**
-- WebSocket gateway
+- Socket.IO realtime gateway
 - S3-compatible object storage
 - Firebase Cloud Messaging for push notifications
 
-The API/realtime contracts remain more important than the framework choice; the mobile client must not depend on NestJS-specific concepts.
+The API/realtime contracts remain more important than the framework choice; the mobile client must not depend on NestJS- or Socket.IO-specific concepts.
 
 ---
 
@@ -62,7 +62,7 @@ V1 direction:
 - Access token.
 - Refresh token/session rotation strategy.
 - Logout/revocation support.
-- Authenticated WebSocket handshake.
+- Authenticated Socket.IO handshake.
 
 OAuth/social login can be added later if intentionally scoped.
 
@@ -78,6 +78,7 @@ Examples:
 - User may edit/delete only their own message under allowed product rules.
 - User may mark read only for their own membership.
 - Media access must follow conversation/resource authorization.
+- Typing commands validate conversation membership server-side.
 
 Client-side hiding is not authorization.
 
@@ -92,6 +93,7 @@ Responsibilities:
 - List a user's conversations.
 - Maintain conversation summary metadata where useful.
 - Validate participant membership.
+- Advance monotonic read state.
 
 Use a canonical direct-conversation key or equivalent unique constraint for duplicate prevention.
 
@@ -107,21 +109,28 @@ Responsibilities:
 - Support reply relation.
 - Support edit/delete rules.
 - Return canonical server timestamps.
-- Publish realtime event only after durable persistence succeeds.
+- Publish realtime events only after durable persistence succeeds.
 
 ---
 
-## 7. Realtime gateway
+## 7. Realtime module
+
+The implementation contract is `docs/api/realtime-contract-v1.md`.
 
 Responsibilities:
 
-- Authenticate socket.
-- Join user/conversation rooms.
-- Publish message/receipt updates.
-- Accept transient typing commands.
-- Clean up presence/typing state on disconnect.
+- Authenticate Socket.IO connections.
+- Bind sockets to server-owned user/session identity.
+- Join internal user/session rooms.
+- Publish post-commit message/conversation/read events.
+- Accept only transient typing commands in the first slice.
+- Clean up typing state on disconnect/expiry.
+- Expose no client-controlled arbitrary room subscription.
+- Remain replaceable behind a `RealtimePublisher` boundary.
 
-Durable message creation remains REST-based in V1.
+Durable message creation/edit/delete/read commands remain REST-based.
+
+Post-commit publication is best effort in the first slice. REST resynchronization restores correctness after missed events.
 
 ---
 
@@ -167,8 +176,9 @@ Validate at boundaries:
 - Pagination limits.
 - UUID/identifier formats.
 - Edit/delete permissions.
+- Realtime handshake and transient command payloads.
 
-Validation errors use a stable API error shape.
+Validation errors use stable error codes/envelopes.
 
 ---
 
@@ -195,7 +205,9 @@ Backend test layers:
 - Unit tests for important domain/service logic.
 - Integration tests against a real test database for persistence-heavy behavior.
 - API/e2e tests for critical auth/conversation/message flows.
-- Realtime integration tests for message broadcast and typing where valuable.
+- Realtime integration tests using the compiled app and real test database.
+
+Realtime E2E must verify authorization, publication after REST mutations, typing membership/expiry, and reconnect correctness through REST resync.
 
 ---
 
@@ -204,3 +216,5 @@ Backend test layers:
 V1 backend is one deployable application plus managed dependencies.
 
 No service split unless profiling/scale requirements justify it.
+
+Redis is not required for single-instance V1. A transient Socket.IO adapter/pub-sub layer may be introduced only when multiple realtime instances are required.
