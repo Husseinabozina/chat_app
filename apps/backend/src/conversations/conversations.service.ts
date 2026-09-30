@@ -11,6 +11,7 @@ import {
 import {
   ConversationEntity,
   ConversationMemberEntity,
+  MessageEntity,
   UserEntity,
 } from '../database/entities';
 
@@ -43,6 +44,12 @@ export interface ConversationPage {
   items: ConversationSummary[];
   nextCursor: string | null;
   hasMore: boolean;
+}
+
+export interface ReadStateResponse {
+  conversationId: string;
+  lastReadMessageId: string;
+  lastReadAt: Date;
 }
 
 interface ConversationSummaryRow {
@@ -179,6 +186,77 @@ export class ConversationsService {
           ? encodeOrderedCursor(lastItem.updatedAt, lastItem.id)
           : null,
     };
+  }
+
+  async markRead(
+    userId: string,
+    conversationId: string,
+    upToMessageId: string,
+  ): Promise<ReadStateResponse> {
+    return this.dataSource.transaction(async (manager) => {
+      const members = manager.getRepository(ConversationMemberEntity);
+      const messages = manager.getRepository(MessageEntity);
+      const membership = await members
+        .createQueryBuilder('member')
+        .where('member.conversation_id = :conversationId', { conversationId })
+        .andWhere('member.user_id = :userId', { userId })
+        .setLock('pessimistic_write')
+        .getOne();
+
+      if (!membership) {
+        throw new ApiException(
+          HttpStatus.NOT_FOUND,
+          'CONVERSATION_NOT_FOUND',
+          'Conversation not found.',
+        );
+      }
+
+      const targetMessage = await messages.findOne({
+        where: {
+          id: upToMessageId,
+          conversationId,
+        },
+      });
+
+      if (!targetMessage) {
+        throw new ApiException(
+          HttpStatus.NOT_FOUND,
+          'MESSAGE_NOT_FOUND',
+          'Message not found in this conversation.',
+        );
+      }
+
+      if (membership.lastReadMessageId) {
+        const currentMessage = await messages.findOne({
+          where: {
+            id: membership.lastReadMessageId,
+            conversationId,
+          },
+        });
+
+        if (
+          currentMessage &&
+          this.isAtOrBefore(targetMessage, currentMessage)
+        ) {
+          return {
+            conversationId,
+            lastReadMessageId: currentMessage.id,
+            lastReadAt: membership.lastReadAt ?? new Date(),
+          };
+        }
+      }
+
+      const readAt = new Date();
+      membership.lastReadMessageId = targetMessage.id;
+      membership.lastReadAt = readAt;
+      await members.save(membership);
+
+      return {
+        conversationId,
+        lastReadMessageId: targetMessage.id,
+        lastReadAt: readAt,
+      };
+    });
   }
 
   private async getSummary(
@@ -323,6 +401,20 @@ export class ConversationsService {
       unreadCount: Number(row.unread_count),
       updatedAt: new Date(row.updated_at),
     };
+  }
+
+  private isAtOrBefore(
+    candidate: MessageEntity,
+    current: MessageEntity,
+  ): boolean {
+    const candidateTime = candidate.createdAt.getTime();
+    const currentTime = current.createdAt.getTime();
+
+    if (candidateTime !== currentTime) {
+      return candidateTime < currentTime;
+    }
+
+    return candidate.id <= current.id;
   }
 
   private directKey(firstUserId: string, secondUserId: string): string {

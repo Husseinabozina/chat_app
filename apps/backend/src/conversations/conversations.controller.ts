@@ -5,6 +5,8 @@ import {
   HttpCode,
   HttpStatus,
   Inject,
+  Param,
+  ParseUUIDPipe,
   Post,
   Query,
   UseGuards,
@@ -15,6 +17,7 @@ import { CurrentAuth, type AuthContext } from '../auth/current-auth.decorator';
 import { ConversationsService } from './conversations.service';
 import { CreateDirectConversationDto } from './dto/create-direct-conversation.dto';
 import { ListConversationsQueryDto } from './dto/list-conversations-query.dto';
+import { MarkConversationReadDto } from './dto/mark-conversation-read.dto';
 
 @Controller('conversations')
 @UseGuards(AccessTokenGuard)
@@ -45,6 +48,20 @@ export class ConversationsController {
     return this.conversationsService.createOrResolveDirect(
       auth.userId,
       dto.userId,
+    );
+  }
+
+  @Post(':conversationId/read')
+  @HttpCode(HttpStatus.OK)
+  markRead(
+    @CurrentAuth() auth: AuthContext,
+    @Param('conversationId', new ParseUUIDPipe()) conversationId: string,
+    @Body() dto: MarkConversationReadDto,
+  ) {
+    return this.conversationsService.markRead(
+      auth.userId,
+      conversationId,
+      dto.upToMessageId,
     );
   }
 }

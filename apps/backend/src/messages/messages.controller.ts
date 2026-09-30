@@ -4,6 +4,7 @@ import {
   Get,
   Inject,
   Param,
+  ParseUUIDPipe,
   Post,
   Query,
   UseGuards,
@@ -26,7 +27,7 @@ export class MessagesController {
   @Get()
   list(
     @CurrentAuth() auth: AuthContext,
-    @Param('conversationId') conversationId: string,
+    @Param('conversationId', new ParseUUIDPipe()) conversationId: string,
     @Query() query: ListMessagesQueryDto,
   ) {
     return this.messagesService.list(
@@ -40,7 +41,7 @@ export class MessagesController {
   @Post()
   send(
     @CurrentAuth() auth: AuthContext,
-    @Param('conversationId') conversationId: string,
+    @Param('conversationId', new ParseUUIDPipe()) conversationId: string,
     @Body() dto: SendMessageDto,
   ) {
     return this.messagesService.send(auth.userId, conversationId, dto);

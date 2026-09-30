@@ -28,6 +28,7 @@ interface ConversationSummary {
   lastMessage: {
     id: string;
     text: string | null;
+    deletedAt: string | null;
   } | null;
   unreadCount: number;
   updatedAt: string;
@@ -47,12 +48,20 @@ interface MessageResponse {
   text: string | null;
   replyToMessageId: string | null;
   createdAt: string;
+  editedAt: string | null;
+  deletedAt: string | null;
 }
 
 interface MessagePage {
   items: MessageResponse[];
   nextCursor: string | null;
   hasMore: boolean;
+}
+
+interface ReadStateResponse {
+  conversationId: string;
+  lastReadMessageId: string;
+  lastReadAt: string;
 }
 
 let app: INestApplication;
@@ -276,6 +285,178 @@ test('reply targets and client message ids cannot cross conversations', async ()
   assert.equal(conflict.status, 409);
 });
 
+test('read state advances monotonically and drives unread counts', async () => {
+  const baseline = await request<MessagePage>(
+    `/conversations/${conversationId}/messages?limit=1`,
+    {
+      method: 'GET',
+      accessToken: alice.accessToken,
+    },
+  );
+  assert.equal(baseline.status, 200);
+
+  const baselineMessage = baseline.body.items[0];
+  if (baselineMessage) {
+    const baselineRead = await request<ReadStateResponse>(
+      `/conversations/${conversationId}/read`,
+      {
+        method: 'POST',
+        accessToken: alice.accessToken,
+        body: { upToMessageId: baselineMessage.id },
+      },
+    );
+    assert.equal(baselineRead.status, 200);
+  }
+
+  const first = await sendMessage(
+    bob.accessToken,
+    conversationId,
+    randomUUID(),
+    'read-state one',
+  );
+  const second = await sendMessage(
+    bob.accessToken,
+    conversationId,
+    randomUUID(),
+    'read-state two',
+  );
+  const third = await sendMessage(
+    bob.accessToken,
+    conversationId,
+    randomUUID(),
+    'read-state three',
+  );
+  assert.equal(first.status, 201);
+  assert.equal(second.status, 201);
+  assert.equal(third.status, 201);
+
+  const beforeRead = await request<ConversationPage>('/conversations', {
+    method: 'GET',
+    accessToken: alice.accessToken,
+  });
+  assert.equal(beforeRead.status, 200);
+  assert.equal(beforeRead.body.items[0]?.unreadCount, 3);
+
+  const readSecond = await request<ReadStateResponse>(
+    `/conversations/${conversationId}/read`,
+    {
+      method: 'POST',
+      accessToken: alice.accessToken,
+      body: { upToMessageId: second.body.id },
+    },
+  );
+  assert.equal(readSecond.status, 200);
+  assert.equal(readSecond.body.lastReadMessageId, second.body.id);
+
+  const afterRead = await request<ConversationPage>('/conversations', {
+    method: 'GET',
+    accessToken: alice.accessToken,
+  });
+  assert.equal(afterRead.status, 200);
+  assert.equal(afterRead.body.items[0]?.unreadCount, 1);
+
+  const backwards = await request<ReadStateResponse>(
+    `/conversations/${conversationId}/read`,
+    {
+      method: 'POST',
+      accessToken: alice.accessToken,
+      body: { upToMessageId: first.body.id },
+    },
+  );
+  assert.equal(backwards.status, 200);
+  assert.equal(backwards.body.lastReadMessageId, second.body.id);
+
+  const outsider = await request<{ error: { code: string } }>(
+    `/conversations/${conversationId}/read`,
+    {
+      method: 'POST',
+      accessToken: eve.accessToken,
+      body: { upToMessageId: third.body.id },
+    },
+  );
+  assert.equal(outsider.status, 404);
+  assert.equal(outsider.body.error.code, 'CONVERSATION_NOT_FOUND');
+});
+
+test('only senders can edit or soft-delete their messages', async () => {
+  const created = await sendMessage(
+    alice.accessToken,
+    conversationId,
+    randomUUID(),
+    'editable message',
+  );
+  assert.equal(created.status, 201);
+
+  const forbiddenEdit = await request<{ error: { code: string } }>(
+    `/messages/${created.body.id}`,
+    {
+      method: 'PATCH',
+      accessToken: bob.accessToken,
+      body: { text: 'not mine' },
+    },
+  );
+  assert.equal(forbiddenEdit.status, 403);
+  assert.equal(forbiddenEdit.body.error.code, 'FORBIDDEN');
+
+  const edited = await request<MessageResponse>(
+    `/messages/${created.body.id}`,
+    {
+      method: 'PATCH',
+      accessToken: alice.accessToken,
+      body: { text: 'edited message' },
+    },
+  );
+  assert.equal(edited.status, 200);
+  assert.equal(edited.body.text, 'edited message');
+  assert.ok(edited.body.editedAt);
+
+  const forbiddenDelete = await request<{ error: { code: string } }>(
+    `/messages/${created.body.id}`,
+    {
+      method: 'DELETE',
+      accessToken: bob.accessToken,
+    },
+  );
+  assert.equal(forbiddenDelete.status, 403);
+  assert.equal(forbiddenDelete.body.error.code, 'FORBIDDEN');
+
+  const deleted = await request<unknown>(`/messages/${created.body.id}`, {
+    method: 'DELETE',
+    accessToken: alice.accessToken,
+  });
+  assert.equal(deleted.status, 204);
+
+  const deletedAgain = await request<unknown>(`/messages/${created.body.id}`, {
+    method: 'DELETE',
+    accessToken: alice.accessToken,
+  });
+  assert.equal(deletedAgain.status, 204);
+
+  const history = await request<MessagePage>(
+    `/conversations/${conversationId}/messages?limit=100`,
+    {
+      method: 'GET',
+      accessToken: alice.accessToken,
+    },
+  );
+  assert.equal(history.status, 200);
+  const tombstone = history.body.items.find(
+    (message) => message.id === created.body.id,
+  );
+  assert.ok(tombstone);
+  assert.equal(tombstone.text, null);
+  assert.ok(tombstone.deletedAt);
+
+  const conversations = await request<ConversationPage>('/conversations', {
+    method: 'GET',
+    accessToken: alice.accessToken,
+  });
+  assert.equal(conversations.status, 200);
+  assert.equal(conversations.body.items[0]?.lastMessage?.id, created.body.id);
+  assert.equal(conversations.body.items[0]?.lastMessage?.text, null);
+  assert.ok(conversations.body.items[0]?.lastMessage?.deletedAt);
+});
+
 async function register(email: string): Promise<SessionResponse> {
   const response = await request<SessionResponse>('/auth/register', {
     method: 'POST',
@@ -310,7 +491,7 @@ function sendMessage(
 async function request<T>(
   path: string,
   options: {
-    method: 'GET' | 'POST' | 'PATCH';
+    method: 'GET' | 'POST' | 'PATCH' | 'DELETE';
     accessToken?: string;
     body?: Record<string, unknown>;
   },
