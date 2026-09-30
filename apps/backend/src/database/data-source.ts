@@ -5,6 +5,7 @@ import { DataSource } from 'typeorm';
 import { databaseEntities } from './entities';
 import { InitialSchema2026093000000 } from './migrations/2026093000000-initial-schema';
 import { AuthSessionIndexes2026093000100 } from './migrations/2026093000100-auth-session-indexes';
+import { ConversationMessageIndexes2026093000200 } from './migrations/2026093000200-conversation-message-indexes';
 
 try {
   loadEnvFile('.env');
@@ -22,7 +23,11 @@ export const AppDataSource = new DataSource({
   type: 'postgres',
   url: databaseUrl,
   entities: databaseEntities,
-  migrations: [InitialSchema2026093000000, AuthSessionIndexes2026093000100],
+  migrations: [
+    InitialSchema2026093000000,
+    AuthSessionIndexes2026093000100,
+    ConversationMessageIndexes2026093000200,
+  ],
   synchronize: false,
   logging: false,
 });
