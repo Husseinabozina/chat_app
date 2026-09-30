@@ -1,8 +1,9 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, QueryFailedError, type EntityManager } from 'typeorm';
 
 import { ApiException } from '../common/http/api-exception';
+import { ConversationsService } from '../conversations/conversations.service';
 import {
   decodeOrderedCursor,
   encodeOrderedCursor,
@@ -12,6 +13,7 @@ import {
   ConversationMemberEntity,
   MessageEntity,
 } from '../database/entities';
+import { RealtimePublisher } from '../realtime/realtime.publisher';
 import { SendMessageDto } from './dto/send-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 
@@ -36,7 +38,16 @@ export interface MessagePage {
 
 @Injectable()
 export class MessagesService {
-  constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
+  private readonly logger = new Logger(MessagesService.name);
+
+  constructor(
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
+    @Inject(ConversationsService)
+    private readonly conversationsService: ConversationsService,
+    @Inject(RealtimePublisher)
+    private readonly realtimePublisher: RealtimePublisher,
+  ) {}
 
   async list(
     userId: string,
@@ -104,7 +115,7 @@ export class MessagesService {
     }
 
     try {
-      return await this.dataSource.transaction(async (manager) => {
+      const result = await this.dataSource.transaction(async (manager) => {
         await this.requireMembership(manager, userId, conversationId);
 
         const conversations = manager.getRepository(ConversationEntity);
@@ -131,7 +142,10 @@ export class MessagesService {
             throw this.clientMessageIdConflict();
           }
 
-          return this.toResponse(existing);
+          return {
+            message: this.toResponse(existing),
+            created: false,
+          };
         }
 
         if (dto.replyToMessageId) {
@@ -168,8 +182,19 @@ export class MessagesService {
         conversation.updatedAt = message.createdAt;
         await conversations.save(conversation);
 
-        return this.toResponse(message);
+        return {
+          message: this.toResponse(message),
+          created: true,
+        };
       });
+
+      if (result.created) {
+        await this.publishSafely(() =>
+          this.publishMessageCreated(result.message),
+        );
+      }
+
+      return result.message;
     } catch (error) {
       if (!this.isUniqueViolation(error, 'uq_messages_sender_client_id')) {
         throw error;
@@ -191,7 +216,6 @@ export class MessagesService {
       throw this.clientMessageIdConflict();
     }
   }
-
   async edit(
     userId: string,
     messageId: string,
@@ -208,45 +232,126 @@ export class MessagesService {
       );
     }
 
-    return this.dataSource.transaction(async (manager) => {
-      const message = await this.requireAccessibleMessage(
+    const message = await this.dataSource.transaction(async (manager) => {
+      const entity = await this.requireAccessibleMessage(
         manager,
         userId,
         messageId,
       );
 
-      this.requireSender(message, userId);
+      this.requireSender(entity, userId);
 
-      if (message.deletedAt) {
+      if (entity.deletedAt) {
         throw this.messageNotFound();
       }
 
-      message.text = text;
-      message.editedAt = new Date();
-      const saved = await manager.getRepository(MessageEntity).save(message);
+      entity.text = text;
+      entity.editedAt = new Date();
+      const saved = await manager.getRepository(MessageEntity).save(entity);
 
       return this.toResponse(saved);
     });
-  }
 
+    await this.publishSafely(() => this.publishMessageUpdated(message));
+
+    return message;
+  }
   async delete(userId: string, messageId: string): Promise<void> {
-    await this.dataSource.transaction(async (manager) => {
-      const message = await this.requireAccessibleMessage(
-        manager,
-        userId,
-        messageId,
+    const deletedMessage = await this.dataSource.transaction(
+      async (manager) => {
+        const message = await this.requireAccessibleMessage(
+          manager,
+          userId,
+          messageId,
+        );
+
+        this.requireSender(message, userId);
+
+        if (message.deletedAt) {
+          return null;
+        }
+
+        message.text = null;
+        message.deletedAt = new Date();
+        const saved = await manager
+          .getRepository(MessageEntity)
+          .save(message);
+
+        return this.toResponse(saved);
+      },
+    );
+
+    if (deletedMessage) {
+      await this.publishSafely(() =>
+        this.publishMessageDeleted(deletedMessage),
+      );
+    }
+  }
+  private async publishMessageCreated(
+    message: MessageResponse,
+  ): Promise<void> {
+    const participantUserIds =
+      await this.conversationsService.getParticipantUserIds(
+        message.conversationId,
       );
 
-      this.requireSender(message, userId);
+    this.realtimePublisher.publishMessageCreated(
+      participantUserIds,
+      message,
+    );
 
-      if (message.deletedAt) {
-        return;
-      }
+    await this.conversationsService.publishConversationSummaries(
+      message.conversationId,
+    );
+  }
 
-      message.text = null;
-      message.deletedAt = new Date();
-      await manager.getRepository(MessageEntity).save(message);
-    });
+  private async publishMessageUpdated(
+    message: MessageResponse,
+  ): Promise<void> {
+    const participantUserIds =
+      await this.conversationsService.getParticipantUserIds(
+        message.conversationId,
+      );
+
+    this.realtimePublisher.publishMessageUpdated(
+      participantUserIds,
+      message,
+    );
+
+    await this.conversationsService.publishConversationSummaries(
+      message.conversationId,
+    );
+  }
+
+  private async publishMessageDeleted(
+    message: MessageResponse,
+  ): Promise<void> {
+    const participantUserIds =
+      await this.conversationsService.getParticipantUserIds(
+        message.conversationId,
+      );
+
+    this.realtimePublisher.publishMessageDeleted(
+      participantUserIds,
+      message,
+    );
+
+    await this.conversationsService.publishConversationSummaries(
+      message.conversationId,
+    );
+  }
+
+  private async publishSafely(
+    publish: () => Promise<void>,
+  ): Promise<void> {
+    try {
+      await publish();
+    } catch (error) {
+      this.logger.error(
+        'Post-commit realtime publication failed.',
+        error instanceof Error ? error.stack : undefined,
+      );
+    }
   }
 
   private async requireAccessibleMessage(
