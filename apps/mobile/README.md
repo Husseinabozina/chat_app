@@ -2,22 +2,27 @@
 
 Flutter client for the messaging platform.
 
-At this checkpoint, the previous Flutter project has been moved from the repository root into this directory **without changing application behavior**.
+## Baseline
 
-This is intentional: the monorepo migration is kept separate from the upcoming Flutter modernization/refactor so Git history remains reviewable.
+- Flutter: 3.47+
+- Dart: 3.13+
+- Android: modern declarative Flutter Gradle plugin setup
+- Android minimum SDK: 24
+- iOS minimum target: 15.0
 
-## Next mobile checkpoints
+The current feature code still represents the legacy Firebase chat implementation. This modernization checkpoint intentionally updates the toolchain, package baseline, null-safety/code quality, and tests **before** the feature-first architecture refactor.
 
-1. Upgrade Flutter/Dart and dependencies.
-2. Fix deprecated APIs, lints, and baseline tests.
-3. Introduce app/core/feature-first structure.
-4. Add repository/domain abstractions.
-5. Replace direct Firebase calls with infrastructure adapters.
-6. Implement the approved product flows and design system.
-
-## Run
+## Development
 
 ```bash
 flutter pub get
+flutter analyze
+flutter test
 flutter run
 ```
+
+After dependency resolution, commit the regenerated `pubspec.lock` because this is an application repository.
+
+## Next checkpoint
+
+Introduce the approved app/core/feature-first architecture and repository boundaries while preserving behavior.

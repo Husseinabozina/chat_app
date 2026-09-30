@@ -31,7 +31,7 @@ The project is currently in the foundation phase.
 - REST/realtime contracts: documented
 - Monorepo: initialized
 - Backend: bootstrapped
-- Flutter client: moved under `apps/mobile` without feature refactoring yet
+- Flutter client: moved under `apps/mobile` and modernized to the Flutter 3.47 / Dart 3.13 baseline; feature-first refactoring is next
 
 ## Development
 
@@ -64,7 +64,7 @@ flutter pub get
 flutter run
 ```
 
-The mobile application is still the legacy Flutter implementation at this checkpoint. Modernization and feature-first restructuring happen in subsequent commits.
+The mobile application still preserves the legacy Firebase feature behavior, but its SDK/dependency/platform baseline and code hygiene are being modernized before the feature-first architecture refactor.
 
 ## Engineering workflow
 

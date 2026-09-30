@@ -2,15 +2,11 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../widgets/auth_widgets.dart';
+import '../widgets/auth_form.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -20,64 +16,89 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  bool _isloading = false;
-  final _auth = FirebaseAuth.instance;
-  void _submitUserForm(String email, String username, String password,
-      bool isLogin, BuildContext ctx,
-      [XFile? image]) async {
-    UserCredential result;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  bool _isLoading = false;
+
+  Future<void> _submitUserForm({
+    required String email,
+    required String username,
+    required String password,
+    required bool isLogin,
+    XFile? image,
+  }) async {
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
-      setState(() {
-        _isloading = true;
-      });
-
       if (isLogin) {
-        result = await _auth.signInWithEmailAndPassword(
-            email: email, password: password);
-      } else {
-        result = await _auth.createUserWithEmailAndPassword(
-            email: email, password: password);
-        final ref = FirebaseStorage.instance
-            .ref()
-            .child('User_Image')
-            .child(result.user!.uid + '.jpg');
-        await ref.putFile(File(image!.path));
-        final url = await ref.getDownloadURL();
-
-        FirebaseFirestore.instance
-            .collection('users')
-            .doc(result.user!.uid)
-            .set({'username': username, 'email': email, 'imageUrl': url});
+        await _auth.signInWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+        return;
       }
 
-      setState(() {
-        _isloading = false;
-      });
-    } on PlatformException catch (error) {
-      var message = 'An error occured please check your credential!!';
-      if (error.message != null) {
-        message = error.message!;
+      final selectedImage = image;
+      if (selectedImage == null) {
+        throw StateError('A profile image is required to create an account.');
       }
-      ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.black54,
-      ));
-      setState(() {
-        _isloading = false;
+
+      final result = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      final user = result.user;
+      if (user == null) {
+        throw StateError('Firebase did not return a user after sign up.');
+      }
+
+      final imageReference = FirebaseStorage.instance
+          .ref()
+          .child('User_Image')
+          .child('${user.uid}.jpg');
+
+      await imageReference.putFile(File(selectedImage.path));
+      final imageUrl = await imageReference.getDownloadURL();
+
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'username': username,
+        'email': email,
+        'imageUrl': imageUrl,
       });
-    } catch (error) {
-      setState(() {
-        _isloading = false;
-      });
-      print(error.toString());
+    } on FirebaseAuthException catch (error) {
+      _showError(
+        error.message ?? 'Authentication failed. Please check your details.',
+      );
+    } catch (error, stackTrace) {
+      debugPrint('Authentication flow failed: $error\n$stackTrace');
+      _showError('Something went wrong. Please try again.');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
+  }
+
+  void _showError(String message) {
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.black87),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.orange[700],
-      body: AuthWidget(_submitUserForm, _isloading),
+      body: AuthForm(isLoading: _isLoading, onSubmit: _submitUserForm),
     );
   }
 }

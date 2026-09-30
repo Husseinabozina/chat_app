@@ -24,6 +24,10 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Allow access to the camera to choose a profile photo and send images.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allow access to the photo library to choose images for your profile and conversations.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
