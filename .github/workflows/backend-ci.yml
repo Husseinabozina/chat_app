@@ -1,0 +1,90 @@
+name: Backend CI
+
+on:
+  pull_request:
+    paths:
+      - "apps/backend/**"
+      - ".github/workflows/backend-ci.yml"
+  push:
+    branches:
+      - master
+    paths:
+      - "apps/backend/**"
+      - ".github/workflows/backend-ci.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Typecheck, migrate, build, and health
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: chat_app_test
+          POSTGRES_USER: chat_app
+          POSTGRES_PASSWORD: chat_app
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U chat_app -d chat_app_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://chat_app:chat_app@localhost:5432/chat_app_test
+      PORT: 3000
+
+    defaults:
+      run:
+        working-directory: apps/backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Upload resolved lockfile
+        uses: actions/upload-artifact@v7
+        with:
+          name: backend-package-lock
+          path: apps/backend/package-lock.json
+          if-no-files-found: error
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Run migrations
+        run: npm run db:migrate
+
+      - name: Start API
+        run: |
+          npm run start:prod > /tmp/chat-api.log 2>&1 &
+          echo $! > /tmp/chat-api.pid
+
+      - name: Verify health
+        run: |
+          for attempt in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:3000/v1/health; then
+              exit 0
+            fi
+            sleep 1
+          done
+
+          cat /tmp/chat-api.log
+          exit 1
