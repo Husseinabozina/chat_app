@@ -1,20 +1,7 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  HttpStatus,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { CanActivate, ExecutionContext, Inject, Injectable } from '@nestjs/common';
 
-import { ApiException } from '../common/http/api-exception';
+import { AccessTokenVerifier } from './access-token.verifier';
 import { type AuthContext } from './current-auth.decorator';
-
-interface AccessTokenPayload {
-  sub: string;
-  sid: string;
-  typ: 'access';
-}
 
 interface RequestWithHeadersAndAuth {
   headers: {
@@ -25,7 +12,10 @@ interface RequestWithHeadersAndAuth {
 
 @Injectable()
 export class AccessTokenGuard implements CanActivate {
-  constructor(@Inject(JwtService) private readonly jwtService: JwtService) {}
+  constructor(
+    @Inject(AccessTokenVerifier)
+    private readonly accessTokenVerifier: AccessTokenVerifier,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context
@@ -34,44 +24,13 @@ export class AccessTokenGuard implements CanActivate {
     const authorization = request.headers.authorization;
 
     if (!authorization?.startsWith('Bearer ')) {
-      throw this.unauthorized();
+      await this.accessTokenVerifier.verify('');
+      return false;
     }
 
     const token = authorization.slice('Bearer '.length).trim();
+    request.auth = await this.accessTokenVerifier.verify(token);
 
-    try {
-      const payload = await this.jwtService.verifyAsync<AccessTokenPayload>(
-        token,
-        {
-          issuer: 'chat-platform-api',
-          audience: 'chat-mobile',
-        },
-      );
-
-      if (
-        payload.typ !== 'access' ||
-        typeof payload.sub !== 'string' ||
-        typeof payload.sid !== 'string'
-      ) {
-        throw this.unauthorized();
-      }
-
-      request.auth = {
-        userId: payload.sub,
-        sessionId: payload.sid,
-      };
-
-      return true;
-    } catch {
-      throw this.unauthorized();
-    }
-  }
-
-  private unauthorized(): ApiException {
-    return new ApiException(
-      HttpStatus.UNAUTHORIZED,
-      'UNAUTHORIZED',
-      'Access token is missing, invalid, or expired.',
-    );
+    return true;
   }
 }
