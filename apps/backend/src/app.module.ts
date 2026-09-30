@@ -6,6 +6,7 @@ import { ConversationsModule } from './conversations/conversations.module';
 import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
 import { MessagesModule } from './messages/messages.module';
+import { RealtimeModule } from './realtime/realtime.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -18,6 +19,7 @@ import { UsersModule } from './users/users.module';
     UsersModule,
     ConversationsModule,
     MessagesModule,
+    RealtimeModule,
     HealthModule,
   ],
 })
