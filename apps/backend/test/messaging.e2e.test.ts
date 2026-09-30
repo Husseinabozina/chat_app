@@ -226,14 +226,11 @@ test('messages are idempotent, authorized, and cursor paginated', async () => {
 });
 
 test('reply targets and client message ids cannot cross conversations', async () => {
-  const aliceEve = await request<ConversationSummary>(
-    '/conversations/direct',
-    {
-      method: 'POST',
-      accessToken: alice.accessToken,
-      body: { userId: eve.user.id },
-    },
-  );
+  const aliceEve = await request<ConversationSummary>('/conversations/direct', {
+    method: 'POST',
+    accessToken: alice.accessToken,
+    body: { userId: eve.user.id },
+  });
   assert.equal(aliceEve.status, 200);
 
   const otherMessage = await sendMessage(
