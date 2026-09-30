@@ -62,7 +62,7 @@ The domain layer must not import:
 
 - Firebase SDK classes.
 - HTTP clients.
-- WebSocket clients.
+- Socket.IO/WebSocket clients.
 - DTOs.
 - Flutter widgets or BuildContext.
 
@@ -111,7 +111,7 @@ abstract interface class ChatRepository {
 }
 ```
 
-The UI never calls Dio, FirebaseFirestore, or a WebSocket directly.
+The UI never calls Dio, FirebaseFirestore, or a Socket.IO client directly.
 
 ---
 
@@ -120,13 +120,13 @@ The UI never calls Dio, FirebaseFirestore, or a WebSocket directly.
 Infrastructure responses map:
 
 ```text
-JSON / socket payload
+JSON / realtime payload
 → DTO
 → mapper
-→ domain entity
+→ domain entity/event
 ```
 
-This prevents API schema changes from leaking directly into presentation.
+This prevents API/realtime schema changes from leaking directly into presentation.
 
 ---
 
@@ -146,7 +146,7 @@ Infrastructure exceptions should become typed product failures, for example:
 
 UI copy is chosen at the presentation layer from these product-level failures.
 
-Never display raw server/Firebase exception text directly.
+Never display raw server/Firebase/Socket.IO exception text directly.
 
 ---
 
@@ -159,30 +159,81 @@ pending
 sending
 sent
 failed
+read
 ```
 
 A client-generated message ID/idempotency key allows retry without accidental duplication.
 
-V1 local persistence choice should be made during implementation after evaluating message-cache needs; the architecture must allow a local datasource without changing the domain API.
+`sent` means the REST command returned the durably persisted message.
+
+`read` is derived from the other participant's durable read pointer.
+
+V1 does not claim a durable delivered-to-device state.
+
+Local persistence choice should be made during implementation after evaluating message-cache needs; the architecture must allow a local datasource without changing the domain API.
 
 ---
 
-## 8. Realtime lifecycle
+## 8. Realtime infrastructure boundary
+
+Target composition:
+
+```text
+ApiChatRepository
+├── RestChatDataSource
+└── RealtimeChatDataSource
+      └── RealtimeClient
+```
+
+The domain/presentation layers do not import Socket.IO types.
+
+The repository merges durable REST results and realtime domain events.
+
+Socket payloads map to typed DTOs and then domain events before they reach Cubits.
+
+---
+
+## 9. Realtime lifecycle
 
 The mobile app should:
 
-1. Authenticate normally.
-2. Establish realtime connection after a valid session exists.
-3. Subscribe to relevant conversation/user channels.
-4. Merge realtime events into current state.
-5. Reconnect with backoff.
-6. Resync via REST after reconnect/app resume when correctness requires it.
+1. authenticate normally through REST
+2. establish realtime after a valid access token exists
+3. wait for `connection.ready`
+4. consume domain realtime events from the repository
+5. reconnect with bounded exponential backoff/jitter
+6. refresh/reconnect when the access token expires
+7. REST-resync after reconnect
+8. reconcile pending outgoing messages by `clientMessageId`
+9. disconnect realtime when auth is cleared
 
-WebSocket data is not assumed to be a perfect permanent event log.
+No client-controlled room subscription API is required in V1.
+
+### Reconnect merge strategy
+
+During reconnect resync:
+
+- buffer incoming realtime events
+- refresh the relevant conversation-list window
+- refresh the active conversation's newest message page
+- apply buffered events afterward
+- never regress edited/deleted/read state
+
+WebSocket/Socket.IO data is not assumed to be a permanent event log.
 
 ---
 
-## 9. Dependency injection
+## 10. Typing state
+
+Typing is transient presentation state sourced from realtime domain events.
+
+The UI must expire stale typing locally even if a stop event is lost.
+
+Typing state must not be written into durable message history or treated as conversation authority.
+
+---
+
+## 11. Dependency injection
 
 Centralize object composition.
 
@@ -190,11 +241,13 @@ Repositories depend on datasources/clients.
 
 Cubits/use cases depend on repository interfaces.
 
+Auth/session coordination owns realtime connect/disconnect lifecycle.
+
 Avoid service-locator calls scattered inside widgets.
 
 ---
 
-## 10. Navigation
+## 12. Navigation
 
 Navigation must support:
 
@@ -208,14 +261,15 @@ Routing should remain outside feature business logic.
 
 ---
 
-## 11. Testing strategy
+## 13. Testing strategy
 
 ### Unit
 
-- Mappers.
+- REST/realtime DTO mappers.
+- Event deduplication/merge rules.
 - Use cases where present.
 - Cubit/state transitions.
-- Repository behavior with mocked/fake datasources.
+- Repository behavior with fake REST/realtime datasources.
 
 ### Widget
 
@@ -223,6 +277,7 @@ Routing should remain outside feature business logic.
 - Conversation tiles.
 - Message states.
 - Composer states.
+- Typing state.
 - Empty/error/loading UI.
 
 ### Integration
@@ -234,6 +289,9 @@ Critical flows:
 - Start conversation.
 - Send/retry message.
 - Receive realtime message.
+- Edit/delete propagation.
+- Read-state propagation.
+- Reconnect + REST resync.
 - Open notification target.
 
 Testing depth should follow risk, not arbitrary coverage numbers.
