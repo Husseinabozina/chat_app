@@ -13,6 +13,7 @@ import {
   MessageEntity,
 } from '../database/entities';
 import { SendMessageDto } from './dto/send-message.dto';
+import { UpdateMessageDto } from './dto/update-message.dto';
 
 export interface MessageResponse {
   id: string;
@@ -191,6 +192,105 @@ export class MessagesService {
     }
   }
 
+  async edit(
+    userId: string,
+    messageId: string,
+    dto: UpdateMessageDto,
+  ): Promise<MessageResponse> {
+    const text = dto.text.trim();
+
+    if (text.length === 0) {
+      throw new ApiException(
+        HttpStatus.BAD_REQUEST,
+        'VALIDATION_ERROR',
+        'Message text cannot be empty.',
+        { field: 'text' },
+      );
+    }
+
+    return this.dataSource.transaction(async (manager) => {
+      const message = await this.requireAccessibleMessage(
+        manager,
+        userId,
+        messageId,
+      );
+
+      this.requireSender(message, userId);
+
+      if (message.deletedAt) {
+        throw this.messageNotFound();
+      }
+
+      message.text = text;
+      message.editedAt = new Date();
+      const saved = await manager.getRepository(MessageEntity).save(message);
+
+      return this.toResponse(saved);
+    });
+  }
+
+  async delete(userId: string, messageId: string): Promise<void> {
+    await this.dataSource.transaction(async (manager) => {
+      const message = await this.requireAccessibleMessage(
+        manager,
+        userId,
+        messageId,
+      );
+
+      this.requireSender(message, userId);
+
+      if (message.deletedAt) {
+        return;
+      }
+
+      message.text = null;
+      message.deletedAt = new Date();
+      await manager.getRepository(MessageEntity).save(message);
+    });
+  }
+
+  private async requireAccessibleMessage(
+    manager: EntityManager,
+    userId: string,
+    messageId: string,
+  ): Promise<MessageEntity> {
+    const message = await manager
+      .getRepository(MessageEntity)
+      .createQueryBuilder('message')
+      .where('message.id = :messageId', { messageId })
+      .setLock('pessimistic_write')
+      .getOne();
+
+    if (!message) {
+      throw this.messageNotFound();
+    }
+
+    const membership = await manager
+      .getRepository(ConversationMemberEntity)
+      .findOne({
+        where: {
+          conversationId: message.conversationId,
+          userId,
+        },
+      });
+
+    if (!membership) {
+      throw this.messageNotFound();
+    }
+
+    return message;
+  }
+
+  private requireSender(message: MessageEntity, userId: string): void {
+    if (message.senderId !== userId) {
+      throw new ApiException(
+        HttpStatus.FORBIDDEN,
+        'FORBIDDEN',
+        'Only the sender can modify this message.',
+      );
+    }
+  }
+
   private async requireMembership(
     manager: EntityManager,
     userId: string,
@@ -225,6 +325,14 @@ export class MessagesService {
       editedAt: message.editedAt,
       deletedAt: message.deletedAt,
     };
+  }
+
+  private messageNotFound(): ApiException {
+    return new ApiException(
+      HttpStatus.NOT_FOUND,
+      'MESSAGE_NOT_FOUND',
+      'Message not found.',
+    );
   }
 
   private conversationNotFound(): ApiException {
