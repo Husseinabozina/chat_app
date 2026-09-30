@@ -14,7 +14,9 @@ export class UserDiscoveryIndexes2026093000300 implements MigrationInterface {
   }
 
   async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query('DROP INDEX IF EXISTS "idx_users_display_name_trgm"');
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "idx_users_display_name_trgm"',
+    );
     await queryRunner.query('DROP INDEX IF EXISTS "idx_users_username_trgm"');
   }
 }
