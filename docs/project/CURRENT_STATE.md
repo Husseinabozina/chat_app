@@ -2,78 +2,156 @@
 
 Update this file before closing each future project checkpoint. Verify branch heads and CI runs from GitHub before changing the status below.
 
-**Updated:** 2026-09-30
-**Current phase:** Backend stack reconciliation and quality checkpoint, verified and awaiting review. Realtime/WebSocket implementation is deferred.
+**Updated:** 2026-09-30  
+**Current phase:** Backend/mobile integration complete on `master`. Realtime/WebSocket implementation has **not** started. The next checkpoint is the realtime architecture contract review.
 
-## Last verified implementation
+## Last verified integrated baseline
 
-- Branch: `chore/backend-quality-reconcile`
-- Pull request: [#12 — backend quality reconciliation](https://github.com/Husseinabozina/chat_app/pull/12)
-- Verified implementation commit: `2c981c8fa4144ab97b83f7b3d6d694ff8f97b56b`
-- Backend CI: [run #66](https://github.com/Husseinabozina/chat_app/actions/runs/36718806255), passed on that commit with 12 E2E tests
-- Direct baseline: [#11 — read and message lifecycle](https://github.com/Husseinabozina/chat_app/pull/11), commit `a2568595f42088193b3c15423e0cdca220891044`, [CI run #65](https://github.com/Husseinabozina/chat_app/actions/runs/36653806395) passed.
+- Default branch: `master`
+- Integrated application baseline SHA: `c84e4ff5294867de0d6da392dccc071ca076901b`
+- Backend CI: [run #73](https://github.com/Husseinabozina/chat_app/actions/runs/36724138035), passed on that exact master SHA.
+- Latest mobile-changing master SHA: `e03d990fda545463ff259513fb668494dec8b1ec`
+- Mobile CI: [run #12](https://github.com/Husseinabozina/chat_app/actions/runs/36723604090), passed on that exact mobile-changing master SHA.
+- Later master merges after `e03d990...` affected backend/docs only, not `apps/mobile/**`.
 
-## PR stack and dependencies
+## Integrated PR history
 
-The active dependency chain is:
+The active stack has been merged to `master` with merge commits, preserving stacked ancestry:
 
-`master` → [#1 product/architecture docs](https://github.com/Husseinabozina/chat_app/pull/1) → [#2 monorepo](https://github.com/Husseinabozina/chat_app/pull/2) → [#3 mobile modernization](https://github.com/Husseinabozina/chat_app/pull/3) → [#4 mobile feature architecture](https://github.com/Husseinabozina/chat_app/pull/4) → [#6 database foundation](https://github.com/Husseinabozina/chat_app/pull/6) → [#7 auth/users](https://github.com/Husseinabozina/chat_app/pull/7) → [#9 conversations/messages](https://github.com/Husseinabozina/chat_app/pull/9) → [#10 user discovery](https://github.com/Husseinabozina/chat_app/pull/10) → [#11 read/message lifecycle](https://github.com/Husseinabozina/chat_app/pull/11) → [#12 quality reconciliation](https://github.com/Husseinabozina/chat_app/pull/12).
+1. [#1 Product/design/architecture docs](https://github.com/Husseinabozina/chat_app/pull/1)  
+   Merge commit: `3bb14efd7c1fc28208534a5e3687e8e0e52628cf`
+2. [#2 Monorepo/backend foundation](https://github.com/Husseinabozina/chat_app/pull/2)  
+   Merge commit: `6961c3b36459a96819e08c7c579ec08e86964946`
+3. [#3 Mobile modernization](https://github.com/Husseinabozina/chat_app/pull/3)  
+   Merge commit: `bd822d3796acec1a36a393a8a9a74a18b1823553`
+4. [#4 Mobile feature-first architecture](https://github.com/Husseinabozina/chat_app/pull/4)  
+   Merge commit: `e03d990fda545463ff259513fb668494dec8b1ec`
+5. [#6 Database foundation](https://github.com/Husseinabozina/chat_app/pull/6)  
+   Merge commit: `62c3e521188f68ab7cb277db73badcb601d9357c`
+6. [#7 Auth/users](https://github.com/Husseinabozina/chat_app/pull/7)  
+   Merge commit: `9c0506e372eb3caeab643d7a2adc91ced3c4edf1`
+7. [#9 Conversations/messages](https://github.com/Husseinabozina/chat_app/pull/9)  
+   Merge commit: `9d6dfecc3f3fec557c9fceabbc93fd969792414c`
+8. [#10 User discovery/public profiles](https://github.com/Husseinabozina/chat_app/pull/10)  
+   Merge commit: `bd0670026d88eae6f9ff9277a3d21143f33601f6`
+9. [#11 Read + message lifecycle](https://github.com/Husseinabozina/chat_app/pull/11)  
+   Merge commit: `f16d521d560e9353fbdad97f22bff4cd584c43b3`
+10. [#12 Backend quality reconciliation](https://github.com/Husseinabozina/chat_app/pull/12)  
+    Merge commit: `c84e4ff5294867de0d6da392dccc071ca076901b`
 
-[#5 backend quality foundation](https://github.com/Husseinabozina/chat_app/pull/5) and #6 both branch from #4. [#8 identity persistence](https://github.com/Husseinabozina/chat_app/pull/8) branches from #5. Neither #5 nor #8 is part of the active backend chain; leave both open while reviewing what has been superseded. Do not merge them into the chain without reconciling their changes.
+All active-stack PRs above are now merged.
+
+## Superseded branches / PRs
+
+- [#5 Backend quality foundation](https://github.com/Husseinabozina/chat_app/pull/5) is closed as superseded. Useful quality work was reconciled into #12; the older Jest/ts-jest and TypeScript 5.9 direction is intentionally not part of the current stack.
+- [#8 Identity persistence](https://github.com/Husseinabozina/chat_app/pull/8) is closed as superseded. Its schema conflicts with the active #6/#7 implementation and must not be merged.
+- The branches for #5 and #8 are preserved for history/reference.
 
 ## Completed checkpoints
 
 ### Product and design
 
 - Product vision, V1 scope, user flows, initial REST and realtime contracts, system/data architecture, ADR 0001, and approved visual direction are documented under `docs/`.
-- High-fidelity screen planning is documented; final screens and prototype validation are not implemented.
+- High-fidelity screen planning and approved UI direction are documented.
+- Final production UI implementation and prototype validation are not complete.
 
 ### Backend
 
-- NestJS modular backend and PostgreSQL 17 local/CI infrastructure.
-- TypeORM entities and explicit migrations for users, refresh sessions, device tokens, conversations, membership, messages, and attachments.
-- Email/password auth, Argon2id hashing, access tokens, refresh rotation/revocation, and current-user profile endpoints.
-- Direct conversation creation, durable text messages, cursor pagination, idempotent sends, reply isolation, and membership authorization.
-- User discovery and public profiles with ranked, paginated search.
-- Monotonic read pointers, unread counts, sender-owned edits, and idempotent soft deletion through REST.
+- NestJS modular backend with PostgreSQL 17.
+- TypeORM entities and explicit migrations; `synchronize` remains disabled.
+- Users, refresh sessions, device-token groundwork, conversations, membership, messages, and attachments schema.
+- Email/password authentication with Argon2id.
+- Short-lived JWT access tokens and rotating/revocable refresh sessions.
+- Current-user profile endpoints.
+- Direct conversation creation and canonical participant-pair identity.
+- Durable text messages, reply isolation, sender/client-message idempotency, and deterministic cursor pagination.
+- User discovery and public profiles.
+- Monotonic read pointers and unread counts.
+- Sender-owned message edit and idempotent soft delete.
+- ESLint, Prettier, typecheck, compiled-app E2E tests, migrations, and reproducible `npm ci` CI.
+- Live PostgreSQL health E2E coverage.
 
 ### Mobile
 
-- Flutter 3.47 / Dart 3.13 baseline and Mobile CI.
-- Feature-first auth/chat structure with Cubit, domain repository contracts, and Firebase confined to data adapters.
-- The running mobile behavior still uses the legacy Firebase chat model; the custom backend adapters and multi-conversation product flow are not implemented.
+- Flutter 3.47 / Dart 3.13 baseline.
+- Mobile CI with dependency resolution, formatting, analysis, and tests.
+- Feature-first auth/chat structure.
+- Cubit state management.
+- Domain repository contracts.
+- Firebase implementation isolated behind data-layer repository adapters.
+
+The running mobile product still uses the legacy Firebase chat behavior. Custom REST/realtime backend adapters and the approved multi-conversation UI flow are not implemented yet.
 
 ## Locked architecture decisions
 
-- A custom modular NestJS backend with PostgreSQL is the primary V1 backend. TypeORM schema changes use migrations; `synchronize` stays disabled.
-- Durable state and authorization are established through REST/database operations before realtime event delivery.
-- Mobile presentation/domain code depends on repository contracts, not Firebase or backend SDK types.
-- Direct conversation identity is the canonical participant pair. Message retries are keyed by sender and `clientMessageId`; message and conversation pages use stable timestamp-plus-ID ordering.
-- Read pointers are monotonic. Only a message's sender may edit or soft-delete it. No edit/delete time window has been selected yet.
-- E2E tests exercise the compiled Nest application, preserving production decorator metadata. Database-using suites run in separate Node processes.
+- Custom modular NestJS + PostgreSQL is the primary V1 backend.
+- Durable state and authorization are committed through REST/database operations before realtime delivery.
+- Realtime transport must not become the source of truth for durable state.
+- Mobile presentation/domain layers depend on repository contracts rather than Firebase/backend SDK types.
+- Direct conversation identity is the canonical participant pair.
+- Message retries are keyed by sender + `clientMessageId`.
+- Message/conversation pagination uses stable timestamp-plus-ID ordering.
+- Read pointers are monotonic.
+- Only the message sender may edit or soft-delete that message.
+- E2E suites exercise the compiled Nest application so runtime decorator metadata matches production.
+- Database-using E2E suites run in separate Node processes.
 
 ## Current CI state
 
-PR #12 run #66 passed on its verified implementation commit. Its sequence is `npm ci` → `format:check` → `lint` → `typecheck` → `build` → migrations → tests. The test command first typechecks E2E sources, then runs health (1), auth (3), user discovery (3), and messaging (5) in separate processes: 12 passed, 0 failed. The workflow keeps `contents: read` and no diagnostic artifact steps. Documentation-only follow-up commits do not change the verified backend implementation; check the PR's latest Actions run for their final head status.
+### Backend
+
+Master Backend CI [run #73](https://github.com/Husseinabozina/chat_app/actions/runs/36724138035) passed on `c84e4ff5294867de0d6da392dccc071ca076901b`.
+
+Pipeline:
+
+`npm ci → format:check → lint → typecheck → build → migrations → E2E tests`
+
+The workflow uses read-only repository permissions and contains no temporary diagnostic/writeback steps.
+
+### Mobile
+
+Master Mobile CI [run #12](https://github.com/Husseinabozina/chat_app/actions/runs/36723604090) passed on `e03d990fda545463ff259513fb668494dec8b1ec`, the latest commit in the integrated chain that changed mobile code.
+
+Subsequent integrated PRs changed backend/docs only.
 
 ## Deferred features
 
-- Realtime/WebSocket delivery and read events, push notifications, and media upload/storage flows.
-- Flutter adapters for the custom REST backend and the approved multi-conversation flow.
-- Final high-fidelity UI implementation, offline/retry behavior, deployment, and monitoring.
+- Realtime/WebSocket delivery.
+- Realtime read/delivery events.
+- Typing indicators and presence/last-seen policy.
+- Push notifications and device-token runtime flow.
+- Media upload/storage flows and avatar storage-key policy.
+- Flutter REST/realtime adapters.
+- Multi-conversation Flutter product flow.
+- Final high-fidelity UI implementation.
+- Offline queue/retry semantics beyond current server idempotency groundwork.
+- Deployment, observability, monitoring, and production hardening.
 
-## Divergent PR reconciliation
+## Known issues / technical debt
 
-- #5's locked install, npm cache, formatting, shared app configuration, and live health behavior already exist in the active chain. This checkpoint restores its missing static lint gate, health E2E coverage, test typechecking, and useful development guidance. It does not import the older Jest/ts-jest runner, TypeScript 5.9 pin, or a type-import rule that conflicts with Nest runtime injection metadata.
-- #8's alternate users/refresh-sessions implementation is superseded by #6/#7. The active schema has case-insensitive unique indexes and refresh-session cascade deletion through its own migration. #8's separate normalized columns and avatar storage key are not part of the active schema. Its schema-specific cascade test remains an unported test idea, so the PR should not be merged or closed as part of this checkpoint.
-
-## Known issues and technical debt
-
-- The PR stack is still open; #5 and #8 are divergent alternatives to the active chain.
-- #8's identity entities/migration cannot be merged over #6/#7. Its database-specific regression ideas (especially cascade behavior) are not yet reproduced as a dedicated test in the active chain.
-- The root README now points here; keep detailed checkpoint status in this file to avoid competing summaries.
-- Product policy for an edit/delete time window has not been decided.
+- A dedicated cascade-deletion database regression test from the superseded #8 exploration has not been reproduced in the active test suite.
+- Avatar storage-key design remains deferred to the media-storage checkpoint.
+- Product policy for an edit/delete time window has not been selected.
+- The mobile app still uses the legacy Firebase behavior despite having backend-agnostic repository contracts.
+- Realtime reconnect/resume, event ordering, event IDs, delivery acknowledgement, typing, and presence semantics are not locked yet.
 
 ## Exact next checkpoint
 
-Review PR #12 and integrate the active PR dependency chain in order, without merging #5 or #8. Defer any realtime implementation until that integration checkpoint is complete and separately authorized.
+**Realtime Architecture Contract Review — no implementation before the contract is approved.**
+
+The review must define at minimum:
+
+1. WebSocket authentication and token refresh/re-auth behavior.
+2. Connection identity, device/session semantics, and multi-device behavior.
+3. Event envelope/versioning and stable event IDs.
+4. Server ordering guarantees and duplicate-event handling.
+5. Reconnect/resume strategy and missed-event recovery through REST/database state.
+6. Message-created/edited/deleted events.
+7. Read-pointer/read-receipt events and their durable source of truth.
+8. Typing event semantics, throttling, TTL, and non-durable behavior.
+9. Presence/last-seen privacy and durability policy.
+10. Backpressure, rate limiting, payload limits, and abuse controls.
+11. Horizontal scaling/pub-sub strategy without making the socket layer authoritative.
+12. Flutter repository/transport boundaries for REST + realtime coexistence.
+
+Only after that contract is reviewed should the Realtime/WebSocket implementation branch begin.
