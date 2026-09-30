@@ -108,7 +108,8 @@ export class UsersService {
     ];
     const addParameter = (value: unknown): string => {
       parameters.push(value);
-      return '
+      return String.fromCharCode(36) + parameters.length;
+    };
     let cursorClause = '';
 
     if (cursor) {
