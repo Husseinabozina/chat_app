@@ -3,14 +3,16 @@
 Update this file before closing each future project checkpoint. Verify branch heads and CI runs from GitHub before changing the status below.
 
 **Updated:** 2026-09-30  
-**Current phase:** Realtime Backend Foundation implemented on PR #15 and verified; awaiting review/merge. Flutter REST/realtime integration is the next product checkpoint.
+**Current phase:** Backend realtime foundation is verified on PR #15. Flutter backend data foundations are verified on stacked PR #16; repository reconciliation and the new conversation flow are next.
 
 ## Last verified integrated baseline
 
 - Default branch: `master`
 - Integrated master HEAD: `5f77dbd50efd9ae12f17d809a63c2746f35fc9ee` (PR #14 realtime contract merge).
-- Last verified feature branch/PR/commit: `feat/backend-realtime-foundation` / [PR #15](https://github.com/Husseinabozina/chat_app/pull/15) / `4f96acd914c8ef0038aa3d6ee88781fad53ade03`.
-- Backend CI on that feature commit: [run #80](https://github.com/Husseinabozina/chat_app/actions/runs/36740011258), passed on Node 24 with PostgreSQL 17.
+- Last verified backend branch/PR/HEAD: `feat/backend-realtime-foundation` / [PR #15](https://github.com/Husseinabozina/chat_app/pull/15) / `456c842b157b30f4dd9728ba3869f7fa7b6a50d8`.
+- Backend CI on that exact HEAD: [run #81](https://github.com/Husseinabozina/chat_app/actions/runs/36740459123), passed on Node 24 with PostgreSQL 17.
+- Last verified mobile branch/PR/code commit: `feat/mobile-api-realtime-foundation` / [PR #16](https://github.com/Husseinabozina/chat_app/pull/16) / `dab2bd3a70f3518f08341eac859274f18744d9a2`.
+- Mobile CI on that code commit: [run #13](https://github.com/Husseinabozina/chat_app/actions/runs/36753226755), passed on Flutter 3.47.5.
 - Backend CI: [run #73](https://github.com/Husseinabozina/chat_app/actions/runs/36724138035), passed on the integrated backend baseline `c84e4ff5294867de0d6da392dccc071ca076901b`.
 - Latest mobile-changing master SHA: `e03d990fda545463ff259513fb668494dec8b1ec`
 - Mobile CI: [run #12](https://github.com/Husseinabozina/chat_app/actions/runs/36723604090), passed on that exact mobile-changing master SHA.
@@ -35,7 +37,7 @@ The active pre-realtime stack is integrated on `master` with merge commits:
 
 PR #5 and PR #8 are closed as superseded and their branches remain available for reference.
 
-PR #15 is open on `feat/backend-realtime-foundation` against `master`; it has not been merged.
+Open stack: PR #15 (`feat/backend-realtime-foundation` → `master`) → PR #16 (`feat/mobile-api-realtime-foundation` → `feat/backend-realtime-foundation`). Neither PR has been merged.
 
 ## Completed checkpoints
 
@@ -68,8 +70,10 @@ PR #15 is open on `feat/backend-realtime-foundation` against `master`; it has no
 - Cubit state management.
 - Domain repository contracts.
 - Firebase isolated behind data-layer adapters.
+- On PR #16: secure backend session store; refresh-aware REST client; backend auth and direct-conversation REST datasources; typed Socket.IO V1 event datasource with bounded reconnect; central opt-in backend data composition.
+- On PR #16: canonical Flutter 3.47.5 lockfile, read-only Mobile CI, and tests for backend session handling and realtime event mapping.
 
-The running mobile product still uses legacy Firebase chat behavior. Custom REST/realtime adapters and the approved multi-conversation UI are not implemented yet.
+The running mobile product still uses legacy Firebase chat behavior. The new backend datasources are staged and are not wired into `main.dart` or the current single-room UI. Repository-level REST/realtime reconciliation and the approved multi-conversation UI are not implemented yet.
 
 ### Realtime architecture
 
@@ -114,7 +118,7 @@ ADR 0002 records the Socket.IO transport choice.
 
 ### Backend
 
-Backend CI [run #80](https://github.com/Husseinabozina/chat_app/actions/runs/36740011258) passed on PR #15 commit `4f96acd914c8ef0038aa3d6ee88781fad53ade03`. The latest integrated backend code on `master` previously passed [run #73](https://github.com/Husseinabozina/chat_app/actions/runs/36724138035).
+Backend CI [run #81](https://github.com/Husseinabozina/chat_app/actions/runs/36740459123) passed on PR #15 HEAD `456c842b157b30f4dd9728ba3869f7fa7b6a50d8`. The latest integrated backend code on `master` previously passed [run #73](https://github.com/Husseinabozina/chat_app/actions/runs/36724138035).
 
 Pipeline:
 
@@ -122,9 +126,9 @@ Pipeline:
 
 ### Mobile
 
-Mobile CI [run #12](https://github.com/Husseinabozina/chat_app/actions/runs/36723604090) passed on the latest integrated mobile-changing commit.
+Mobile CI [run #13](https://github.com/Husseinabozina/chat_app/actions/runs/36753226755) passed on PR #16 code commit `dab2bd3a70f3518f08341eac859274f18744d9a2`. It uses `flutter pub get --enforce-lockfile`, a non-writing format check, analysis, and tests. The latest integrated mobile-changing `master` commit previously passed [run #12](https://github.com/Husseinabozina/chat_app/actions/runs/36723604090).
 
-PR #14 was docs-only; PR #15 changes backend runtime code and has its own green Backend CI. Mobile runtime remains at the prior verified baseline.
+PR #14 was docs-only. PR #15 has green Backend CI and PR #16 has green Mobile CI; the active mobile entrypoint remains on the prior Firebase behavior.
 
 ## Deferred features
 
@@ -134,7 +138,7 @@ PR #14 was docs-only; PR #15 changes backend runtime code and has its own green 
 - Redis/multi-instance realtime adapter.
 - Push notifications/device-token runtime flow.
 - Media uploads/storage and avatar storage-key policy.
-- Flutter REST/realtime adapters.
+- Flutter repository-level REST/realtime merge, event deduplication/ordering, and reconnect resynchronization.
 - Multi-conversation Flutter product flow.
 - Final high-fidelity UI implementation.
 - Deployment/observability/production hardening beyond current CI.
@@ -145,11 +149,13 @@ PR #14 was docs-only; PR #15 changes backend runtime code and has its own green 
 - Avatar storage-key design remains deferred to media storage.
 - Product edit/delete time-window policy remains undecided.
 - Mobile still runs legacy Firebase behavior.
+- The current Firebase registration form requires a profile image, while backend registration accepts email/password; media/profile setup needs a separate product flow before entrypoint migration.
+- PR #16 transport tests are local/fake-client tests; an on-device backend/socket integration flow has not been verified yet.
 - Production allowed-origin/CORS policy and handshake attempt throttling still need implementation before public deployment. The current backend checkpoint is for local/single-instance integration.
 - Realtime publication is best effort after commit; a crash between commit and emission can lose an event. REST resynchronization is the V1 recovery path.
 
 ## Exact next checkpoint
 
-**Flutter REST/realtime data integration**, after PR #15 review/merge. Replace the legacy Firebase chat data path behind the existing mobile repository contracts with authenticated REST and Socket.IO datasources. Preserve REST as the durable authority, implement reconnect resynchronization and event deduplication, and keep presentation/domain layers free of transport types. Decide the screen-level rollout separately; do not combine it with presence, push, media, Redis, or durable event replay.
+**Mobile repository reconciliation and auth lifecycle**, stacked after PR #16 until the two open PRs are reviewed/merged. Build the direct-conversation repository over the staged REST/realtime datasources; deduplicate events, preserve deleted/edited/read monotonic state, buffer events during REST resync after reconnect, and coordinate socket connect/disconnect with the backend session. Test these merge rules with fake datasources. The subsequent checkpoint can switch the single-room Firebase UI to the approved direct-conversation flow using the design assets.
 
 Before any public backend deployment, complete the allowed-origin/CORS policy and handshake attempt throttling noted above.
