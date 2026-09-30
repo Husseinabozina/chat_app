@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { type Server } from 'socket.io';
 
 import {
@@ -8,6 +8,7 @@ import {
   type ReadStateResponse,
 } from '../conversations/conversations.service';
 import { type MessageResponse } from '../messages/messages.service';
+import { SessionRevocationService } from '../auth/session-revocation.service';
 import {
   REALTIME_PROTOCOL_VERSION,
   type RealtimeEnvelope,
@@ -18,6 +19,15 @@ import {
 export class RealtimePublisher {
   private readonly logger = new Logger(RealtimePublisher.name);
   private server: Server | null = null;
+
+  constructor(
+    @Inject(SessionRevocationService)
+    sessionRevocation: SessionRevocationService,
+  ) {
+    sessionRevocation.subscribe((sessionId) =>
+      this.disconnectSession(sessionId),
+    );
+  }
 
   attachServer(server: Server): void {
     this.server = server;

@@ -52,10 +52,12 @@ let realtimeUrl: string;
 let alice: SessionResponse;
 let bob: SessionResponse;
 let eve: SessionResponse;
+let mallory: SessionResponse;
 let conversationId: string;
 let aliceSocket: Socket;
 let bobSocket: Socket;
 let eveSocket: Socket;
+let mallorySocket: Socket;
 
 before(async () => {
   process.env.REALTIME_TYPING_TTL_MS = '250';
@@ -76,6 +78,7 @@ before(async () => {
   alice = await register('realtime-alice@example.com');
   bob = await register('realtime-bob@example.com');
   eve = await register('realtime-eve@example.com');
+  mallory = await register('realtime-mallory@example.com');
 
   const direct = await request<ConversationSummary>('/conversations/direct', {
     method: 'POST',
@@ -88,12 +91,14 @@ before(async () => {
   aliceSocket = await connectRealtime(alice.accessToken);
   bobSocket = await connectRealtime(bob.accessToken);
   eveSocket = await connectRealtime(eve.accessToken);
+  mallorySocket = await connectRealtime(mallory.accessToken);
 });
 
 after(async () => {
   aliceSocket?.disconnect();
   bobSocket?.disconnect();
   eveSocket?.disconnect();
+  mallorySocket?.disconnect();
   await app.close();
 });
 
@@ -110,11 +115,14 @@ test('realtime rejects invalid authentication and revoked sessions', async () =>
   assert.equal(error.data?.code, 'UNAUTHORIZED');
   invalid.disconnect();
 
+  const disconnected = waitForDisconnect(eveSocket);
   const logout = await request<unknown>('/auth/logout', {
     method: 'POST',
     body: { refreshToken: eve.refreshToken },
   });
   assert.equal(logout.status, 204);
+  await disconnected;
+  assert.equal(eveSocket.connected, false);
 
   const revoked = io(realtimeUrl, {
     autoConnect: false,
@@ -138,6 +146,13 @@ test('REST message lifecycle publishes durable realtime events', async () => {
     bobSocket,
     'message.created',
   );
+  const bobConversation = waitForEvent<{
+    conversation: {
+      id: string;
+      unreadCount: number;
+      lastMessage: { id: string };
+    };
+  }>(bobSocket, 'conversation.updated');
 
   const sent = await request<MessageResponse>(
     `/conversations/${conversationId}/messages`,
@@ -160,11 +175,18 @@ test('REST message lifecycle publishes durable realtime events', async () => {
   assert.equal(bobEvent.data.message.id, sent.body.id);
   assert.equal(bobEvent.protocolVersion, 1);
   assert.equal(bobEvent.conversationId, conversationId);
+  const summary = await bobConversation;
+  assert.equal(summary.data.conversation.id, conversationId);
+  assert.equal(summary.data.conversation.lastMessage.id, sent.body.id);
+  assert.equal(summary.data.conversation.unreadCount, 1);
 
   const updatedEvent = waitForEvent<{ message: MessageResponse }>(
     bobSocket,
     'message.updated',
   );
+  const editSummary = waitForEvent<{
+    conversation: { lastMessage: { id: string; text: string } };
+  }>(bobSocket, 'conversation.updated');
   const edited = await request<MessageResponse>(`/messages/${sent.body.id}`, {
     method: 'PATCH',
     accessToken: alice.accessToken,
@@ -174,6 +196,10 @@ test('REST message lifecycle publishes durable realtime events', async () => {
   const updated = await updatedEvent;
   assert.equal(updated.data.message.text, 'hello edited realtime');
   assert.ok(updated.data.message.editedAt);
+  assert.equal(
+    (await editSummary).data.conversation.lastMessage.text,
+    'hello edited realtime',
+  );
 
   const readEvent = waitForEvent<{
     conversationId: string;
@@ -181,6 +207,9 @@ test('REST message lifecycle publishes durable realtime events', async () => {
     lastReadMessageId: string;
     lastReadAt: string;
   }>(aliceSocket, 'read.updated');
+  const bobReadSummary = waitForEvent<{
+    conversation: { unreadCount: number };
+  }>(bobSocket, 'conversation.updated');
   const read = await request<unknown>(`/conversations/${conversationId}/read`, {
     method: 'POST',
     accessToken: bob.accessToken,
@@ -190,6 +219,7 @@ test('REST message lifecycle publishes durable realtime events', async () => {
   const readUpdate = await readEvent;
   assert.equal(readUpdate.data.userId, bob.user.id);
   assert.equal(readUpdate.data.lastReadMessageId, sent.body.id);
+  assert.equal((await bobReadSummary).data.conversation.unreadCount, 0);
 
   const deletedEvent = waitForEvent<{ messageId: string; deletedAt: string }>(
     bobSocket,
@@ -230,11 +260,32 @@ test('typing is membership scoped and transient', async () => {
   const stoppedEvent = await stopped;
   assert.equal(stoppedEvent.data.userId, alice.user.id);
 
-  const unauthorizedAck = await emitWithAck(eveSocket, 'typing.start', {
+  const unauthorizedAck = await emitWithAck(mallorySocket, 'typing.start', {
     conversationId,
   });
   assert.equal(unauthorizedAck.ok, false);
   assert.equal(unauthorizedAck.error?.code, 'CONVERSATION_NOT_FOUND');
+
+  const expired = waitForEvent<{ conversationId: string; userId: string }>(
+    bobSocket,
+    'typing.stopped',
+  );
+  assert.equal(
+    (await emitWithAck(aliceSocket, 'typing.start', { conversationId })).ok,
+    true,
+  );
+  assert.equal((await expired).data.userId, alice.user.id);
+
+  const disconnected = waitForEvent<{
+    conversationId: string;
+    userId: string;
+  }>(bobSocket, 'typing.stopped');
+  assert.equal(
+    (await emitWithAck(aliceSocket, 'typing.start', { conversationId })).ok,
+    true,
+  );
+  aliceSocket.disconnect();
+  assert.equal((await disconnected).data.userId, alice.user.id);
 });
 
 async function register(email: string): Promise<SessionResponse> {
@@ -297,6 +348,22 @@ function waitForConnectError(
     };
 
     socket.once('connect_error', onError);
+  });
+}
+
+function waitForDisconnect(socket: Socket, timeoutMs = 3000): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      socket.off('disconnect', onDisconnect);
+      reject(new Error('Timed out waiting for socket disconnect.'));
+    }, timeoutMs);
+
+    const onDisconnect = () => {
+      clearTimeout(timer);
+      resolve();
+    };
+
+    socket.once('disconnect', onDisconnect);
   });
 }
 
