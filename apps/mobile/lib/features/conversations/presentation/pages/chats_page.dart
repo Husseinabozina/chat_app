@@ -73,10 +73,7 @@ class _ChatsPageState extends State<ChatsPage> {
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       children: [
-                        const WarmHeader(
-                          'Chats',
-                          'Good conversations start with hello.',
-                        ),
+                        const WarmHeader('Chats', 'Good chats. Brighter days.'),
                         const SizedBox(height: 16),
                         TextField(
                           maxLength: 80,
@@ -88,27 +85,26 @@ class _ChatsPageState extends State<ChatsPage> {
                           onChanged: (v) => setState(() => _query = v),
                         ),
                         const SizedBox(height: 12),
-                        Wrap(
-                          spacing: 12,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            ChoiceChip(
-                              label: const Text('All'),
-                              selected: !_unread,
-                              onSelected: (_) =>
-                                  setState(() => _unread = false),
-                            ),
-                            ChoiceChip(
-                              label: const Text('Unread'),
-                              selected: _unread,
-                              onSelected: (_) => setState(() => _unread = true),
-                            ),
-                            IconButton(
-                              tooltip: 'New chat',
-                              onPressed: widget.onFindPeople,
-                              icon: const Icon(Icons.edit_square),
-                            ),
-                          ],
+                        Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Wrap(
+                            spacing: 8,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              ChoiceChip(
+                                label: const Text('All'),
+                                selected: !_unread,
+                                onSelected: (_) =>
+                                    setState(() => _unread = false),
+                              ),
+                              ChoiceChip(
+                                label: const Text('Unread'),
+                                selected: _unread,
+                                onSelected: (_) =>
+                                    setState(() => _unread = true),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -168,40 +164,67 @@ class _ChatsPageState extends State<ChatsPage> {
                     c.otherUser.username ??
                     'Chat member';
                 final last = c.lastMessage;
-                return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 6,
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 4,
                   ),
-                  leading: InitialAvatar(name),
-                  title: Text(name),
-                  subtitle: Text(
-                    last == null
-                        ? 'Say hello'
-                        : last.deletedAt != null
-                        ? 'Message deleted'
-                        : last.text ?? '',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  trailing: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        _time(last?.createdAt ?? c.updatedAt),
-                        style: Theme.of(context).textTheme.labelSmall,
+                  child: Material(
+                    color: c.unreadCount > 0
+                        ? Theme.of(context).colorScheme.primaryContainer
+                              .withValues(alpha: .38)
+                        : Theme.of(context).colorScheme.surface
+                              .withValues(alpha: .8),
+                    borderRadius: BorderRadius.circular(22),
+                    child: ListTile(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(22),
                       ),
-                      if (c.unreadCount > 0)
-                        Badge(label: Text('${c.unreadCount}')),
-                    ],
-                  ),
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => ConversationPage(
-                        repository: widget.repository,
-                        users: widget.users,
-                        conversation: c,
-                        currentUserId: widget.currentUserId,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
+                      leading: InitialAvatar(name),
+                      title: Text(
+                        name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontWeight: c.unreadCount > 0
+                              ? FontWeight.w800
+                              : FontWeight.w700,
+                        ),
+                      ),
+                      subtitle: Text(
+                        last == null
+                            ? 'Say hello'
+                            : last.deletedAt != null
+                            ? 'Message deleted'
+                            : last.text ?? '',
+                        textDirection: messageDirection(last?.text ?? ''),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            _time(last?.createdAt ?? c.updatedAt),
+                            style: Theme.of(context).textTheme.labelSmall,
+                          ),
+                          if (c.unreadCount > 0)
+                            Badge(label: Text('${c.unreadCount}')),
+                        ],
+                      ),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => ConversationPage(
+                            repository: widget.repository,
+                            users: widget.users,
+                            conversation: c,
+                            currentUserId: widget.currentUserId,
+                          ),
+                        ),
                       ),
                     ),
                   ),

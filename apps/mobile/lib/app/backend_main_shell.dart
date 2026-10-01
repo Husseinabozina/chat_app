@@ -95,83 +95,74 @@ class _BackendMainShellState extends State<BackendMainShell> {
       );
     }
     return Scaffold(
-      body: SafeArea(
-        child: IndexedStack(
-          index: _tab,
-          children: [
-            ChatsPage(
-              repository: widget.services.conversations,
-              users: widget.services.users,
-              currentUserId: widget.user.id,
-              onFindPeople: () => setState(() => _tab = 1),
-            ),
-            PeoplePage(
-              users: widget.services.users,
-              conversations: widget.services.conversations,
-              currentUserId: widget.user.id,
-            ),
-            SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const WarmHeader(
-                    'Your profile',
-                    'The familiar face behind your messages.',
-                  ),
-                  const SizedBox(height: 32),
-                  Center(child: InitialAvatar(p.label, radius: 48)),
-                  const SizedBox(height: 16),
-                  Text(
-                    p.label,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  Text('@${p.username}', textAlign: TextAlign.center),
-                  const SizedBox(height: 16),
-                  if (p.bio?.isNotEmpty ?? false)
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Text(p.bio!),
+      body: MingleBackdrop(
+        child: SafeArea(
+          child: IndexedStack(
+            index: _tab,
+            children: [
+              ChatsPage(
+                repository: widget.services.conversations,
+                users: widget.services.users,
+                currentUserId: widget.user.id,
+                onFindPeople: () => setState(() => _tab = 1),
+              ),
+              PeoplePage(
+                users: widget.services.users,
+                conversations: widget.services.conversations,
+                currentUserId: widget.user.id,
+              ),
+              SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const WarmHeader('Your profile', 'A little about you.'),
+                    const SizedBox(height: 24),
+                    Center(child: InitialAvatar(p.label, radius: 54)),
+                    const SizedBox(height: 16),
+                    Text(
+                      p.label,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    Text(
+                      '@${p.username}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
-                  const SizedBox(height: 24),
-                  FilledButton(
-                    onPressed: _edit,
-                    child: const Text('Edit profile'),
-                  ),
-                  const SizedBox(height: 16),
-                  OutlinedButton(
-                    onPressed: _logout,
-                    child: const Text('Sign out'),
-                  ),
-                ],
+                    const SizedBox(height: 16),
+                    if (p.bio?.isNotEmpty ?? false)
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Text(p.bio!),
+                        ),
+                      ),
+                    const SizedBox(height: 24),
+                    OutlinedButton.icon(
+                      onPressed: _edit,
+                      icon: const Icon(Icons.edit_outlined, size: 18),
+                      label: const Text('Edit profile'),
+                    ),
+                    const SizedBox(height: 16),
+                    TextButton.icon(
+                      onPressed: _logout,
+                      icon: const Icon(Icons.logout_rounded, size: 18),
+                      label: const Text('Sign out'),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-      bottomNavigationBar: NavigationBar(
+      bottomNavigationBar: MingleNavigation(
         selectedIndex: _tab,
-        onDestinationSelected: (i) => setState(() => _tab = i),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.chat_bubble_outline_rounded),
-            selectedIcon: Icon(Icons.chat_bubble_rounded),
-            label: 'Chats',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.people_outline_rounded),
-            selectedIcon: Icon(Icons.people_rounded),
-            label: 'People',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline_rounded),
-            selectedIcon: Icon(Icons.person_rounded),
-            label: 'Profile',
-          ),
-        ],
+        onSelected: (i) => setState(() => _tab = i),
+        onNewChat: () => setState(() => _tab = 1),
       ),
     );
   }

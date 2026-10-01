@@ -68,81 +68,87 @@ class _ProfileFormState extends State<ProfileForm> {
           ),
       ],
     ),
-    body: Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 560),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Form(
-            key: _form,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(child: InitialAvatar(widget.profile.label, radius: 42)),
-                const SizedBox(height: 24),
-                if (widget.completing)
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: 24),
-                    child: Text(
-                      'Choose the name people will see and a username they can find.',
-                    ),
+    body: MingleBackdrop(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 560),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Form(
+              key: _form,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(
+                    child: InitialAvatar(widget.profile.label, radius: 42),
                   ),
-                TextFormField(
-                  controller: _name,
-                  enabled: !_busy,
-                  maxLength: 80,
-                  decoration: const InputDecoration(labelText: 'Display name'),
-                  validator: (v) => v == null || v.trim().isEmpty
-                      ? 'Enter a display name.'
-                      : null,
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _username,
-                  enabled: !_busy,
-                  maxLength: 40,
-                  decoration: const InputDecoration(
-                    labelText: 'Username',
-                    prefixText: '@',
-                  ),
-                  validator: (v) =>
-                      v == null ||
-                          !RegExp(r'^[a-zA-Z0-9_]{3,40}$').hasMatch(v.trim())
-                      ? 'Use 3–40 letters, numbers or underscores.'
-                      : null,
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _bio,
-                  enabled: !_busy,
-                  maxLength: 280,
-                  maxLines: 3,
-                  decoration: const InputDecoration(
-                    labelText: 'Bio (optional)',
-                  ),
-                ),
-                if (_error != null)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: Text(
-                      _error!,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
+                  const SizedBox(height: 24),
+                  if (widget.completing)
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 24),
+                      child: Text(
+                        'Choose the name people will see and a username they can find.',
                       ),
                     ),
+                  TextFormField(
+                    controller: _name,
+                    enabled: !_busy,
+                    maxLength: 80,
+                    decoration: const InputDecoration(
+                      labelText: 'Display name',
+                    ),
+                    validator: (v) => v == null || v.trim().isEmpty
+                        ? 'Enter a display name.'
+                        : null,
                   ),
-                const SizedBox(height: 16),
-                FilledButton(
-                  onPressed: _busy ? null : _save,
-                  child: Text(
-                    _busy
-                        ? 'Saving…'
-                        : (widget.completing
-                              ? 'Start chatting'
-                              : 'Save profile'),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _username,
+                    enabled: !_busy,
+                    maxLength: 40,
+                    decoration: const InputDecoration(
+                      labelText: 'Username',
+                      prefixText: '@',
+                    ),
+                    validator: (v) =>
+                        v == null ||
+                            !RegExp(r'^[a-zA-Z0-9_]{3,40}$').hasMatch(v.trim())
+                        ? 'Use 3–40 letters, numbers or underscores.'
+                        : null,
                   ),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _bio,
+                    enabled: !_busy,
+                    maxLength: 280,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      labelText: 'Bio (optional)',
+                    ),
+                  ),
+                  if (_error != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: Text(
+                        _error!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 16),
+                  FilledButton(
+                    onPressed: _busy ? null : _save,
+                    child: Text(
+                      _busy
+                          ? 'Saving…'
+                          : (widget.completing
+                                ? 'Start chatting'
+                                : 'Save profile'),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

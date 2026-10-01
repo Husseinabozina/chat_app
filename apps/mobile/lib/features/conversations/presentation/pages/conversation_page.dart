@@ -289,6 +289,10 @@ class _ConversationPageState extends State<ConversationPage>
                 child: const Text('Cancel'),
               ),
               FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: Theme.of(c).colorScheme.error,
+                  foregroundColor: Theme.of(c).colorScheme.onError,
+                ),
                 onPressed: () => Navigator.of(c).pop(true),
                 child: const Text('Delete'),
               ),
@@ -353,22 +357,31 @@ class _ConversationPageState extends State<ConversationPage>
     _scheduleRead();
     return Scaffold(
       appBar: AppBar(
+        flexibleSpace: const MingleBackdrop(
+          intensity: .4,
+          child: SizedBox.expand(),
+        ),
         title: InkWell(
           onTap: _profile,
           child: Row(
             children: [
-              InitialAvatar(name, radius: 18),
+              InitialAvatar(name, radius: 20),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(name, maxLines: 1, overflow: TextOverflow.ellipsis),
-                    if (typing)
-                      Text(
-                        'typing…',
-                        style: Theme.of(context).textTheme.labelSmall,
-                      ),
+                    Text(
+                      typing
+                          ? 'typing…'
+                          : (other.username != null
+                                ? '@${other.username}'
+                                : 'Direct conversation'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
                   ],
                 ),
               ),
@@ -376,243 +389,279 @@ class _ConversationPageState extends State<ConversationPage>
           ),
         ),
       ),
-      body: SafeArea(
-        top: false,
-        child: Column(
-          children: [
-            if (_state.connection == ConversationConnection.offline)
-              MaterialBanner(
-                content: const Text(
-                  'Connection paused. Messages may need a retry.',
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () async {
-                      try {
-                        await widget.repository.resynchronize();
-                      } catch (e) {
-                        if (context.mounted) showFailure(context, e);
-                      }
-                    },
-                    child: const Text('Refresh'),
+      body: MingleBackdrop(
+        intensity: .28,
+        child: SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              if (_state.connection == ConversationConnection.offline)
+                MaterialBanner(
+                  content: const Text(
+                    'Connection paused. Messages may need a retry.',
                   ),
-                ],
-              ),
-            if (_loadError != null)
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Row(
-                  children: [
-                    Expanded(child: Text(friendlyError(_loadError!))),
+                  actions: [
                     TextButton(
-                      onPressed: () => _load(),
-                      child: const Text('Retry history'),
-                    ),
-                  ],
-                ),
-              ),
-            if (_readError != null)
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Row(
-                  children: [
-                    const Expanded(
-                      child: Text('Read status could not be saved.'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        setState(() => _readError = null);
-                        _scheduleRead();
+                      onPressed: () async {
+                        try {
+                          await widget.repository.resynchronize();
+                        } catch (e) {
+                          if (context.mounted) showFailure(context, e);
+                        }
                       },
-                      child: const Text('Retry read'),
+                      child: const Text('Refresh'),
                     ),
                   ],
                 ),
-              ),
-            Expanded(
-              child: SizedBox(
-                key: _viewport,
-                child: _loading && messages.isEmpty
-                    ? const Center(child: CircularProgressIndicator())
-                    : messages.isEmpty && outgoing.isEmpty
-                    ? const StatusPanel('Say hello to start the conversation.')
-                    : ListView.builder(
-                        controller: _scroll,
-                        reverse: true,
-                        padding: const EdgeInsets.all(16),
-                        itemCount:
-                            outgoing.length +
-                            messages.length +
-                            (hasMore ? 1 : 0),
-                        itemBuilder: (context, i) {
-                          if (i < outgoing.length) {
-                            final m = outgoing[i];
-                            return MessageCard(
-                              key: ValueKey(m.clientMessageId),
-                              text: m.text,
-                              own: true,
-                              status: m.status == OutgoingStatus.failed
-                                  ? 'Failed · Tap to retry'
-                                  : 'Sending…',
-                              onTap: m.status == OutgoingStatus.failed
-                                  ? () => _retry(m)
-                                  : null,
-                            );
-                          }
-                          final index = i - outgoing.length;
-                          if (index == messages.length) {
-                            return TextButton(
-                              onPressed: _more
-                                  ? null
-                                  : () => _load(older: true),
-                              child: Text(
-                                _more ? 'Loading…' : 'Load older messages',
-                              ),
-                            );
-                          }
-                          final m = messages[index];
-                          final own = m.senderId == widget.currentUserId;
-                          final read =
-                              own &&
-                              _state.readPointers.any(
-                                (p) =>
-                                    p.conversationId == _id &&
-                                    p.userId != widget.currentUserId &&
-                                    covers(p, m, messages),
+              if (_loadError != null)
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      Expanded(child: Text(friendlyError(_loadError!))),
+                      TextButton(
+                        onPressed: () => _load(),
+                        child: const Text('Retry history'),
+                      ),
+                    ],
+                  ),
+                ),
+              if (_readError != null)
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: Text('Read status could not be saved.'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          setState(() => _readError = null);
+                          _scheduleRead();
+                        },
+                        child: const Text('Retry read'),
+                      ),
+                    ],
+                  ),
+                ),
+              Expanded(
+                child: SizedBox(
+                  key: _viewport,
+                  child: _loading && messages.isEmpty
+                      ? const Center(child: CircularProgressIndicator())
+                      : messages.isEmpty && outgoing.isEmpty
+                      ? const StatusPanel(
+                          'Say hello to start the conversation.',
+                        )
+                      : ListView.builder(
+                          controller: _scroll,
+                          reverse: true,
+                          padding: const EdgeInsets.all(16),
+                          itemCount:
+                              outgoing.length +
+                              messages.length +
+                              (hasMore ? 1 : 0),
+                          itemBuilder: (context, i) {
+                            if (i < outgoing.length) {
+                              final m = outgoing[i];
+                              return MessageCard(
+                                key: ValueKey(m.clientMessageId),
+                                text: m.text,
+                                own: true,
+                                status: m.status == OutgoingStatus.failed
+                                    ? 'Failed · Tap to retry'
+                                    : 'Sending…',
+                                onTap: m.status == OutgoingStatus.failed
+                                    ? () => _retry(m)
+                                    : null,
                               );
-                          final reply = m.replyToMessageId == null
-                              ? null
-                              : messages
-                                    .where((r) => r.id == m.replyToMessageId)
-                                    .firstOrNull;
-                          final date = m.createdAt.toLocal();
-                          final previous = index + 1 < messages.length
-                              ? messages[index + 1].createdAt.toLocal()
-                              : null;
-                          final showDate =
-                              previous == null ||
-                              date.year != previous.year ||
-                              date.month != previous.month ||
-                              date.day != previous.day;
-                          return Column(
-                            key: ValueKey(m.id),
-                            children: [
-                              if (showDate)
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                  ),
-                                  child: Text(
-                                    '${date.day}/${date.month}/${date.year}',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelSmall,
-                                  ),
-                                ),
-                              MessageCard(
-                                key: _messageKeys.putIfAbsent(
-                                  m.id,
-                                  GlobalKey.new,
-                                ),
-                                text: m.isDeleted
-                                    ? 'Message deleted'
-                                    : m.text ?? '',
-                                own: own,
-                                deleted: m.isDeleted,
-                                quote: m.isDeleted || m.replyToMessageId == null
+                            }
+                            final index = i - outgoing.length;
+                            if (index == messages.length) {
+                              return TextButton(
+                                onPressed: _more
                                     ? null
-                                    : reply == null
-                                    ? 'Reply to an earlier message'
-                                    : reply.isDeleted
-                                    ? 'Message deleted'
-                                    : reply.text,
-                                status:
-                                    '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}${m.editedAt != null && !m.isDeleted ? ' · edited' : ''}${own && !m.isDeleted
-                                        ? read
-                                              ? ' · Read'
-                                              : ' · Sent'
-                                        : ''}',
-                                onLongPress: m.isDeleted
-                                    ? null
-                                    : () => _actions(m),
-                              ),
-                            ],
-                          );
+                                    : () => _load(older: true),
+                                child: Text(
+                                  _more ? 'Loading…' : 'Load older messages',
+                                ),
+                              );
+                            }
+                            final m = messages[index];
+                            final own = m.senderId == widget.currentUserId;
+                            final read =
+                                own &&
+                                _state.readPointers.any(
+                                  (p) =>
+                                      p.conversationId == _id &&
+                                      p.userId != widget.currentUserId &&
+                                      covers(p, m, messages),
+                                );
+                            final reply = m.replyToMessageId == null
+                                ? null
+                                : messages
+                                      .where((r) => r.id == m.replyToMessageId)
+                                      .firstOrNull;
+                            final date = m.createdAt.toLocal();
+                            final previous = index + 1 < messages.length
+                                ? messages[index + 1].createdAt.toLocal()
+                                : null;
+                            final showDate =
+                                previous == null ||
+                                date.year != previous.year ||
+                                date.month != previous.month ||
+                                date.day != previous.day;
+                            return Column(
+                              key: ValueKey(m.id),
+                              children: [
+                                if (showDate)
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 14,
+                                        vertical: 6,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .surface,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
+                                        '${date.day}/${date.month}/${date.year}',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelSmall,
+                                      ),
+                                    ),
+                                  ),
+                                MessageCard(
+                                  key: _messageKeys.putIfAbsent(
+                                    m.id,
+                                    GlobalKey.new,
+                                  ),
+                                  text: m.isDeleted
+                                      ? 'Message deleted'
+                                      : m.text ?? '',
+                                  own: own,
+                                  deleted: m.isDeleted,
+                                  quote:
+                                      m.isDeleted || m.replyToMessageId == null
+                                      ? null
+                                      : reply == null
+                                      ? 'Reply to an earlier message'
+                                      : reply.isDeleted
+                                      ? 'Message deleted'
+                                      : reply.text,
+                                  status:
+                                      '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}${m.editedAt != null && !m.isDeleted ? ' · edited' : ''}${own && !m.isDeleted
+                                          ? read
+                                                ? ' · Read'
+                                                : ' · Sent'
+                                          : ''}',
+                                  onLongPress: m.isDeleted
+                                      ? null
+                                      : () => _actions(m),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                ),
+              ),
+              if (contextMessage != null)
+                ListTile(
+                  title: Text(
+                    _editing != null
+                        ? deletedEditing
+                              ? 'This message was deleted'
+                              : 'Editing message'
+                        : 'Replying',
+                  ),
+                  subtitle: Text(
+                    contextMessage.isDeleted
+                        ? 'Message deleted'
+                        : contextMessage.text ?? '',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  trailing: IconButton(
+                    tooltip: 'Cancel',
+                    onPressed: _savingEdit
+                        ? null
+                        : () => setState(() {
+                            if (_editing != null) _text.clear();
+                            _reply = null;
+                            _editing = null;
+                          }),
+                    icon: const Icon(Icons.close),
+                  ),
+                ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _text,
+                        enabled: !_savingEdit,
+                        minLines: 1,
+                        maxLines: 5,
+                        maxLength: 4000,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(28),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(28),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.outline,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(28),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                          hintText: 'Message…',
+                          counterText: '',
+                          errorText: messageLength(_text.text.trim()) > 4000
+                              ? 'Use at most 4,000 characters.'
+                              : null,
+                        ),
+                        onChanged: (v) {
+                          _typing(v);
+                          setState(() {});
                         },
                       ),
-              ),
-            ),
-            if (contextMessage != null)
-              ListTile(
-                title: Text(
-                  _editing != null
-                      ? deletedEditing
-                            ? 'This message was deleted'
-                            : 'Editing message'
-                      : 'Replying',
-                ),
-                subtitle: Text(
-                  contextMessage.isDeleted
-                      ? 'Message deleted'
-                      : contextMessage.text ?? '',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                trailing: IconButton(
-                  tooltip: 'Cancel',
-                  onPressed: _savingEdit
-                      ? null
-                      : () => setState(() {
-                          if (_editing != null) _text.clear();
-                          _reply = null;
-                          _editing = null;
-                        }),
-                  icon: const Icon(Icons.close),
-                ),
-              ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _text,
-                      enabled: !_savingEdit,
-                      minLines: 1,
-                      maxLines: 5,
-                      maxLength: 4000,
-                      decoration: InputDecoration(
-                        hintText: 'Message…',
-                        counterText: '',
-                        errorText: messageLength(_text.text.trim()) > 4000
-                            ? 'Use at most 4,000 characters.'
-                            : null,
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton.filled(
+                      tooltip: _editing == null ? 'Send message' : 'Save edit',
+                      style: IconButton.styleFrom(
+                        minimumSize: const Size(50, 50),
                       ),
-                      onChanged: (v) {
-                        _typing(v);
-                        setState(() {});
-                      },
+                      onPressed:
+                          _text.text.trim().isEmpty ||
+                              messageLength(_text.text.trim()) > 4000 ||
+                              _savingEdit ||
+                              deletedEditing
+                          ? null
+                          : _send,
+                      icon: Icon(
+                        _editing == null ? Icons.send_rounded : Icons.check,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton.filled(
-                    tooltip: _editing == null ? 'Send message' : 'Save edit',
-                    onPressed:
-                        _text.text.trim().isEmpty ||
-                            messageLength(_text.text.trim()) > 4000 ||
-                            _savingEdit ||
-                            deletedEditing
-                        ? null
-                        : _send,
-                    icon: Icon(
-                      _editing == null ? Icons.send_rounded : Icons.check,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -674,8 +723,20 @@ class MessageCard extends StatelessWidget {
         child: Material(
           color: own
               ? Theme.of(context).colorScheme.primaryContainer
-              : Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(22),
+              : Theme.of(context).brightness == Brightness.dark
+              ? Theme.of(context).colorScheme.surface
+              : const Color(0xFFFFFDFC),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusDirectional.only(
+              topStart: const Radius.circular(22),
+              topEnd: const Radius.circular(22),
+              bottomStart: Radius.circular(own ? 22 : 7),
+              bottomEnd: Radius.circular(own ? 7 : 22),
+            ),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+          ),
           child: InkWell(
             borderRadius: BorderRadius.circular(22),
             onTap: onTap,
@@ -707,12 +768,32 @@ class MessageCard extends StatelessWidget {
                   Text(
                     text,
                     textDirection: messageDirection(text),
-                    style: deleted
-                        ? const TextStyle(fontStyle: FontStyle.italic)
-                        : null,
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                      fontSize: 15.5,
+                      fontStyle: deleted ? FontStyle.italic : FontStyle.normal,
+                    ),
                   ),
                   const SizedBox(height: 6),
-                  Text(status, style: Theme.of(context).textTheme.labelSmall),
+                  Wrap(
+                    spacing: 4,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text(
+                        status,
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
+                      if (own &&
+                          !deleted &&
+                          (status.endsWith('Read') || status.endsWith('Sent')))
+                        Icon(
+                          status.endsWith('Read')
+                              ? Icons.done_all_rounded
+                              : Icons.done_rounded,
+                          size: 14,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                    ],
+                  ),
                 ],
               ),
             ),

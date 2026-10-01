@@ -91,10 +91,7 @@ class _PeoplePageState extends State<PeoplePage> {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              const WarmHeader(
-                'People',
-                'Find a familiar name or meet someone new.',
-              ),
+              const WarmHeader('People', 'A new conversation is a name away.'),
               const SizedBox(height: 16),
               TextField(
                 maxLength: 80,
@@ -139,17 +136,33 @@ class _PeoplePageState extends State<PeoplePage> {
         itemCount: _page?.items.length ?? 0,
         itemBuilder: (context, i) {
           final p = _page!.items[i];
-          return ListTile(
-            leading: InitialAvatar(p.label),
-            title: Text(p.label),
-            subtitle: Text(p.username == null ? '' : '@${p.username}'),
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => PublicProfilePage(
-                  userId: p.id,
-                  users: widget.users,
-                  conversations: widget.conversations,
-                  currentUserId: widget.currentUserId,
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Material(
+              color: Theme.of(context).colorScheme.surface
+                  .withValues(alpha: .85),
+              borderRadius: BorderRadius.circular(22),
+              child: ListTile(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(22),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                trailing: const Icon(Icons.chevron_right_rounded, size: 20),
+                leading: InitialAvatar(p.label),
+                title: Text(p.label),
+                subtitle: Text(p.username == null ? '' : '@${p.username}'),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => PublicProfilePage(
+                      userId: p.id,
+                      users: widget.users,
+                      conversations: widget.conversations,
+                      currentUserId: widget.currentUserId,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -233,41 +246,49 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: const Text('Profile')),
-    body: _error != null
-        ? StatusPanel(friendlyError(_error!), action: _load)
-        : _profile == null
-        ? const Center(child: CircularProgressIndicator())
-        : SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(child: InitialAvatar(_profile!.label, radius: 56)),
-                const SizedBox(height: 24),
-                Text(
-                  _profile!.label,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                if (_profile!.username != null)
-                  Text('@${_profile!.username}', textAlign: TextAlign.center),
-                const SizedBox(height: 24),
-                if (_profile!.bio?.isNotEmpty ?? false)
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Text(_profile!.bio!),
+    body: MingleBackdrop(
+      child: _error != null
+          ? StatusPanel(friendlyError(_error!), action: _load)
+          : _profile == null
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(child: InitialAvatar(_profile!.label, radius: 56)),
+                  const SizedBox(height: 24),
+                  Text(
+                    _profile!.label,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                  if (_profile!.username != null)
+                    Text(
+                      '@${_profile!.username}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                const SizedBox(height: 24),
-                if (widget.allowMessage &&
-                    widget.userId != widget.currentUserId)
-                  FilledButton(
-                    onPressed: _busy ? null : _message,
-                    child: Text(_busy ? 'Opening…' : 'Message'),
-                  ),
-              ],
+                  const SizedBox(height: 24),
+                  if (_profile!.bio?.isNotEmpty ?? false)
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Text(_profile!.bio!),
+                      ),
+                    ),
+                  const SizedBox(height: 24),
+                  if (widget.allowMessage &&
+                      widget.userId != widget.currentUserId)
+                    FilledButton(
+                      onPressed: _busy ? null : _message,
+                      child: Text(_busy ? 'Opening…' : 'Message'),
+                    ),
+                ],
+              ),
             ),
-          ),
+    ),
   );
 }
