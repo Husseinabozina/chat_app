@@ -54,3 +54,15 @@ Next: review the open stack, then implement the approved backend account,
 conversation-list/history UI and lifecycle hooks with repository contracts.
 Include a two-account integration pass for send/retry/edit/delete/read/reconnect.
 Do not claim Firebase entrypoint migration or public deployment is complete.
+
+## Verified result
+
+PR #17 is stacked above #16 and ready for review, unmerged. Implementation
+commit `9c369dc661d4e59341318304c3b779eeb5425991` passed Backend CI
+[run #82](https://github.com/Husseinabozina/chat_app/actions/runs/36798100758)
+and Mobile CI
+[run #16](https://github.com/Husseinabozina/chat_app/actions/runs/36798100980).
+Backend: 20 tests passed; mobile: 37 passed. GitHub's synthetic PR merge tree
+matches the implementation tree exactly; this was not a branch merge.
+Local format/analyze/tests and backend static/build checks also passed.
+Final documentation HEAD/checks are recorded in the PR verification section.
