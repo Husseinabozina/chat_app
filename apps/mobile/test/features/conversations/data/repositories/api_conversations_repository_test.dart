@@ -213,7 +213,11 @@ void main() {
   });
 
   test('typing expires locally and stop wins over an older start', () async {
-    final now = DateTime.now().toUtc();
+    await repository.close();
+    var clock = DateTime.utc(2026, 10, 1);
+    repository = ApiConversationsRepository(rest, realtime, now: () => clock);
+    await repository.start('alice');
+    final now = clock;
     realtime.emit(
       TypingChanged(
         eventId: 'typing-start',
@@ -225,7 +229,11 @@ void main() {
       ),
     );
     expect(repository.currentState.typing, hasLength(1));
-    await repository.watchState().firstWhere((state) => state.typing.isEmpty);
+    clock = now.add(const Duration(milliseconds: 51));
+    await repository
+        .watchState()
+        .firstWhere((state) => state.typing.isEmpty)
+        .timeout(const Duration(seconds: 3));
     realtime.emit(
       TypingChanged(
         eventId: 'typing-stop',

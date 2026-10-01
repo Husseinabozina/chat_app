@@ -3,7 +3,7 @@
 Update this file before closing each future project checkpoint. Verify branch heads and CI runs from GitHub before changing the status below.
 
 **Updated:** 2026-10-01
-**Current phase:** Mobile repository reconciliation and backend session lifecycle are verified on [PR #17](https://github.com/Husseinabozina/chat_app/pull/17), stacked above PR #16. The new backend path is staged; the active app still uses the legacy Firebase entrypoint. Backend account/direct-conversation UI integration is next.
+**Current phase:** Backend account/direct-conversation UI implementation on `feat/mobile-backend-product-flow`, based on verified PR #17 HEAD `d1a1c683a63c9ace2b337d861bb83eef26e45763`. The backend app entrypoint is enabled by `CHAT_API_BASE_URL`; the legacy Firebase fallback remains when unset. Host/widget and live two-account checks have passed locally; final CI/native-device results are recorded at checkpoint closure.
 
 ## Last verified integrated baseline
 
@@ -19,7 +19,7 @@ Update this file before closing each future project checkpoint. Verify branch he
 - Mobile CI: [run #12](https://github.com/Husseinabozina/chat_app/actions/runs/36723604090), passed on that exact mobile-changing master SHA.
 - Later master merges after `e03d990...` affected backend/docs only, not `apps/mobile/**`.
 
-## Last verified active checkpoint
+## Last verified repository checkpoint (#17)
 
 - Branch/PR: `feat/mobile-repository-reconciliation` / [PR #17](https://github.com/Husseinabozina/chat_app/pull/17), ready for review and unmerged.
 - Verified implementation commit: `9c369dc661d4e59341318304c3b779eeb5425991`.
@@ -86,7 +86,7 @@ Open stack: PR #15 (`feat/backend-realtime-foundation` → `master`) → PR #16 
 - On PR #16: canonical Flutter 3.47.5 lockfile, read-only Mobile CI, and tests for backend session handling and realtime event mapping.
 - On PR #17: domain conversation/account repositories, REST/event deduplication, edit/delete/read monotonic merging, buffered resync of loaded windows/read snapshots, outgoing retries, typing TTL/throttling, and account-scoped session/socket lifecycle.
 
-The running mobile product still uses legacy Firebase chat behavior. The new backend datasources are staged and are not wired into `main.dart` or the current single-room UI. Repository-level REST/realtime reconciliation is verified on PR #17; the approved multi-conversation UI is not implemented yet.
+The backend entrypoint now exposes account creation/login, profile completion/editing, Chats/People/Profile, search/public profiles/direct conversation creation, paginated text history, reply/copy/edit/delete, failed-send retry, read receipts and typing. Widgets use domain contracts and account-keyed routing; background/foreground hooks pause/resume the existing transport. No backend architecture/schema/durable socket command changes are introduced. The Firebase flow is still the default when the backend URL is unset. This is functional UI implementation based on the documented direction; final visual acceptance is pending.
 
 ### Realtime architecture
 
@@ -152,7 +152,6 @@ Both workflows are unchanged and read-only, with no temporary diagnostics/artifa
 - Push notifications/device-token runtime flow.
 - Media uploads/storage and avatar storage-key policy.
 - Durable mobile offline cache/outbox beyond in-memory outgoing retries.
-- Multi-conversation Flutter product flow.
 - Final high-fidelity UI implementation.
 - Deployment/observability/production hardening beyond current CI.
 
@@ -161,9 +160,9 @@ Both workflows are unchanged and read-only, with no temporary diagnostics/artifa
 - Dedicated cascade-deletion regression coverage from superseded #8 has not been reproduced.
 - Avatar storage-key design remains deferred to media storage.
 - Product edit/delete time-window policy remains undecided.
-- Mobile still runs legacy Firebase behavior.
-- The current Firebase registration form requires a profile image, while backend registration accepts email/password; media/profile setup needs a separate product flow before entrypoint migration.
-- Mobile transport/repository/session coverage uses local/fake clients; a two-account on-device backend/socket integration flow has not been verified yet.
+- Backend mode requires an explicit `CHAT_API_BASE_URL`; the default remains the legacy Firebase flow.
+- Backend onboarding separates email/password creation from supported text identity fields. Avatar/media upload remains deferred.
+- Two real backend accounts are verified on the Flutter test host; this does not establish two-device UI behavior or native secure-storage persistence. Native iPhone simulator verification is tracked separately.
 - Conversation summaries have no durable revision; mobile conservatively invalidates/refetches them, which may add REST traffic under heavy load.
 - Message-edit timestamps can tie; conflicting equal-time content is resolved through REST refetch. An independent resource revision can reduce ambiguity/query traffic later.
 - Offline logout clears local state immediately, while server revocation of pending rotated/auth tokens remains best effort.
@@ -172,7 +171,16 @@ Both workflows are unchanged and read-only, with no temporary diagnostics/artifa
 
 ## Exact next checkpoint
 
-**Backend account and direct-conversation UI integration**, after review of the open stack. Use the approved visual direction/assets and the new domain repositories for account creation/login, conversation list, paginated history, composer/retry, read/edit/delete, typing, and foreground/background hooks. Validate a two-account backend/device flow including network interruption, REST/realtime deduplication, and auth expiry/logout. Keep profile/media setup separate from email/password account creation. Review/merge the stack with merge commits before final integrated-master verification.
+**Native backend UI/device acceptance and reviewed stack integration.** Finish native simulator/device validation and visual acceptance (including two-device foreground/background/reconnect and secure storage restore), then review the open #15 → #16 → #17 → UI PR stack. Merge only after explicit authorization; use merge commits, retarget the following PR and verify integrated master. Before any public deployment, implement allowed-origin/CORS and handshake attempt throttling. Media/push/presence/outbox remain deferred.
+
+## Backend UI checkpoint in progress
+
+- Branch: `feat/mobile-backend-product-flow`; parent is PR #17 final HEAD above. PR/implementation/final-check identifiers will be recorded after publication.
+- Local mobile: format/analysis at earlier revision and full current test suite passed (46 tests; live test skipped without URL). The live test separately passed with two accounts on PostgreSQL 17.11/Node 24.9.0.
+- Backend existing 20 compiled-app E2E tests previously passed on the same unchanged backend tree.
+- Mobile CI adds a reproducible Node 24/PostgreSQL 17 integration job and triggers for backend contract changes; it retains `contents: read`, locked dependencies, and no diagnostic artifact upload. Backend workflow remains unchanged.
+- Native iOS build is still in dependency preparation at publication planning time; it is not counted as passed. Final native and CI results are documented in `MOBILE_BACKEND_UI_CHECKPOINT.md` and the PR.
+- Typography/assets and final visual approval remain future acceptance work. No new generated images.
 
 Reconciliation details and limitations: `docs/project/MOBILE_RECONCILIATION_CHECKPOINT.md`.
 
