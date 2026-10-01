@@ -288,3 +288,12 @@ This is a standing project rule:
 - If a visual artifact is needed later, generate only the specific screen/asset requested rather than a full-app collage unless the user explicitly asks for one.
 
 This guardrail exists to keep the AI workflow aligned with the project plan and prevent repeated visual work from replacing the actual next engineering task.
+
+
+## 10. Approved Chats preview — 2026-10-01
+
+The user reattached the original pastel Mingle board and requested implementation. After an isolated avatar asset caused confusion, the user requested a complete Chats preview before further implementation. The full-screen concept at `docs/design/references/approved-chats-preview.png` was displayed; the user explicitly approved it and asked to continue.
+
+This locks the direction of this iteration: soft cloud/paper-plane/leaf decoration at the edges; cream/blush surfaces; readable rounded navy typography; small circular illustrated avatars; soft search, All/Unread filters, clear direct-conversation rows and rounded Chats/People/new-chat/Profile navigation. The plus is a new-chat action, not a fourth product section. Reference groups/files/presence are not added to scope.
+
+The concept is an AI-rendered visual target, not a screenshot or proof of implementation. Match it in Flutter and compare the actual native rendering before declaring visual QA passed. Typography family/asset refinements may be necessary to reproduce the approved appearance. Keep controls/content as native widgets. Do not generate further mockups or visual boards without a specific request.

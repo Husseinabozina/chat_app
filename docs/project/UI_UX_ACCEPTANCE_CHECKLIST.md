@@ -49,7 +49,7 @@ PR #18 code HEAD `b4a31c6c7c17e7f12062c83261d700d94d8cc60d` passed Mobile CI #19
 - [ ] Content/empty/no-results/loading/error/offline states reviewed on device, including loaded-window search wording and load-more when filtered empty.
 - [ ] Final rounded bottom navigation and preserved tab/scroll behavior reviewed.
 
-Current baseline: gradient WarmHeader, Material controls/navigation and initials avatars; full environmental decoration/custom typography/navigation are pending.
+Current implementation: PR #19 adds bundled rounded fonts, separate cloud/plane/leaf artwork, illustrated fallback plus initial badge, native rounded rows/forms/bubbles and custom navigation. The user approved the complete Chats concept; inspection of the revised native rendering is pending manual Mac unlock. Implementation alone does not tick visual acceptance boxes.
 
 ### Conversation and composer
 
@@ -110,6 +110,10 @@ Voice notes/reactions/presence/pinning need a later scope decision. Groups/calls
 | Exact log counts | CI #18 inspected logs/local suite: 46 mobile passed + one ordinary live skip; 20 backend passed; one separate live integration passed | Counts scoped to recorded runs |
 | Native artifact/runtime | User-built Runner.app installed/launched successfully on iPhone 16e/iOS 26.2; existing platform diff remains uncommitted | Artifact launch passed; final terminal build summary not captured |
 | Native secure storage / two-device flow | One-simulator login/profile/search/direct send, Arabic realtime reception/read display and account/history restoration after process restart passed; peer was REST fixture | Targeted one-device smoke passed; two-native-client flow pending |
-| Final artwork/font/navigation | Approved direction documented; simplified generated Chats preview only | Pending user review |
+| Final artwork/font/navigation | PR #19 implementation/CI #22; user-approved complete Chats concept saved under docs/design/references | Native visual comparison blocked by locked Mac; not accepted as finished |
 
 Record dated device screenshots/review decisions and targeted verification as they occur. Do not tick boxes based on expectations or build-artifact presence alone.
+
+### PR #19 evidence update — 2026-10-01
+
+Code `9dbf88c359d446d8b9853573cedc478243e3006c` passed Mobile CI #22 (quality + real two-account integration). Native build/launch succeeded on iPhone 16e/iOS 26.2 in 749.7s. New native screenshots/visual comparison are unavailable because the Mac is locked; the user was asked to unlock it. `design-qa.md` is explicitly blocked. Earlier native smoke remains historical PR #18 evidence, not automatic acceptance of the new appearance.
