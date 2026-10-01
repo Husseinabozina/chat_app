@@ -101,6 +101,26 @@ after(async () => {
   await app.close();
 });
 
+test('unread conversations expose null read pointers to members', async () => {
+  const snapshot = await request<{
+    members: Array<{
+      lastReadMessageId: string | null;
+      lastReadAt: string | null;
+      lastReadMessageCreatedAt: string | null;
+    }>;
+  }>(`/conversations/${conversationId}/read-state`, {
+    method: 'GET',
+    accessToken: alice.accessToken,
+  });
+  assert.equal(snapshot.status, 200);
+  assert.equal(snapshot.body.members.length, 2);
+  for (const member of snapshot.body.members) {
+    assert.equal(member.lastReadMessageId, null);
+    assert.equal(member.lastReadAt, null);
+    assert.equal(member.lastReadMessageCreatedAt, null);
+  }
+});
+
 test('direct conversations resolve idempotently and validate participants', async () => {
   const duplicate = await request<ConversationSummary>(
     '/conversations/direct',
@@ -376,6 +396,62 @@ test('read state advances monotonically and drives unread counts', async () => {
   );
   assert.equal(outsider.status, 404);
   assert.equal(outsider.body.error.code, 'CONVERSATION_NOT_FOUND');
+});
+
+test('read snapshots restore both participant pointers without realtime and hide outsiders', async () => {
+  const message = await sendMessage(
+    alice.accessToken,
+    conversationId,
+    randomUUID(),
+    'receipt recovery',
+  );
+  assert.equal(message.status, 201);
+  const advanced = await request<ReadStateResponse>(
+    `/conversations/${conversationId}/read`,
+    {
+      method: 'POST',
+      accessToken: bob.accessToken,
+      body: { upToMessageId: message.body.id },
+    },
+  );
+  assert.equal(advanced.status, 200);
+  const snapshot = await request<{
+    conversationId: string;
+    members: Array<{
+      userId: string;
+      lastReadMessageId: string | null;
+      lastReadAt: string | null;
+      lastReadMessageCreatedAt: string | null;
+    }>;
+  }>(`/conversations/${conversationId}/read-state`, {
+    method: 'GET',
+    accessToken: alice.accessToken,
+  });
+  assert.equal(snapshot.status, 200);
+  assert.equal(snapshot.body.conversationId, conversationId);
+  assert.equal(snapshot.body.members.length, 2);
+  const bobState = snapshot.body.members.find(
+    (member) => member.userId === bob.user.id,
+  );
+  assert.equal(bobState?.lastReadMessageId, message.body.id);
+  assert.equal(bobState?.lastReadMessageCreatedAt, message.body.createdAt);
+  assert.equal(bobState?.lastReadAt, advanced.body.lastReadAt);
+  const outsider = await request<{ error: { code: string } }>(
+    `/conversations/${conversationId}/read-state`,
+    { method: 'GET', accessToken: eve.accessToken },
+  );
+  assert.equal(outsider.status, 404);
+  assert.equal(outsider.body.error.code, 'CONVERSATION_NOT_FOUND');
+  const unauthenticated = await request<unknown>(
+    `/conversations/${conversationId}/read-state`,
+    { method: 'GET' },
+  );
+  assert.equal(unauthenticated.status, 401);
+  const missing = await request<unknown>(
+    `/conversations/${randomUUID()}/read-state`,
+    { method: 'GET', accessToken: alice.accessToken },
+  );
+  assert.equal(missing.status, 404);
 });
 
 test('only senders can edit or soft-delete their messages', async () => {

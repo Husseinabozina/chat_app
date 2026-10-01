@@ -38,6 +38,9 @@ ConversationEvent eventFromEnvelope(String eventName, Object? raw) {
         userId: data['userId'] as String,
         lastReadMessageId: data['lastReadMessageId'] as String,
         lastReadAt: asDate(data['lastReadAt']),
+        lastReadMessageCreatedAt: asNullableDate(
+          data['lastReadMessageCreatedAt'],
+        ),
       ),
     ),
     'typing.started' || 'typing.stopped' => TypingChanged(

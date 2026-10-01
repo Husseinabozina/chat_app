@@ -76,3 +76,10 @@ final class TypingChanged extends ConversationEvent {
   final bool isTyping;
   final DateTime? expiresAt;
 }
+
+final class RealtimeDisconnected extends ConversationEvent {
+  const RealtimeDisconnected({
+    required super.eventId,
+    required super.occurredAt,
+  });
+}

@@ -51,6 +51,14 @@ export class ConversationsController {
     );
   }
 
+  @Get(':conversationId/read-state')
+  readState(
+    @CurrentAuth() auth: AuthContext,
+    @Param('conversationId', new ParseUUIDPipe()) conversationId: string,
+  ) {
+    return this.conversationsService.getReadState(auth.userId, conversationId);
+  }
+
   @Post(':conversationId/read')
   @HttpCode(HttpStatus.OK)
   markRead(

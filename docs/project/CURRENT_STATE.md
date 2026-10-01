@@ -2,8 +2,8 @@
 
 Update this file before closing each future project checkpoint. Verify branch heads and CI runs from GitHub before changing the status below.
 
-**Updated:** 2026-09-30  
-**Current phase:** Backend realtime foundation is verified on PR #15. Flutter backend data foundations are verified on stacked PR #16; repository reconciliation and the new conversation flow are next.
+**Updated:** 2026-10-01
+**Current phase:** Mobile repository reconciliation and backend session lifecycle are implemented on `feat/mobile-repository-reconciliation`, stacked above PR #16. Local checks and GitHub CI verification are in progress. The active app still uses the legacy Firebase entrypoint.
 
 ## Last verified integrated baseline
 
@@ -13,7 +13,7 @@ Update this file before closing each future project checkpoint. Verify branch he
 - Backend CI on that exact HEAD: [run #81](https://github.com/Husseinabozina/chat_app/actions/runs/36740459123), passed on Node 24 with PostgreSQL 17.
 - Last verified mobile branch/PR/code commit: `feat/mobile-api-realtime-foundation` / [PR #16](https://github.com/Husseinabozina/chat_app/pull/16) / `dab2bd3a70f3518f08341eac859274f18744d9a2`.
 - Mobile CI on that code commit: [run #13](https://github.com/Husseinabozina/chat_app/actions/runs/36753226755), passed on Flutter 3.47.5.
-- Final documentation HEAD `42fe888387728447723b3d691719af1b99c50085` also passed Mobile CI [run #14](https://github.com/Husseinabozina/chat_app/actions/runs/36753687572). PR #16 is ready for review.
+- PR #16 final HEAD `b0a68f4908a60facea617655b358e478b22a7004` passed Mobile CI [run #15](https://github.com/Husseinabozina/chat_app/actions/runs/36755021551). PR #16 is ready for review.
 - Backend CI: [run #73](https://github.com/Husseinabozina/chat_app/actions/runs/36724138035), passed on the integrated backend baseline `c84e4ff5294867de0d6da392dccc071ca076901b`.
 - Latest mobile-changing master SHA: `e03d990fda545463ff259513fb668494dec8b1ec`
 - Mobile CI: [run #12](https://github.com/Husseinabozina/chat_app/actions/runs/36723604090), passed on that exact mobile-changing master SHA.
@@ -38,7 +38,7 @@ The active pre-realtime stack is integrated on `master` with merge commits:
 
 PR #5 and PR #8 are closed as superseded and their branches remain available for reference.
 
-Open stack: PR #15 (`feat/backend-realtime-foundation` → `master`) → PR #16 (`feat/mobile-api-realtime-foundation` → `feat/backend-realtime-foundation`). Both are ready for review. Neither PR has been merged. Preserve ancestry with merge commits; after #15 merges, retarget #16 to `master` and recheck the diff/checks.
+Open stack: PR #15 (`feat/backend-realtime-foundation` → `master`) → PR #16 (`feat/mobile-api-realtime-foundation` → `feat/backend-realtime-foundation`). Both are ready for review and unmerged. The reconciliation branch is stacked above #16; its review/CI status will be recorded before closing this checkpoint. Preserve ancestry with merge commits; after #15 merges, retarget #16 to `master` and recheck the diff/checks.
 
 ## Completed checkpoints
 
@@ -62,6 +62,7 @@ Open stack: PR #15 (`feat/backend-realtime-foundation` → `master`) → PR #16 
 - Health/PostgreSQL E2E coverage.
 - On PR #15: authenticated Socket.IO `/realtime` gateway, user/session rooms, post-commit message/conversation/read events, transient typing, and session-scoped disconnect after logout.
 - On PR #15: compiled-app realtime E2E coverage for auth, revocation, event delivery, isolation, summaries, read monotonicity, typing expiry/disconnect, and REST resync after reconnect.
+- On the reconciliation branch: membership-authorized read-state recovery query and additive canonical read-position fields, allowing REST recovery of receipts missed offline.
 
 ### Mobile
 
@@ -73,8 +74,9 @@ Open stack: PR #15 (`feat/backend-realtime-foundation` → `master`) → PR #16 
 - Firebase isolated behind data-layer adapters.
 - On PR #16: secure backend session store; refresh-aware REST client; backend auth and direct-conversation REST datasources; typed Socket.IO V1 event datasource with bounded reconnect; central opt-in backend data composition.
 - On PR #16: canonical Flutter 3.47.5 lockfile, read-only Mobile CI, and tests for backend session handling and realtime event mapping.
+- On the reconciliation branch: domain conversation/account repositories, REST/event deduplication, edit/delete/read monotonic merging, buffered resync of loaded windows/read snapshots, outgoing retries, typing TTL/throttling, and account-scoped session/socket lifecycle.
 
-The running mobile product still uses legacy Firebase chat behavior. The new backend datasources are staged and are not wired into `main.dart` or the current single-room UI. Repository-level REST/realtime reconciliation and the approved multi-conversation UI are not implemented yet.
+The running mobile product still uses legacy Firebase chat behavior. The new backend datasources are staged and are not wired into `main.dart` or the current single-room UI. Repository-level REST/realtime reconciliation is implemented on the new branch; the approved multi-conversation UI is not implemented yet.
 
 ### Realtime architecture
 
@@ -139,7 +141,7 @@ PR #14 was docs-only. PR #15 has green Backend CI and PR #16 has green Mobile CI
 - Redis/multi-instance realtime adapter.
 - Push notifications/device-token runtime flow.
 - Media uploads/storage and avatar storage-key policy.
-- Flutter repository-level REST/realtime merge, event deduplication/ordering, and reconnect resynchronization.
+- Durable mobile offline cache/outbox beyond in-memory outgoing retries.
 - Multi-conversation Flutter product flow.
 - Final high-fidelity UI implementation.
 - Deployment/observability/production hardening beyond current CI.
@@ -151,12 +153,17 @@ PR #14 was docs-only. PR #15 has green Backend CI and PR #16 has green Mobile CI
 - Product edit/delete time-window policy remains undecided.
 - Mobile still runs legacy Firebase behavior.
 - The current Firebase registration form requires a profile image, while backend registration accepts email/password; media/profile setup needs a separate product flow before entrypoint migration.
-- PR #16 transport tests are local/fake-client tests; an on-device backend/socket integration flow has not been verified yet.
+- Mobile transport/repository/session coverage uses local/fake clients; a two-account on-device backend/socket integration flow has not been verified yet.
+- Conversation summaries have no durable revision; mobile conservatively invalidates/refetches them, which may add REST traffic under heavy load.
+- Message-edit timestamps can tie; an independent resource revision remains potential future hardening.
+- Offline logout clears local state immediately, while server revocation of pending rotated/auth tokens remains best effort.
 - Production allowed-origin/CORS policy and handshake attempt throttling still need implementation before public deployment. The current backend checkpoint is for local/single-instance integration.
 - Realtime publication is best effort after commit; a crash between commit and emission can lose an event. REST resynchronization is the V1 recovery path.
 
 ## Exact next checkpoint
 
-**Mobile repository reconciliation and auth lifecycle**, stacked after PR #16 until the two open PRs are reviewed/merged. Build the direct-conversation repository over the staged REST/realtime datasources; deduplicate events, preserve deleted/edited/read monotonic state, buffer events during REST resync after reconnect, and coordinate socket connect/disconnect with the backend session. Test these merge rules with fake datasources. The subsequent checkpoint can switch the single-room Firebase UI to the approved direct-conversation flow using the design assets.
+**Backend account and direct-conversation UI integration**, after review of the open stack. Use the approved visual direction/assets and the new domain repositories for account creation/login, conversation list, paginated history, composer/retry, read/edit/delete, typing, and foreground/background hooks. Validate a two-account backend/device flow including network interruption, REST/realtime deduplication, and auth expiry/logout. Keep profile/media setup separate from email/password account creation. Review/merge the stack with merge commits before final integrated-master verification.
+
+Reconciliation details and limitations: `docs/project/MOBILE_RECONCILIATION_CHECKPOINT.md`.
 
 Before any public backend deployment, complete the allowed-origin/CORS policy and handshake attempt throttling noted above.

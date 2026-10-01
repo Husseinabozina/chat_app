@@ -19,17 +19,64 @@ final class RestApiClient {
   final http.Client _httpClient;
   final ApiSessionStore _sessionStore;
   Future<ApiSession>? _refreshing;
+  Future<void> _sessionWrites = Future.value();
+  final _sessions = StreamController<ApiSession?>.broadcast();
+  int _sessionRevision = 0;
+  bool _closed = false;
 
-  Future<ApiSession?> currentSession() => _sessionStore.read();
+  int get sessionRevision => _sessionRevision;
+  Stream<ApiSession?> get sessionChanges => _sessions.stream;
 
-  Future<void> saveSession(ApiSession session) => _sessionStore.write(session);
+  Future<ApiSession?> currentSession() async {
+    await _sessionWrites;
+    return _sessionStore.read();
+  }
 
-  Future<void> clearSession() => _sessionStore.clear();
+  Future<void> saveSession(ApiSession session, {int? expectedRevision}) {
+    if (_closed ||
+        (expectedRevision != null && expectedRevision != _sessionRevision)) {
+      return Future.error(_unauthorized());
+    }
+    _sessionRevision++;
+    _refreshing = null;
+    return _writeSession(() async {
+      await _sessionStore.write(session);
+      _sessions.add(session);
+    });
+  }
+
+  Future<void> clearSession() {
+    _sessionRevision++;
+    _refreshing = null;
+    return _writeSession(() async {
+      await _sessionStore.clear();
+      _sessions.add(null);
+    });
+  }
+
+  Future<void> _writeSession(Future<void> Function() write) {
+    final operation = _sessionWrites.then((_) => write());
+    _sessionWrites = operation.then((_) {}, onError: (Object _) {});
+    return operation;
+  }
+
+  void _checkRevision(int revision) {
+    if (_closed || revision != _sessionRevision) throw _unauthorized();
+  }
+
+  Future<void> close() async {
+    _closed = true;
+    _sessionRevision++;
+    await _sessionWrites;
+    await _sessions.close();
+  }
 
   Future<ApiSession> refreshSession() => _refresh();
 
   Future<String> accessToken() async {
-    final session = await _sessionStore.read();
+    final revision = _sessionRevision;
+    final session = await currentSession();
+    _checkRevision(revision);
     if (session == null) throw _unauthorized();
     if (session.needsRefresh) return (await _refresh()).accessToken;
     return session.accessToken;
@@ -42,15 +89,25 @@ final class RestApiClient {
     Map<String, String>? query,
     bool authenticated = true,
   }) async {
+    final revision = _sessionRevision;
     var token = authenticated ? await accessToken() : null;
+    if (authenticated) _checkRevision(revision);
     var response = await _send(method, path, body, query, token);
 
+    if (authenticated) _checkRevision(revision);
     if (authenticated && response.statusCode == 401) {
-      token = (await _refresh()).accessToken;
+      final latest = await currentSession();
+      _checkRevision(revision);
+      token = latest != null && latest.accessToken != token
+          ? await accessToken()
+          : (await _refresh()).accessToken;
+      _checkRevision(revision);
       response = await _send(method, path, body, query, token);
     }
 
+    if (authenticated) _checkRevision(revision);
     if (response.statusCode < 200 || response.statusCode >= 300) {
+      if (authenticated && response.statusCode == 401) await clearSession();
       throw _failure(response);
     }
 
@@ -68,9 +125,12 @@ final class RestApiClient {
   }
 
   Future<ApiSession> _performRefresh() async {
-    final previous = await _sessionStore.read();
+    final revision = _sessionRevision;
+    final previous = await currentSession();
+    _checkRevision(revision);
     if (previous == null) throw _unauthorized();
 
+    ApiSession? rotated;
     try {
       final response = await _send(
         'POST',
@@ -80,21 +140,45 @@ final class RestApiClient {
         null,
       );
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        if (response.statusCode == 401) await _sessionStore.clear();
+        _checkRevision(revision);
+        if (response.statusCode == 401) await clearSession();
         throw _failure(response);
       }
 
       final data = _decodeObject(response.body);
       final session = sessionFromAuthResponse(data);
-      await _sessionStore.write(session);
+      rotated = session;
+      await _writeSession(() async {
+        _checkRevision(revision);
+        await _sessionStore.write(session);
+        _sessions.add(session);
+      });
+      _checkRevision(revision);
       return session;
     } on AppFailure {
+      if (rotated != null && revision != _sessionRevision) {
+        discardSession(rotated.refreshToken);
+      }
       rethrow;
     } on http.ClientException catch (error) {
       throw AppFailure(kind: FailureKind.network, debugMessage: error.message);
     } on TimeoutException catch (error) {
       throw AppFailure(kind: FailureKind.network, debugMessage: '$error');
     }
+  }
+
+  /// A cancelled auth response may already have created/rotated a server
+  /// session. Revoke its returned token without restoring it locally.
+  void discardSession(String refreshToken) {
+    unawaited(
+      _send(
+        'POST',
+        '/auth/logout',
+        {'refreshToken': refreshToken},
+        null,
+        null,
+      ).then((_) {}, onError: (Object _) {}),
+    );
   }
 
   Future<http.Response> _send(
@@ -168,6 +252,8 @@ AppFailure _failure(http.Response response) {
     final body = _decodeObject(response.body);
     final error = body['error'] as Map<String, dynamic>?;
     code = error?['code'] as String?;
+  } on TypeError {
+    // HTTP status remains authoritative when error fields have invalid types.
   } on AppFailure {
     // HTTP status remains authoritative when an error body is malformed.
   }

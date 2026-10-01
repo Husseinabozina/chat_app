@@ -23,6 +23,7 @@ final class ConversationMessage {
     this.replyToMessageId,
     this.editedAt,
     this.deletedAt,
+    this.deletionConfirmed = false,
   });
 
   final String id;
@@ -34,6 +35,8 @@ final class ConversationMessage {
   final DateTime createdAt;
   final DateTime? editedAt;
   final DateTime? deletedAt;
+  final bool deletionConfirmed;
+  bool get isDeleted => deletionConfirmed || deletedAt != null;
 }
 
 final class ConversationSummary {
@@ -88,10 +91,12 @@ final class ReadPointer {
     required this.userId,
     required this.lastReadMessageId,
     required this.lastReadAt,
+    this.lastReadMessageCreatedAt,
   });
 
   final String conversationId;
   final String userId;
   final String lastReadMessageId;
   final DateTime lastReadAt;
+  final DateTime? lastReadMessageCreatedAt;
 }

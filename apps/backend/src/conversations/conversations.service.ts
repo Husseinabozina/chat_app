@@ -51,6 +51,7 @@ export interface ReadStateResponse {
   conversationId: string;
   lastReadMessageId: string;
   lastReadAt: Date;
+  lastReadMessageCreatedAt: Date;
 }
 
 interface ConversationSummaryRow {
@@ -200,6 +201,46 @@ export class ConversationsService {
     };
   }
 
+  async getReadState(userId: string, conversationId: string) {
+    const rows: Array<{
+      user_id: string;
+      last_read_message_id: string | null;
+      last_read_at: Date | null;
+      last_read_message_created_at: Date | null;
+    }> = await this.dataSource.query(
+      `SELECT member.user_id, member.last_read_message_id,
+              member.last_read_at, message.created_at AS last_read_message_created_at
+       FROM conversation_members member
+       LEFT JOIN messages message
+         ON message.id = member.last_read_message_id
+         AND message.conversation_id = member.conversation_id
+       WHERE member.conversation_id = $1
+         AND EXISTS (
+           SELECT 1 FROM conversation_members self_member
+           WHERE self_member.conversation_id = member.conversation_id
+             AND self_member.user_id = $2
+         )
+       ORDER BY member.user_id`,
+      [conversationId, userId],
+    );
+    if (rows.length === 0) {
+      throw new ApiException(
+        HttpStatus.NOT_FOUND,
+        'CONVERSATION_NOT_FOUND',
+        'Conversation not found.',
+      );
+    }
+    return {
+      conversationId,
+      members: rows.map((row) => ({
+        userId: row.user_id,
+        lastReadMessageId: row.last_read_message_id,
+        lastReadAt: row.last_read_at,
+        lastReadMessageCreatedAt: row.last_read_message_created_at,
+      })),
+    };
+  }
+
   async markRead(
     userId: string,
     conversationId: string,
@@ -255,6 +296,7 @@ export class ConversationsService {
               conversationId,
               lastReadMessageId: currentMessage.id,
               lastReadAt: membership.lastReadAt ?? new Date(),
+              lastReadMessageCreatedAt: currentMessage.createdAt,
             },
             advanced: false,
           };
@@ -271,6 +313,7 @@ export class ConversationsService {
           conversationId,
           lastReadMessageId: targetMessage.id,
           lastReadAt: readAt,
+          lastReadMessageCreatedAt: targetMessage.createdAt,
         },
         advanced: true,
       };

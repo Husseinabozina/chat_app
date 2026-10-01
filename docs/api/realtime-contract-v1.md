@@ -780,3 +780,13 @@ Do not add by default:
 - public presence/last-seen
 - message creation over WebSocket
 - media transfer over WebSocket
+
+## Read recovery addition
+
+`read.updated.data.lastReadMessageCreatedAt` is an optional additive V1 field
+for the pointed-to message's canonical creation timestamp. Current backend
+mark-read responses include it. Clients compare `(lastReadMessageCreatedAt,
+lastReadMessageId)` rather than publication time. Older events lacking the field
+can be resolved from loaded messages or the authenticated REST read-state query
+in `api-contract-v1.md`. Reconnect resync fetches both members' durable pointers
+for loaded chats, including updates missed while offline.
