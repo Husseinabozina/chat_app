@@ -4,12 +4,14 @@ on:
   pull_request:
     paths:
       - "apps/mobile/**"
+      - "apps/backend/**"
       - ".github/workflows/mobile-ci.yml"
   push:
     branches:
       - master
     paths:
       - "apps/mobile/**"
+      - "apps/backend/**"
       - ".github/workflows/mobile-ci.yml"
 
 permissions:
@@ -50,3 +52,83 @@ jobs:
 
       - name: Test
         run: flutter test
+
+  backend-integration:
+    name: Two-account REST and realtime integration
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: chat_app_mobile_test
+          POSTGRES_USER: chat_app
+          POSTGRES_PASSWORD: chat_app
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U chat_app -d chat_app_mobile_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://chat_app:chat_app@127.0.0.1:5432/chat_app_mobile_test
+      ACCESS_TOKEN_SECRET: ci-only-mobile-integration-secret-more-than-32-characters
+      ACCESS_TOKEN_TTL_SECONDS: 900
+      REFRESH_TOKEN_TTL_DAYS: 30
+      REALTIME_TYPING_TTL_MS: 7000
+      PORT: 3000
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: apps/backend/package-lock.json
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.5"
+          channel: stable
+          cache: true
+
+      - name: Verify backend fixture
+        working-directory: apps/backend
+        env:
+          REALTIME_TYPING_TTL_MS: 250
+        run: |
+          npm ci --no-audit --no-fund
+          npm run format:check
+          npm run lint
+          npm run typecheck
+          npm run build
+          node dist/database/migrate.js
+          npm test
+
+      - name: Resolve locked mobile dependencies
+        working-directory: apps/mobile
+        run: flutter pub get --enforce-lockfile
+
+      - name: Verify two accounts against the running backend
+        shell: bash
+        run: |
+          node apps/backend/dist/main.js > "$RUNNER_TEMP/chat-api.log" 2>&1 &
+          api_pid=$!
+          trap 'kill "$api_pid" 2>/dev/null || true' EXIT
+          for attempt in {1..30}; do
+            if curl --silent --fail http://127.0.0.1:3000/v1/health > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl --silent --show-error --fail http://127.0.0.1:3000/v1/health > /dev/null
+          cd apps/mobile
+          flutter test --no-pub test/live/backend_flow_test.dart --dart-define=CHAT_INTEGRATION_URL=http://127.0.0.1:3000

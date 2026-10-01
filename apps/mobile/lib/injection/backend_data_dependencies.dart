@@ -1,6 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
+import '../app/backend_app_services.dart';
 import '../core/network/api_session.dart';
 import '../core/network/rest_api_client.dart';
 import '../features/auth/data/datasources/backend_auth_data_source.dart';
@@ -8,9 +9,9 @@ import '../features/auth/data/repositories/backend_session_controller.dart';
 import '../features/conversations/data/datasources/realtime_chat_data_source.dart';
 import '../features/conversations/data/datasources/rest_conversations_data_source.dart';
 import '../features/conversations/data/repositories/api_conversations_repository.dart';
+import '../features/users/data/api_users_repository.dart';
 
-/// Prepared for the direct-conversation UI rollout. The current app still
-/// composes its legacy single-room Firebase repositories in AppDependencies.
+/// Backend composition for the direct-conversation product entrypoint.
 final class BackendDataDependencies {
   BackendDataDependencies._({
     required this.auth,
@@ -55,6 +56,14 @@ final class BackendDataDependencies {
       httpClient: httpClient,
     );
   }
+
+  BackendAppServices get appServices => BackendAppServices(
+    account: session,
+    conversations: repository,
+    users: ApiUsersRepository(_api),
+    pause: repository.pauseRealtime,
+    resume: repository.resumeRealtime,
+  );
 
   final BackendAuthDataSource auth;
   final RestConversationsDataSource conversations;

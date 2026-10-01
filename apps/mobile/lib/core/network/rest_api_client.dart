@@ -11,9 +11,17 @@ final class RestApiClient {
     required Uri baseUrl,
     required http.Client httpClient,
     required ApiSessionStore sessionStore,
-  }) => RestApiClient._(baseUrl, httpClient, sessionStore);
+    Duration requestTimeout = const Duration(seconds: 15),
+  }) => RestApiClient._(baseUrl, httpClient, sessionStore, requestTimeout);
 
-  RestApiClient._(this._baseUrl, this._httpClient, this._sessionStore);
+  RestApiClient._(
+    this._baseUrl,
+    this._httpClient,
+    this._sessionStore,
+    this._requestTimeout,
+  );
+
+  final Duration _requestTimeout;
 
   final Uri _baseUrl;
   final http.Client _httpClient;
@@ -201,7 +209,10 @@ final class RestApiClient {
     }
 
     try {
-      return await http.Response.fromStream(await _httpClient.send(request));
+      return await _httpClient
+          .send(request)
+          .then(http.Response.fromStream)
+          .timeout(_requestTimeout);
     } on http.ClientException catch (error) {
       throw AppFailure(kind: FailureKind.network, debugMessage: error.message);
     } on TimeoutException catch (error) {

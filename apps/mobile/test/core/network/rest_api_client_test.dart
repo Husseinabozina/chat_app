@@ -23,6 +23,27 @@ final class MemorySessionStore implements ApiSessionStore {
 }
 
 void main() {
+  test('a stalled request becomes a retryable network failure without clearing the session', () async {
+    final store = MemorySessionStore()..session = _storedSession('active');
+    final response = Completer<http.Response>();
+    final client = MockClient((_) => response.future);
+    final api = RestApiClient(
+      baseUrl: Uri.parse('https://api.example.com/v1'),
+      httpClient: client,
+      sessionStore: store,
+      requestTimeout: const Duration(milliseconds: 10),
+    );
+    await expectLater(
+      api.request('GET', '/users/me'),
+      throwsA(
+        isA<AppFailure>().having((f) => f.kind, 'kind', FailureKind.network),
+      ),
+    );
+    expect(store.session?.accessToken, 'active');
+    response.complete(http.Response('{}', 200));
+    await api.close();
+    client.close();
+  });
   test('login saves backend tokens and user identity', () async {
     final store = MemorySessionStore();
     final client = MockClient((request) async {

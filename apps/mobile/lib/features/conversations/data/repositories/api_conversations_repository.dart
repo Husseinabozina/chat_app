@@ -9,7 +9,13 @@ import '../../domain/repositories/conversations_repository.dart';
 import '../datasources/conversation_sources.dart';
 
 final class ApiConversationsRepository implements ConversationsRepository {
-  ApiConversationsRepository(this._rest, this._realtime);
+  ApiConversationsRepository(
+    this._rest,
+    this._realtime, {
+    DateTime Function()? now,
+  }) : _now = now ?? DateTime.now;
+
+  final DateTime Function() _now;
 
   final ConversationsRestSource _rest;
   final ConversationsRealtimeSource _realtime;
@@ -355,7 +361,7 @@ final class ApiConversationsRepository implements ConversationsRepository {
         _typingVersions[key] = event.occurredAt;
         if (event.isTyping &&
             event.expiresAt != null &&
-            event.expiresAt!.isAfter(DateTime.now().toUtc())) {
+            event.expiresAt!.isAfter(_now().toUtc())) {
           _typing[key] = TypingIndicator(
             conversationId: event.conversationId,
             userId: event.userId,
@@ -660,7 +666,7 @@ final class ApiConversationsRepository implements ConversationsRepository {
   Future<void> setTyping(String conversationId, {required bool typing}) async {
     _requireUser();
     final generation = _generation;
-    final now = DateTime.now().toUtc();
+    final now = _now().toUtc();
     final previous = _typingSent[conversationId];
     if (typing &&
         previous != null &&
@@ -686,7 +692,7 @@ final class ApiConversationsRepository implements ConversationsRepository {
   void _scheduleTypingExpiry() {
     _typingExpiry?.cancel();
     if (_typing.isEmpty) return;
-    final now = DateTime.now().toUtc();
+    final now = _now().toUtc();
     _typing.removeWhere((_, value) => !value.expiresAt.isAfter(now));
     if (_typing.isEmpty) return;
     final next = _typing.values

@@ -14,6 +14,8 @@ final class FakeRest implements ConversationsRestSource {
   bool failSend = false;
   bool failList = false;
   final sentIds = <String>[];
+  final readIds = <String>[];
+  String? lastReply;
   Completer<ConversationMessage>? sendGate;
   Completer<CursorPage<ConversationSummary>>? listGate;
   Completer<CursorPage<ConversationMessage>>? historyGate;
@@ -74,6 +76,7 @@ final class FakeRest implements ConversationsRestSource {
     String? replyToMessageId,
   }) async {
     sentIds.add(clientMessageId!);
+    lastReply = replyToMessageId;
     if (sendGate != null) return sendGate!.future;
     if (failSend) throw const AppFailure(kind: FailureKind.network);
     final value = message('sent', text: text, clientId: clientMessageId);
@@ -98,7 +101,10 @@ final class FakeRest implements ConversationsRestSource {
     String conversationId,
     String upToMessageId,
     String userId,
-  ) async => pointer(upToMessageId, 40, userId: userId);
+  ) async {
+    readIds.add(upToMessageId);
+    return pointer(upToMessageId, 40, userId: userId);
+  }
 }
 
 final class FakeRealtime implements ConversationsRealtimeSource {
