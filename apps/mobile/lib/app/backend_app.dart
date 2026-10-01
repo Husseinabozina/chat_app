@@ -76,7 +76,7 @@ class _BackendChatAppState extends State<BackendChatApp>
   Widget build(BuildContext context) => MaterialApp(
     navigatorKey: _navigator,
     debugShowCheckedModeBanner: false,
-    title: 'Chat',
+    title: 'Mingle',
     theme: backendTheme(Brightness.light),
     darkTheme: backendTheme(Brightness.dark),
     home: _loading

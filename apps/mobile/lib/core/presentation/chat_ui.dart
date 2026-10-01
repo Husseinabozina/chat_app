@@ -2,36 +2,145 @@ import 'package:flutter/material.dart';
 
 import '../failures/app_failure.dart';
 
-const blush = Color(0xFFC83279);
+const blush = Color(0xFFCA326E);
+const mingleInk = Color(0xFF22254E);
+const mingleCream = Color(0xFFFFF8F5);
+const minglePink = Color(0xFFFFDCE7);
+const mingleMuted = Color(0xFF666A86);
+
 ThemeData backendTheme(Brightness brightness) {
   final dark = brightness == Brightness.dark;
   final scheme = ColorScheme.fromSeed(seedColor: blush, brightness: brightness)
       .copyWith(
-        primary: dark ? const Color(0xFFFF8FBC) : blush,
-        surface: dark ? const Color(0xFF292327) : Colors.white,
+        primary: dark ? const Color(0xFFFFA6C7) : blush,
+        onPrimary: dark ? const Color(0xFF46152C) : Colors.white,
+        primaryContainer: dark ? const Color(0xFF543343) : minglePink,
+        onPrimaryContainer: dark ? const Color(0xFFFFECF3) : mingleInk,
+        surface: dark ? const Color(0xFF282631) : mingleCream,
+        onSurface: dark ? const Color(0xFFF8EEF3) : mingleInk,
+        onSurfaceVariant: dark ? const Color(0xFFC2BBCD) : mingleMuted,
+        outline: dark ? const Color(0xFF83778B) : const Color(0xFFEADDE2),
+        outlineVariant: dark
+            ? const Color(0xFF443C4C)
+            : const Color(0xFFF1E5E8),
       );
-  return ThemeData(
+  final base = ThemeData(
     useMaterial3: true,
+    brightness: brightness,
     colorScheme: scheme,
-    scaffoldBackgroundColor: dark
-        ? const Color(0xFF1C181B)
-        : const Color(0xFFF8F4F6),
+    fontFamily: 'Nunito',
+    fontFamilyFallback: const ['Tajawal'],
+  );
+  final text = base.textTheme.apply(
+    bodyColor: scheme.onSurface,
+    displayColor: scheme.onSurface,
+  );
+  TextStyle heading(TextStyle? style) => style!.copyWith(
+    fontFamily: 'Quicksand',
+    fontFamilyFallback: const ['Tajawal', 'Nunito'],
+    fontWeight: FontWeight.w700,
+    height: 1.18,
+    letterSpacing: -.5,
+  );
+  final border = OutlineInputBorder(
+    borderRadius: BorderRadius.circular(18),
+    borderSide: BorderSide(color: scheme.outline),
+  );
+  return base.copyWith(
+    scaffoldBackgroundColor: dark ? const Color(0xFF1D1B24) : mingleCream,
+    textTheme: text.copyWith(
+      headlineLarge: heading(text.headlineLarge),
+      headlineMedium: heading(text.headlineMedium),
+      headlineSmall: heading(text.headlineSmall),
+      titleLarge: heading(text.titleLarge),
+      titleMedium: text.titleMedium!.copyWith(fontWeight: FontWeight.w800),
+      bodyLarge: text.bodyLarge!.copyWith(height: 1.45),
+      bodyMedium: text.bodyMedium!.copyWith(height: 1.4),
+      labelSmall: text.labelSmall!.copyWith(
+        color: scheme.onSurfaceVariant,
+        fontSize: 12,
+      ),
+    ),
+    appBarTheme: AppBarTheme(
+      backgroundColor: Colors.transparent,
+      foregroundColor: scheme.onSurface,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      titleTextStyle: heading(text.titleLarge).copyWith(fontSize: 20),
+    ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: scheme.surface,
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-      contentPadding: const EdgeInsets.all(16),
+      fillColor: dark ? scheme.surface : const Color(0xFFFFFBFA),
+      border: border,
+      enabledBorder: border,
+      focusedBorder: border.copyWith(
+        borderSide: BorderSide(color: scheme.primary, width: 1.5),
+      ),
+      hintStyle: TextStyle(color: scheme.onSurfaceVariant, fontSize: 14),
+      prefixIconColor: scheme.onSurfaceVariant,
+      suffixIconColor: scheme.onSurfaceVariant,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
     ),
     cardTheme: CardThemeData(
+      color: scheme.surface,
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+        side: BorderSide(color: scheme.outlineVariant),
+      ),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        minimumSize: const Size(48, 48),
+        minimumSize: const Size(48, 52),
+        textStyle: const TextStyle(
+          fontFamily: 'Nunito',
+          fontFamilyFallback: ['Tajawal'],
+          fontSize: 17,
+          fontWeight: FontWeight.w800,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size(48, 52),
+        side: BorderSide(color: scheme.outline),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       ),
     ),
+    chipTheme: base.chipTheme.copyWith(
+      backgroundColor: dark ? scheme.surface : const Color(0xFFF4EBEF),
+      selectedColor: scheme.primaryContainer,
+      side: BorderSide.none,
+      shape: const StadiumBorder(),
+      showCheckmark: false,
+      labelStyle: TextStyle(
+        color: scheme.onSurface,
+        fontFamily: 'Nunito',
+        fontWeight: FontWeight.w700,
+      ),
+    ),
+    listTileTheme: ListTileThemeData(
+      iconColor: scheme.onSurface,
+      titleTextStyle: text.titleMedium!.copyWith(fontWeight: FontWeight.w800),
+      subtitleTextStyle: text.bodyMedium!.copyWith(
+        color: scheme.onSurfaceVariant,
+      ),
+    ),
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: scheme.surface,
+      showDragHandle: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+    ),
+    badgeTheme: BadgeThemeData(
+      backgroundColor: scheme.primary,
+      textColor: scheme.onPrimary,
+    ),
+    dividerTheme: DividerThemeData(color: scheme.outlineVariant, thickness: 1),
   );
 }
 
@@ -50,15 +159,81 @@ void showFailure(BuildContext context, Object error) =>
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(friendlyError(error))));
 
+/// Real raster decoration stays behind live controls and outside semantics.
+class MingleBackdrop extends StatelessWidget {
+  const MingleBackdrop({required this.child, this.intensity = .65, super.key});
+  final Widget child;
+  final double intensity;
+  @override
+  Widget build(BuildContext context) => Stack(
+    fit: StackFit.expand,
+    children: [
+      IgnorePointer(
+        child: ExcludeSemantics(
+          child: Image.asset(
+            'assets/art/pastel_frame.png',
+            fit: BoxFit.cover,
+            alignment: Alignment.topCenter,
+            opacity: AlwaysStoppedAnimation(
+              Theme.of(context).brightness == Brightness.dark ? .09 : intensity,
+            ),
+          ),
+        ),
+      ),
+      child,
+    ],
+  );
+}
+
 class InitialAvatar extends StatelessWidget {
   const InitialAvatar(this.name, {super.key, this.radius = 24});
   final String name;
   final double radius;
   @override
-  Widget build(BuildContext context) => CircleAvatar(
-    radius: radius,
-    backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-    child: Text(name.isEmpty ? '?' : name.characters.first.toUpperCase()),
+  Widget build(BuildContext context) => ExcludeSemantics(
+    child: SizedBox.square(
+      dimension: radius * 2,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Positioned.fill(
+            child: ClipOval(
+              child: Image.asset(
+                'assets/art/landscape_avatar.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          PositionedDirectional(
+            end: -2,
+            bottom: -2,
+            child: Container(
+              constraints: BoxConstraints(
+                minWidth: radius * .68,
+                minHeight: radius * .68,
+              ),
+              padding: const EdgeInsets.all(2),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                ),
+              ),
+              child: Text(
+                name.isEmpty ? '?' : name.characters.first.toUpperCase(),
+                style: TextStyle(
+                  fontSize: radius * .44,
+                  fontWeight: FontWeight.w800,
+                ),
+                textScaler: TextScaler.noScaling,
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
   );
 }
 
@@ -75,16 +250,34 @@ class StatusPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Center(
     child: Padding(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.chat_bubble_outline_rounded, size: 48),
-          const SizedBox(height: 16),
-          Text(message, textAlign: TextAlign.center),
+          ExcludeSemantics(
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer
+                    .withValues(alpha: .65),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.forum_outlined,
+                size: 36,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
           if (action != null)
             Padding(
-              padding: const EdgeInsets.only(top: 16),
+              padding: const EdgeInsets.only(top: 20),
               child: FilledButton(onPressed: action, child: Text(label)),
             ),
         ],
@@ -94,42 +287,136 @@ class StatusPanel extends StatelessWidget {
 }
 
 class WarmHeader extends StatelessWidget {
-  const WarmHeader(this.title, this.subtitle, {super.key});
+  const WarmHeader(this.title, this.subtitle, {this.trailing, super.key});
   final String title;
   final String subtitle;
+  final Widget? trailing;
   @override
-  Widget build(BuildContext context) => Container(
-    width: double.infinity,
-    padding: const EdgeInsets.all(24),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(28),
-      gradient: LinearGradient(
-        colors: [
-          Theme.of(context).colorScheme.primaryContainer,
-          Theme.of(context).colorScheme.surface,
-        ],
-      ),
-    ),
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 12),
     child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: Theme.of(context).textTheme.headlineMedium),
-              const SizedBox(height: 8),
-              Text(subtitle),
+              Text(title, style: Theme.of(context).textTheme.headlineLarge),
+              const SizedBox(height: 6),
+              Text(
+                subtitle,
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
             ],
           ),
         ),
-        ExcludeSemantics(
-          child: Icon(
-            Icons.send_rounded,
-            size: 42,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ),
+        if (trailing != null) ...[const SizedBox(width: 12), trailing!],
       ],
     ),
   );
+}
+
+class MingleNavigation extends StatelessWidget {
+  const MingleNavigation({
+    required this.selectedIndex,
+    required this.onSelected,
+    required this.onNewChat,
+    super.key,
+  });
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+  final VoidCallback onNewChat;
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    Widget tab(int index, String label, IconData icon, IconData selectedIcon) =>
+        Expanded(
+          child: Semantics(
+            selected: selectedIndex == index,
+            button: true,
+            child: InkWell(
+              onTap: () => onSelected(index),
+              borderRadius: BorderRadius.circular(20),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 4,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      selectedIndex == index ? selectedIcon : icon,
+                      color: selectedIndex == index
+                          ? scheme.primary
+                          : scheme.onSurface,
+                      size: 23,
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: selectedIndex == index
+                            ? FontWeight.w800
+                            : FontWeight.w600,
+                        color: selectedIndex == index
+                            ? scheme.primary
+                            : scheme.onSurface,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+    return Material(
+      color: scheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        side: BorderSide(color: scheme.outlineVariant),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              tab(
+                0,
+                'Chats',
+                Icons.chat_bubble_outline_rounded,
+                Icons.chat_bubble_rounded,
+              ),
+              tab(
+                1,
+                'People',
+                Icons.people_outline_rounded,
+                Icons.people_rounded,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: IconButton.filled(
+                  onPressed: onNewChat,
+                  tooltip: 'New chat',
+                  style: IconButton.styleFrom(minimumSize: const Size(52, 52)),
+                  icon: const Icon(Icons.add_rounded, size: 30),
+                ),
+              ),
+              tab(
+                2,
+                'Profile',
+                Icons.person_outline_rounded,
+                Icons.person_rounded,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
