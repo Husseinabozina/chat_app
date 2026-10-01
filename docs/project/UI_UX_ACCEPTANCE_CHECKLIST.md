@@ -89,7 +89,7 @@ Current baseline: gradient WarmHeader, Material controls/navigation and initials
 - [ ] Large text, readable metadata, contrast, approximately 48dp touch targets and semantic labels.
 - [ ] Arabic/English/mixed messages and emoji; distinguish message-direction support from full Arabic UI localization.
 - [ ] Keyboard appearance, return actions, composer expansion and bottom safe area.
-- [ ] Account persistence across app relaunch using native secure storage.
+- [x] Account persistence across process termination/relaunch using production secure-storage composition on iPhone 16e/iOS 26.2 (2026-10-01); physical-device acceptance remains pending.
 - [ ] Two-account native flow: discover → profile → Message → send/reply/edit/delete/read/typing.
 - [ ] Foreground/background, disconnect/reconnect and refresh expiry recover through the existing repositories.
 - [ ] Short purposeful motion respects reduced-motion preferences where supported.
@@ -108,8 +108,8 @@ Voice notes/reactions/presence/pinning need a later scope decision. Groups/calls
 |---|---|---|
 | Functional host/widget/backend integration | PR #18 code HEAD; CI #19 quality + two-account integration success | Host verified |
 | Exact log counts | CI #18 inspected logs/local suite: 46 mobile passed + one ordinary live skip; 20 backend passed; one separate live integration passed | Counts scoped to recorded runs |
-| Native build | User ran build; executable Runner.app artifact observed, no active matching xcodebuild at latest read | Terminal outcome and launch pending |
-| Native secure storage / two-device flow | None yet | Pending |
+| Native artifact/runtime | User-built Runner.app installed/launched successfully on iPhone 16e/iOS 26.2; existing platform diff remains uncommitted | Artifact launch passed; final terminal build summary not captured |
+| Native secure storage / two-device flow | One-simulator login/profile/search/direct send, Arabic realtime reception/read display and account/history restoration after process restart passed; peer was REST fixture | Targeted one-device smoke passed; two-native-client flow pending |
 | Final artwork/font/navigation | Approved direction documented; simplified generated Chats preview only | Pending user review |
 
 Record dated device screenshots/review decisions and targeted verification as they occur. Do not tick boxes based on expectations or build-artifact presence alone.

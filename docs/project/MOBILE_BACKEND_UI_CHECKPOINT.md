@@ -52,3 +52,13 @@ No merge or force push is included. Keep CURRENT_STATE updated before closing fu
 ## Approved visual direction remains authoritative
 
 The user reaffirmed the approved UI/UX decisions on 2026-10-01. The latest generated Chats preview was a simplified concept, not an app screenshot or replacement specification. Preserve environmental/object decoration, rounded friendly typography and integrated custom navigation from approved-ui-direction.md. Exact font is unapproved; Cairo was requested for the Arabic report. Track current visual/native gaps in UI_UX_ACCEPTANCE_CHECKLIST.md. This documentation follow-up changes no mobile source, dependency, lockfile or platform file. PR #18 stays Draft pending acceptance; #15/#16/#17 remain Ready and unmerged.
+
+## Targeted native smoke follow-up — 2026-10-01
+
+Installed/launched the user's existing Runner.app on iPhone 16e/iOS 26.2; no repeated Flutter build or new local test suite. Restarted task-owned backend dependencies in persistent workspace work/runtime because the earlier temporary Node binary and PostgreSQL cluster had disappeared. New disposable local database: PostgreSQL 17.11 on loopback 55417, migrations applied; Node 24.9.0 API on 55418; health confirmed. No public deployment.
+
+Native UI passed fixture login, profile completion, empty Chats → People, username search, Arabic public profile → Message, reception of an Arabic/emoji message over realtime, native English outgoing send, and Sent → Read after the peer fixture advanced its durable read pointer. REST confirmed exactly two persisted messages. Terminating/relaunching the app restored the account without login and recovered the list/history/read state through production secure-storage composition. The peer is a REST fixture, not a second native client; this is a targeted one-simulator smoke check.
+
+CUA paste/Unicode injection dropped characters; individual physical key presses worked. This is an automation limitation, not an established product defect. A system Save Password suggestion was not accepted. Software keyboard/native Arabic input, full native contextual actions, dark/large-text and two-device foreground/background/reconnect acceptance remain pending. Screenshots of actual Sign In and Conversation surfaces were reviewed through the simulator tool; they establish current functional layout, not final visual approval.
+
+Automatic platform diff was read: Flutter UIScene/implicit-engine migration and CocoaPods wiring; minimum iOS target remains 15.0. All 11 generated platform modifications plus ios/Podfile.lock remain local/unpublished; no manual pbxproj edit, source/dependency/lockfile change or merge/force push. PR #18 remains Draft for full native and visual acceptance.

@@ -3,7 +3,7 @@
 Update this file before closing each future project checkpoint. Verify actual branch heads and CI runs from GitHub before changing the state below. Record native acceptance separately from host/CI checks.
 
 **Updated:** 2026-10-01
-**Current phase:** Functional backend account/direct-conversation UI implemented and verified on the Flutter test host. Native iPhone acceptance and final visual polish are pending. PR #18 remains Draft while those boundaries are reviewed.
+**Current phase:** Functional backend account/direct-conversation UI verified on the Flutter host and a targeted iPhone 16e native smoke check. Login/profile/search/direct messaging, Arabic/emoji reception, read display and session restoration passed on one simulator against the local backend. Full native/two-device acceptance and final visual polish remain pending; PR #18 remains Draft.
 
 ## Last verified branch / PR / commit
 
@@ -134,7 +134,9 @@ Workflows retain `contents: read`; mobile integration uses an ephemeral database
 - Stale local CocoaPods CDN indices were refreshed outside the repository. First native dependency/build preparation was prolonged; low disk space was reported and the user freed space.
 - The user took over the simulator build. At the latest read-only check an executable `build/ios/iphonesimulator/Runner.app/Runner` existed and no matching `xcodebuild` process was running. This establishes artifact presence only; terminal success, launch and screen/device acceptance are not yet recorded.
 - Flutter-generated iOS/macOS project changes and a local `ios/Podfile.lock` remain uncommitted, separate from verified PR #18. Review these with native build evidence before inclusion in any checkpoint.
-- Do not run a concurrent Flutter build/test against the user's active build or silently discard its generated changes.
+- Reviewed automatic platform diff: Flutter UIScene/implicit-engine migration, CocoaPods workspace/framework/scripts/config wiring and platform includes; iOS target remains 15.0. This follow-up does not publish or manually edit these changes. No concurrent Flutter build/test or user-file cleanup was performed.
+- The temporary Node binary/database disappeared between sessions. A new task-owned Node 24.9.0 runtime and PostgreSQL 17.11 cluster were created under the workspace `work/runtime` outside the repository; migrations applied and loopback API port 55418 health succeeded. These are disposable local demo data, not restored prior test accounts.
+- Native automation paste/Unicode injection was unreliable; direct individual key presses worked. An iOS Save Password suggestion was not accepted. Software keyboard layout, native Arabic typing, full edit/delete/reply UI, dark/large-text native and two-device coverage remain pending.
 
 ## Pending initial-release work and later features
 
@@ -150,7 +152,7 @@ Later/deferred work:
 
 ## Known issues / technical debt
 
-- Native secure-storage restore and two-device foreground/background/reconnect behavior are not verified.
+- Native account restoration across process termination/relaunch passed on iPhone 16e using production secure-storage composition. Two-device foreground/background/reconnect behavior and physical-device storage remain unverified.
 - Decorative artwork, final font, custom navigation and final visual acceptance remain pending; current UI must not be described as the fully approved final design.
 - Full Arabic UI localization is pending; current message direction handling is not equivalent to it.
 - Dedicated cascade-deletion regression coverage from #8 has not been reproduced; avatar storage-key policy is deferred to media design.
@@ -163,6 +165,6 @@ Later/deferred work:
 
 ## Exact next checkpoint
 
-**Native backend UI acceptance and final visual alignment.** Record the user's build result, review automatic native changes, open on iPhone 16e, verify keyboard/Arabic/text scaling/session restoration and two-account device behavior; implement missing approved visual details screen by screen against `UI_UX_ACCEPTANCE_CHECKLIST.md`. Complete targeted checks before marking that acceptance passed. Do not silently treat host CI as device/visual approval.
+**Complete native acceptance and final visual alignment.** One-simulator smoke/session restoration is recorded; finish software-keyboard/native Arabic input/text scaling/dark mode and two-native-client lifecycle coverage, then decide how to publish the reviewed automatic native changes; implement missing approved visual details screen by screen against `UI_UX_ACCEPTANCE_CHECKLIST.md`. Complete targeted checks before marking that acceptance passed. Do not silently treat host CI as device/visual approval.
 
 Then review #15 → #16 → #17 → #18 integration; merge only after explicit authorization. Implement production origin/CORS and handshake throttling before any public deployment. Scope media/avatar and push contracts for the remaining initial-release work. Keep this file updated at every checkpoint closure.
