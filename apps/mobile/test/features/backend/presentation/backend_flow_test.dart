@@ -377,6 +377,8 @@ void main() {
       await tester.pumpWidget(const SizedBox());
       expect(messageDirection('مرحبا hello'), TextDirection.rtl);
       expect(messageDirection('Hello مرحبا'), TextDirection.ltr);
+      expect(messageLength('😀' * 4000), 4000);
+      expect(messageLength('♥️'), 1);
     },
   );
   test(

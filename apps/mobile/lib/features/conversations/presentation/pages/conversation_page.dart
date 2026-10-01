@@ -189,7 +189,7 @@ class _ConversationPageState extends State<ConversationPage>
 
   Future<void> _send() async {
     final value = _text.text.trim();
-    if (value.isEmpty || value.length > 4000 || _savingEdit) return;
+    if (value.isEmpty || messageLength(value) > 4000 || _savingEdit) return;
     final editing = _editing;
     if (editing != null) {
       setState(() => _savingEdit = true);
@@ -582,9 +582,12 @@ class _ConversationPageState extends State<ConversationPage>
                       minLines: 1,
                       maxLines: 5,
                       maxLength: 4000,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Message…',
                         counterText: '',
+                        errorText: messageLength(_text.text.trim()) > 4000
+                            ? 'Use at most 4,000 characters.'
+                            : null,
                       ),
                       onChanged: (v) {
                         _typing(v);
@@ -597,6 +600,7 @@ class _ConversationPageState extends State<ConversationPage>
                     tooltip: _editing == null ? 'Send message' : 'Save edit',
                     onPressed:
                         _text.text.trim().isEmpty ||
+                            messageLength(_text.text.trim()) > 4000 ||
                             _savingEdit ||
                             deletedEditing
                         ? null
@@ -727,3 +731,12 @@ TextDirection messageDirection(String text) {
       ? TextDirection.rtl
       : TextDirection.ltr;
 }
+
+// Match the server validator's Unicode length (surrogate pairs and variation selectors).
+int messageLength(String text) => text
+    .replaceAllMapped(
+      RegExp(r'([^\uFE0F\uFE0E])[\uFE0F\uFE0E]', unicode: true),
+      (m) => m[1]!,
+    )
+    .runes
+    .length;
