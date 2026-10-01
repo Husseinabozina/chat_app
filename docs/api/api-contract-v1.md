@@ -273,3 +273,32 @@ Typical stable error codes:
 - UNSUPPORTED_MEDIA_TYPE
 
 The exact list can evolve without changing the envelope.
+
+## Read-state recovery query
+
+`GET /v1/conversations/:conversationId/read-state` requires authentication and
+membership, returning `404 CONVERSATION_NOT_FOUND` for missing or inaccessible
+conversations. It returns both direct-conversation members:
+
+```json
+{
+  "conversationId": "uuid",
+  "members": [
+    {
+      "userId": "uuid",
+      "lastReadMessageId": "uuid-or-null",
+      "lastReadAt": "ISO-timestamp-or-null",
+      "lastReadMessageCreatedAt": "ISO-timestamp-or-null"
+    }
+  ]
+}
+```
+
+Unread members have null pointer fields. `lastReadMessageCreatedAt` plus
+`lastReadMessageId` identifies the canonical read position even outside the
+loaded history window. No message content or session details are returned.
+The query is read-only and creates no events. The existing mark-read response
+and `read.updated` event also include `lastReadMessageCreatedAt` as an additive
+field. Commands, membership authorization, and monotonic read semantics are
+unchanged. Mobile fetches this snapshot when opening/loading history and when
+resynchronizing loaded chats after reconnect.

@@ -8,8 +8,9 @@ import '../../../../core/network/rest_api_client.dart';
 import '../../domain/entities/conversation_event.dart';
 import '../models/conversation_dto.dart';
 import '../models/realtime_event_dto.dart';
+import 'conversation_sources.dart';
 
-final class RealtimeChatDataSource {
+final class RealtimeChatDataSource implements ConversationsRealtimeSource {
   factory RealtimeChatDataSource({
     required Uri serverUrl,
     required RestApiClient api,
@@ -38,18 +39,25 @@ final class RealtimeChatDataSource {
   bool _wanted = false;
   bool _hasConnected = false;
   bool _needsRefresh = false;
+  int _connectionEpoch = 0;
 
+  bool _current(int epoch) => _wanted && epoch == _connectionEpoch;
+
+  @override
   Stream<ConversationEvent> get events => _events.stream;
 
   bool get isConnected => _socket?.connected ?? false;
 
+  @override
   Future<void> connect() async {
     _wanted = true;
+    final epoch = ++_connectionEpoch;
     _retryTimer?.cancel();
     _retryTimer = null;
     try {
-      await _connectOnce();
+      await _connectOnce(epoch);
     } on AppFailure catch (failure) {
+      if (!_current(epoch)) return;
       if (failure.kind == FailureKind.unauthorized) {
         _wanted = false;
       } else {
@@ -59,12 +67,14 @@ final class RealtimeChatDataSource {
     }
   }
 
-  Future<void> _connectOnce() async {
+  Future<void> _connectOnce(int epoch) async {
     if (_needsRefresh) {
       await _api.refreshSession();
+      if (!_current(epoch)) return;
       _needsRefresh = false;
     }
     final token = await _api.accessToken();
+    if (!_current(epoch)) return;
     final previous = _socket;
     _socket = null;
     previous?.dispose();
@@ -83,7 +93,7 @@ final class RealtimeChatDataSource {
     final ready = Completer<void>();
 
     socket.on('connection.ready', (dynamic raw) {
-      if (!identical(_socket, socket)) return;
+      if (!_current(epoch) || !identical(_socket, socket)) return;
       try {
         final envelope = asObject(raw);
         if (envelope['protocolVersion'] != 1 ||
@@ -109,6 +119,7 @@ final class RealtimeChatDataSource {
 
     for (final name in _eventNames) {
       socket.on(name, (dynamic raw) {
+        if (!_current(epoch) || !identical(_socket, socket)) return;
         try {
           _events.add(eventFromEnvelope(name, raw));
         } catch (error) {
@@ -123,7 +134,7 @@ final class RealtimeChatDataSource {
     }
 
     socket.on('connect_error', (dynamic error) {
-      if (!identical(_socket, socket)) return;
+      if (!_current(epoch) || !identical(_socket, socket)) return;
       if (error is Map && error['data'] is Map) {
         final details = error['data'] as Map;
         if (details['code'] == 'UNAUTHORIZED') _needsRefresh = true;
@@ -137,7 +148,13 @@ final class RealtimeChatDataSource {
     });
 
     socket.on('disconnect', (dynamic reason) {
-      if (!identical(_socket, socket)) return;
+      if (!_current(epoch) || !identical(_socket, socket)) return;
+      _events.add(
+        RealtimeDisconnected(
+          eventId: 'disconnect-${DateTime.now().microsecondsSinceEpoch}',
+          occurredAt: DateTime.now().toUtc(),
+        ),
+      );
       if (!ready.isCompleted) {
         ready.completeError(
           AppFailure(kind: FailureKind.network, debugMessage: '$reason'),
@@ -150,6 +167,7 @@ final class RealtimeChatDataSource {
     try {
       await ready.future.timeout(const Duration(seconds: 10));
     } on TimeoutException {
+      if (identical(_socket, socket)) _socket = null;
       socket.dispose();
       throw const AppFailure(
         kind: FailureKind.network,
@@ -158,6 +176,7 @@ final class RealtimeChatDataSource {
     }
   }
 
+  @override
   Future<void> setTyping(String conversationId, {required bool typing}) async {
     final socket = _socket;
     if (socket == null || !socket.connected) {
@@ -199,12 +218,14 @@ final class RealtimeChatDataSource {
     final jittered = (exponential * (0.75 + _random.nextDouble() * 0.5))
         .round();
 
+    final epoch = _connectionEpoch;
     _retryTimer = Timer(Duration(milliseconds: jittered), () async {
       _retryTimer = null;
-      if (!_wanted) return;
+      if (!_current(epoch)) return;
       try {
-        await _connectOnce();
+        await _connectOnce(epoch);
       } on AppFailure catch (failure) {
+        if (!_current(epoch)) return;
         if (failure.kind == FailureKind.unauthorized) {
           _wanted = false;
           _events.addError(failure);
@@ -212,12 +233,14 @@ final class RealtimeChatDataSource {
         }
         _scheduleRetry();
       } catch (_) {
-        _scheduleRetry();
+        if (_current(epoch)) _scheduleRetry();
       }
     });
   }
 
+  @override
   void disconnect() {
+    _connectionEpoch++;
     _wanted = false;
     _retryTimer?.cancel();
     _retryTimer = null;

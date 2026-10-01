@@ -21,17 +21,14 @@ final class BackendAuthDataSource {
 
   Future<void> logout() async {
     final session = await _api.currentSession();
-    try {
-      if (session != null) {
-        await _api.request(
-          'POST',
-          '/auth/logout',
-          authenticated: false,
-          body: {'refreshToken': session.refreshToken},
-        );
-      }
-    } finally {
-      await _api.clearSession();
+    await _api.clearSession();
+    if (session != null) {
+      await _api.request(
+        'POST',
+        '/auth/logout',
+        authenticated: false,
+        body: {'refreshToken': session.refreshToken},
+      );
     }
   }
 
@@ -40,6 +37,7 @@ final class BackendAuthDataSource {
     required String email,
     required String password,
   }) async {
+    final revision = _api.sessionRevision;
     final data = await _api.request(
       'POST',
       path,
@@ -47,7 +45,12 @@ final class BackendAuthDataSource {
       body: {'email': email, 'password': password},
     );
     final session = sessionFromAuthResponse(data);
-    await _api.saveSession(session);
+    try {
+      await _api.saveSession(session, expectedRevision: revision);
+    } catch (_) {
+      _api.discardSession(session.refreshToken);
+      rethrow;
+    }
 
     final user = data['user'] as Map<String, dynamic>;
     return AuthUser(id: session.userId, email: user['email'] as String?);
