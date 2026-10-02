@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
@@ -27,9 +28,19 @@ final class BackendDataDependencies {
   });
 
   factory BackendDataDependencies.fromEnvironment() {
-    const raw = String.fromEnvironment('CHAT_API_BASE_URL');
+    const configured = String.fromEnvironment('CHAT_API_BASE_URL');
+    final raw = configured.isNotEmpty
+        ? configured
+        : kDebugMode
+        ? defaultTargetPlatform == TargetPlatform.android
+              ? 'http://10.0.2.2:55418'
+              : 'http://127.0.0.1:55418'
+        : '';
+
     if (raw.isEmpty) {
-      throw StateError('CHAT_API_BASE_URL is required for backend data mode.');
+      throw StateError(
+        'Release/profile builds require CHAT_API_BASE_URL. Debug builds use the local development server.',
+      );
     }
 
     final serverUrl = Uri.parse(raw);

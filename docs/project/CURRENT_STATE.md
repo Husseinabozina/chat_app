@@ -3,7 +3,7 @@
 Update this file before closing each future project checkpoint. Verify actual branch heads and CI runs from GitHub before changing the state below. Record native acceptance separately from host/CI checks.
 
 **Updated:** 2026-10-02
-**Current phase:** Logo geometry and entry visual polish on `fix/mobile-entry-visual-polish`, based on freshly verified PR #22 HEAD `d89dd9e869f180d42cd9fa60ddee19c194199b2d` (Mobile CI #29 success). Complementary traced regions/cubic curves repair dark junction incursions and edge waviness while preserving the pink fold and recoloring. Onboarding now illustrates People/conversation flows with back navigation and guarded transitions; auth errors announce accessibly. See `ENTRY_VISUAL_POLISH_CHECKPOINT.md`. Draft PR #23 implementation `776e9c1d88ad00c811e2f62a7fb224b87edfedb7` passed Mobile CI #30. Final documentation HEAD/checks are recorded in PR metadata.
+**Current phase:** Real product entry correction on `fix/mobile-product-entry`, based on PR #23 final HEAD `1dd304b054e53b382fa98317a858ccbd8b66e60e` (Mobile CI #32 success). Current Mingle is the default app entry; the Firebase prototype is explicit-only. First-run onboarding no longer auto-completes on account restore, Settings replay is removed, branding remains readable during initialization, and adjacent messages group visually. See `PRODUCT_ENTRY_CHECKPOINT.md`. Publication/current-head CI is recorded in PR metadata.
 
 **Current acceptance boundary:** The user explicitly deferred the previous native visual review and authorized this implementation without further questions. Historical native resource builds succeeded before this checkpoint; no new native build was started. Latest full visual/motion/keyboard/dark/physical/two-device acceptance is still pending. Android native build is unverified because no local Android SDK is installed. See `BRAND_ENTRY_SETTINGS_CHECKPOINT.md` and `design-qa.md`. This is not a finished application; image/profile media, push, supported notification settings and release readiness remain.
 
@@ -103,7 +103,7 @@ PR #5 and PR #8 were closed as superseded by the main project conversation; thei
 - REST requests have a 15-second deadline and preserve credentials on network timeout.
 - Reversed history shows newest messages at the bottom; read commands use visible incoming bounds on a current foreground route; canonical receipt order is `(createdAt,id)`.
 - Chats/People have scrollable headers; Arabic/Latin message direction and scaled/landscape widget behavior are covered. Full Arabic UI localization is not implemented.
-- Backend mode is enabled with `CHAT_API_BASE_URL`; when unset the existing Firebase entrypoint remains available.
+- Current Mingle is the main entry; debug API defaults to local port 55418. Release/profile requires CHAT_API_BASE_URL. The Firebase prototype is explicit-only through main_legacy.dart.
 - PR #19 implements bundled Quicksand/Nunito/Tajawal, pastel raster artwork and navigation. The current motion checkpoint adds 20 original icons, restrained motion with reduced-motion handling, three distinct bottom tabs, dedicated conversation chooser and explicit local demo fixture.
 - New entry/settings checkpoint: editable/tintable logo, native launcher/splash resources, branded initialization, persisted first-run onboarding/skip/replay, System/Light/Dark and reduced-motion Settings, profile edit/about/confirmed logout. Authentication remains actual email/password with session restoration; social login and password recovery are not implemented.
 
@@ -205,7 +205,7 @@ Later/deferred work:
 
 ## Exact next checkpoint
 
-1. Preview the corrected logo and illustrated onboarding with manual Flutter hot restart (`R`); static generated path fields need reinitialization. Rebuild for native launcher/splash. Replay through Profile → Settings → Show introduction. Consolidated native acceptance remains separate; current visual PR remains Draft pending that review.
+1. Manual Flutter hot restart (`R`) previews current product entry. Introduction appears only with an unset completion flag, then sign-in/restored account; no Settings replay. Native launcher/splash require rebuilding. No reset of saved onboarding/session data is performed. Consolidated native acceptance remains separate.
 2. Profile/image-message media contracts and implementation; current avatars remain illustrated fallbacks. Follow with push delivery/routing and supported notification settings.
 3. Consolidated native acceptance remains explicitly deferred by the user; collect the missing evidence when resumed, including Android once its SDK is available.
 4. Password recovery/social auth, localization, files/voice/presence/reactions require scope/contracts. No merges or force pushes without authorization.
@@ -233,3 +233,8 @@ Later/deferred work:
 - Onboarding now explains People and messaging with decorative preview cards, Previous navigation, guarded page transitions and reduced-motion progress. Auth errors announce through a live region; Settings replay remains available.
 - No new native build/simulator launch, backend/schema/dependency/lockfile/workflow change or extra test suite. Local automatic native migration/linker modifications and Podfile.lock remain unpublished.
 - General PNG-to-SVG plugin work is explicitly deferred. Next product checkpoint remains profile/image media contracts and implementation, then push and release work.
+
+## Product entry correction (2026-10-02)
+
+- Supersedes earlier opt-in backend and Settings onboarding replay behavior: normal main.dart is now Mingle, branding is shown during startup, first-run onboarding requires explicit completion/Skip, and Settings no longer offers replay. Saved completion remains saved across logout/relaunch.
+- Adjacent same-sender messages group visually without changing durable/read/retry behavior. Existing local platform modifications remain excluded.
