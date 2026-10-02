@@ -3,13 +3,13 @@
 Update this file before closing each future project checkpoint. Verify actual branch heads and CI runs from GitHub before changing the state below. Record native acceptance separately from host/CI checks.
 
 **Updated:** 2026-10-02
-**Current phase:** Private profile/photo-message implementation on `feat/media-images`, based on PR #24 implementation `06689b770171a607c7279320994e43a587cd07ad` (Mobile CI #33 success). Actual uploads/validated private storage, message image persistence/retry/realtime, profile-photo save, picker/preview/viewer and one-time corrected onboarding revision2 are implemented. See `MEDIA_CHECKPOINT.md`; Draft PR #25 implementation `5baf62fe7941496b361f1477c378e1fe69136243` passed Backend CI #84 and Mobile CI #34; final documentation HEAD/checks are recorded in PR metadata. No native build/visual acceptance claim.
+**Current phase:** Push notification implementation on `feat/push-notifications`, based on exact PR #25 final `ce43154864b9520a4f7178c180e764801e00c6a3` (Backend CI #85 + Mobile CI #35 success). Session-bound registration/revocation, private generic FCM payload, account-safe cold/background conversation routing, Settings opt-in and selective native configuration implemented. Provider credentials/APNs/signing/delivery acceptance remain pending. See `PUSH_CHECKPOINT.md`. No native build or actual push delivery claim.
 
 **Current acceptance boundary:** The user explicitly deferred the previous native visual review and authorized this implementation without further questions. Historical native resource builds succeeded before this checkpoint; no new native build was started. Latest full visual/motion/keyboard/dark/physical/two-device acceptance is still pending. Android native build is unverified because no local Android SDK is installed. See `BRAND_ENTRY_SETTINGS_CHECKPOINT.md` and `design-qa.md`. This is not a released application; new photo features need native/provider acceptance, and push/supported notification settings/release readiness remain.
 
 ## Last verified branch / PR / commit
 
-- Current checkpoint: `feat/media-images`, Draft [PR #25](https://github.com/Husseinabozina/chat_app/pull/25), implementation `5baf62fe7941496b361f1477c378e1fe69136243`. [Backend CI #84](https://github.com/Husseinabozina/chat_app/actions/runs/37029887146) and [Mobile CI #34](https://github.com/Husseinabozina/chat_app/actions/runs/37029887362) completed/success on that exact commit. Local migration and actual private image upload/profile/message fixture succeeded; native picker/rendering and production provider remain unverified. Based on PR #24 implementation `06689b770171a607c7279320994e43a587cd07ad`, [Mobile CI #33](https://github.com/Husseinabozina/chat_app/actions/runs/37025464141) success. Final documentation HEAD/checks are recorded in PR metadata to avoid self-referential hashes; older evidence below is historical.
+- Latest verified baseline: `feat/media-images`, Draft [PR #25](https://github.com/Husseinabozina/chat_app/pull/25), implementation `5baf62fe7941496b361f1477c378e1fe69136243`. [Backend CI #84](https://github.com/Husseinabozina/chat_app/actions/runs/37029887146) and [Mobile CI #34](https://github.com/Husseinabozina/chat_app/actions/runs/37029887362) completed/success on that exact commit. Local migration and actual private image upload/profile/message fixture succeeded; native picker/rendering and production provider remain unverified. Based on PR #24 implementation `06689b770171a607c7279320994e43a587cd07ad`, [Mobile CI #33](https://github.com/Husseinabozina/chat_app/actions/runs/37025464141) success. Final documentation HEAD/checks are recorded in PR metadata to avoid self-referential hashes; older evidence below is historical.
 
 - Historical checkpoint: `fix/mobile-entry-visual-polish`, based on exact PR #22 final HEAD `d89dd9e869f180d42cd9fa60ddee19c194199b2d`, [Mobile CI #29](https://github.com/Husseinabozina/chat_app/actions/runs/37009976819) success. Draft [PR #23](https://github.com/Husseinabozina/chat_app/pull/23), verified implementation `776e9c1d88ad00c811e2f62a7fb224b87edfedb7`; [Mobile CI #30](https://github.com/Husseinabozina/chat_app/actions/runs/37020880336) completed/success. Final documentation HEAD/checks are recorded in PR metadata; older evidence below is historical.
 
@@ -49,9 +49,10 @@ Integrated `master` HEAD: `5f77dbd50efd9ae12f17d809a63c2746f35fc9ee` (PR #14 rea
 | #22 | `fix/mobile-logo-fidelity` | #21 branch | `d89dd9e869f180d42cd9fa60ddee19c194199b2d` | Draft; CI #29 success; geometry superseded by #23 |
 | #23 | `fix/mobile-entry-visual-polish` | #22 branch | `1dd304b054e53b382fa98317a858ccbd8b66e60e` | Draft; CI #32 success; native acceptance pending |
 | #24 | `fix/mobile-product-entry` | #23 branch | `06689b770171a607c7279320994e43a587cd07ad` | Draft; CI #33 success; native acceptance pending |
-| #25 | `feat/media-images` | #24 branch | `5baf62fe7941496b361f1477c378e1fe69136243` (implementation) | Draft; Backend CI #84 + Mobile CI #34 success; native/provider acceptance pending |
+| #25 | `feat/media-images` | #24 branch | `ce43154864b9520a4f7178c180e764801e00c6a3` | Draft; Backend CI #85 + Mobile CI #35 success; native/provider acceptance pending |
+| next | `feat/push-notifications` | #25 branch | Publication pending | Push implementation; provider/native delivery and CI pending |
 
-Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21 → #22 → #23 → #24 → #25**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
+Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21 → #22 → #23 → #24 → #25 → push PR**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
 
 Integrated earlier history:
 
@@ -219,7 +220,7 @@ Later/deferred work:
 ## Exact next checkpoint
 
 1. Manual Flutter hot restart (`R`) previews current product entry. Introduction appears once if revision2 has not been explicitly completed, then sign-in/restored account; no Settings replay. Native launcher/splash require rebuilding. Old automatic development completion flags are corrected once; saved sessions/theme are retained. Consolidated native acceptance remains separate.
-2. Push device-token lifecycle, FCM credential configuration, conversation notification routing and supported Settings. Validate private photo storage/picker/viewer on native devices; avatars now use uploaded media when present.
+2. Activate implemented push through scoped FCM server credentials, APNs/signing configuration and actual delivery/account-routing acceptance. Firebase project is confirmed accessible; no server ADC or local signing identity is configured. Validate private photo picker/viewer on native devices. Public deployment must resolve allowed origins, storage cleanup/provider compatibility and single/multiple-server coordination.
 3. Consolidated native acceptance remains explicitly deferred by the user; collect the missing evidence when resumed, including Android once its SDK is available.
 4. Password recovery/social auth, localization, files/voice/presence/reactions require scope/contracts. No merges or force pushes without authorization.
 
@@ -259,3 +260,10 @@ Later/deferred work:
 - Legacy development onboarding flags are migrated through revision2 because earlier account restore could auto-complete them. Users see introduction once, then the persisted session/sign-in; credentials/theme are retained.
 - Private local object storage is real, data on external disk; API/database healthy after preserving signing secret and restarting. Actual local demo photo/image message added. No cloud deployment or new native build.
 - Remaining: push/FCM configuration and routing, production storage/provider verification, cleanup scheduling/orphan reconciliation, deployment hardening and consolidated native acceptance.
+
+## Push implementation (2026-10-02)
+
+- Session-bound installation registration/rotation/revocation; recipient membership/session/read/deletion checks before generic FCM dispatch. Only new persisted messages enqueue; idempotent retries preserve existing semantics. Queue is bounded and best effort, not a durable notification outbox.
+- Existing Firebase client project confirmed ACTIVE/accessible. No cloud credentials or Apple signing identity available locally; actual delivery remains unverified and PUSH_ENABLED stays false. Settings reflects unavailability, not a fake enabled switch.
+- Cold/background routing validates account, waits for restore/onboarding and fetches membership-authorized summary. Android permissions and selective iOS push settings added without publishing old native migrations. No native build or new test suite.
+- Vercel now supports NestJS and Socket.IO/WebSockets in Beta, but current in-memory realtime/session coordination needs external shared infrastructure for its multiple instances; no deployment/vendor selection or architecture rewrite made.

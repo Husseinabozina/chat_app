@@ -151,3 +151,7 @@ Native visual boxes remain unchecked at the user's request. Android compilation 
 |---|---|---|
 | PR #24 product entry | `06689b7`; Mobile CI #33 success; current default entry, one-time introduction and grouped bubbles | Native entry review pending |
 | PR #25 private photos | `5baf62f`; Backend CI #84 + Mobile CI #34 success; actual local sanitized upload/avatar/image-message fixture | Native/provider/full media authorization matrix pending |
+
+## Push implementation evidence — 2026-10-02
+
+Session-bound registration, generic private notifications, Settings opt-in, token/resume refresh and account-checked cold/background routing are implemented on `feat/push-notifications`. Native permissions/APS entitlements are selectively added. Provider credentials/signing and actual delivery/device matrix remain unverified; no native acceptance boxes are checked. Missing configuration is displayed as unavailable. No new test suite or native build. See `PUSH_CHECKPOINT.md`.

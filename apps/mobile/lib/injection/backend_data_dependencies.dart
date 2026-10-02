@@ -13,6 +13,8 @@ import '../features/conversations/data/datasources/realtime_chat_data_source.dar
 import '../features/conversations/data/datasources/rest_conversations_data_source.dart';
 import '../features/conversations/data/repositories/api_conversations_repository.dart';
 import '../features/media/data/api_media_repository.dart';
+import '../features/push/data/fcm_push_repository.dart';
+import '../features/push/domain/push_repository.dart';
 import '../features/users/data/api_users_repository.dart';
 
 /// Backend composition for the direct-conversation product entrypoint.
@@ -26,6 +28,7 @@ final class BackendDataDependencies {
     required this.repository,
     required this.session,
     required this.preferences,
+    required this.push,
   });
 
   factory BackendDataDependencies.fromEnvironment() {
@@ -62,6 +65,7 @@ final class BackendDataDependencies {
     final realtime = RealtimeChatDataSource(serverUrl: serverUrl, api: api);
     final repository = ApiConversationsRepository(conversations, realtime);
     return BackendDataDependencies._(
+      push: FcmPushRepository(api, const FlutterSecureStorage()),
       auth: auth,
       conversations: conversations,
       realtime: realtime,
@@ -77,6 +81,7 @@ final class BackendDataDependencies {
 
   BackendAppServices get appServices => BackendAppServices(
     account: session,
+    push: push,
     conversations: repository,
     users: ApiUsersRepository(_api),
     media: ApiMediaRepository(_api, _httpClient),
@@ -91,10 +96,12 @@ final class BackendDataDependencies {
   final ApiConversationsRepository repository;
   final BackendSessionController session;
   final AppPreferences preferences;
+  final PushRepository push;
   final RestApiClient _api;
   final http.Client _httpClient;
 
   Future<void> close() async {
+    await push.close();
     await session.close();
     await repository.close();
     await realtime.close();

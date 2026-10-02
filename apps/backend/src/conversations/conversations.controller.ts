@@ -51,6 +51,17 @@ export class ConversationsController {
     );
   }
 
+  @Get(':conversationId')
+  get(
+    @CurrentAuth() auth: AuthContext,
+    @Param('conversationId', new ParseUUIDPipe()) conversationId: string,
+  ) {
+    return this.conversationsService.getSummaryForUser(
+      auth.userId,
+      conversationId,
+    );
+  }
+
   @Get(':conversationId/read-state')
   readState(
     @CurrentAuth() auth: AuthContext,
