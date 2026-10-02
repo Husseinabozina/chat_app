@@ -27,6 +27,7 @@ enum MingleGlyph {
   reply,
   copy,
   trash,
+  settings,
 }
 
 class MingleIcon extends StatefulWidget {
@@ -149,6 +150,18 @@ class _GlyphPainter extends CustomPainter {
           ink,
         );
     switch (glyph) {
+      case MingleGlyph.settings:
+        circle(16, 16, 9);
+        circle(16, 16, 3.5);
+        for (var i = 0; i < 8; i++) {
+          final angle = i * math.pi / 4;
+          line(
+            16 + math.cos(angle) * 9,
+            16 + math.sin(angle) * 9,
+            16 + math.cos(angle) * 13,
+            16 + math.sin(angle) * 13,
+          );
+        }
       case MingleGlyph.chats:
         path(
           Path()

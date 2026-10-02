@@ -59,3 +59,7 @@ final result: blocked
 `feat/mobile-motion-demo` preserves the approved raster artwork/rounded fonts and adds user-authorized original vector icons, reduced-motion-aware interactions, explicit empty-state plane scene, distinct New conversation chooser and loopback-only demo data. Existing automated checks are documented in `docs/project/MOTION_DEMO_CHECKPOINT.md`. These are functional/source checks, not a rendered QA pass.
 
 Final result remains blocked by unfinished consolidated native review and post-fix status-bar evidence, not by host screen lock.
+
+## User-deferred branded-entry checkpoint — 2026-10-02
+
+The user explicitly requested leaving the previous visual review and implementing logo/splash/onboarding/Settings. New implementation is on `feat/mobile-brand-entry-settings`. Editable mark source: `apps/mobile/assets/brand/mingle-mark.svg`; raster mark was opened/inspected as an asset, not as a screen comparison. Native iOS build is resource/compiler evidence only. No new simulator screen comparison or visual acceptance is claimed. Host/CI results belong to `BRAND_ENTRY_SETTINGS_CHECKPOINT.md`; this rendered gate remains deferred/blocked.

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../core/presentation/chat_ui.dart';
 import '../features/auth/domain/entities/auth_user.dart';
 import '../features/conversations/presentation/pages/chats_page.dart';
+import '../features/settings/presentation/settings_page.dart';
 import '../features/users/domain/users_repository.dart';
 import '../features/users/presentation/pages/people_page.dart';
 import '../features/users/presentation/pages/profile_form.dart';
@@ -90,6 +91,16 @@ class _BackendMainShellState extends State<BackendMainShell> {
     ),
   );
 
+  Future<void> _settings() => Navigator.of(context).push<void>(
+    MaterialPageRoute(
+      builder: (_) => SettingsPage(
+        preferences: widget.services.preferences,
+        onEditProfile: _edit,
+        onLogout: _logout,
+      ),
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     if (_loading) {
@@ -167,6 +178,12 @@ class _BackendMainShellState extends State<BackendMainShell> {
                       onPressed: _edit,
                       icon: const MingleIcon(MingleGlyph.edit, size: 20),
                       label: const Text('Edit profile'),
+                    ),
+                    const SizedBox(height: 16),
+                    OutlinedButton.icon(
+                      onPressed: _settings,
+                      icon: const MingleIcon(MingleGlyph.settings, size: 20),
+                      label: const Text('Settings'),
                     ),
                     const SizedBox(height: 16),
                     TextButton.icon(

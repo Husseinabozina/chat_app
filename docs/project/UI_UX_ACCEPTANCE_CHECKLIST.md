@@ -128,3 +128,15 @@ Additional entry-experience backlog, explicitly clarified with the user:
 - [ ] Native Mingle splash with no arbitrary startup delay.
 - [ ] First-run onboarding/skip and persisted completion, followed by existing authentication and profile setup.
 - [ ] Password recovery requires backend contract; Google/Apple providers are not currently implemented or silently added to scope.
+
+### Branded entry and Settings implementation — 2026-10-02
+
+The user explicitly deferred the earlier visual review and authorized logo, splash, onboarding and Settings without additional questions. `BRAND_ENTRY_SETTINGS_CHECKPOINT.md` records source/assets, the recoloring API and tests. These are implemented/host-verified, not automatically visually accepted:
+
+- Editable SVG mark, theme tint/central override, native icon exports and display name.
+- Native and real-initialization splash without an artificial delay.
+- Three first-run pages with Skip/Get started and saved completion; established sessions bypass and Settings can replay.
+- Settings: persistent System/Light/Dark, reduced motion respecting the OS, profile edit, introduction, About/licenses, confirmed logout.
+- Existing account test exercises introduction, settings, persistence and logout; original assertions retained.
+
+Native visual boxes remain unchecked at the user's request. Android compilation remains unverified (SDK unavailable); local iOS native-resource build passed. Privacy/notifications/language/account deletion are not exposed before their behavior/contracts exist.

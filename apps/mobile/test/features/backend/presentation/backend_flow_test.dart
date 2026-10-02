@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:chat_app/app/backend_app.dart';
 import 'package:chat_app/app/backend_app_services.dart';
+import 'package:chat_app/core/preferences/app_preferences.dart';
 import 'package:chat_app/core/presentation/chat_ui.dart';
 import 'package:chat_app/features/auth/domain/entities/auth_user.dart';
 import 'package:chat_app/features/auth/domain/repositories/backend_account_repository.dart';
@@ -107,6 +108,8 @@ void main() {
     'account creation completes profile; sign out clears pushed routes',
     (tester) async {
       final account = AccountFake();
+      final preferencesStore = MemoryPreferencesStore();
+      final preferences = AppPreferences(preferencesStore);
       users.me = const UserProfile(id: 'alice');
       await repo.start('alice');
       await tester.pumpWidget(
@@ -117,10 +120,18 @@ void main() {
             users: users,
             pause: repo.pauseRealtime,
             resume: repo.resumeRealtime,
+            preferences: preferences,
           ),
         ),
       );
       await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Get started'));
+      await tester.pumpAndSettle();
+      expect(preferences.onboardingComplete, isTrue);
       await tester.tap(find.text('New here? Create account'));
       await tester.pumpAndSettle();
       await tester.enterText(
@@ -145,6 +156,28 @@ void main() {
       await tester.ensureVisible(find.text('Start chatting'));
       await tester.tap(find.text('Start chatting'));
       await tester.pumpAndSettle();
+      await tester.tap(find.text('Profile'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Settings'));
+      await tester.tap(find.text('Settings'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Dark'));
+      await tester.pumpAndSettle();
+      expect(preferences.themeMode, ThemeMode.dark);
+      await tester.ensureVisible(find.text('Reduce motion'));
+      await tester.tap(find.text('Reduce motion'));
+      await tester.pumpAndSettle();
+      expect(preferences.reduceMotion, isTrue);
+      final restored = AppPreferences(preferencesStore);
+      await restored.load();
+      expect(restored.themeMode, ThemeMode.dark);
+      expect(restored.reduceMotion, isTrue);
+      expect(restored.onboardingComplete, isTrue);
+      restored.dispose();
+      await tester.tap(find.byTooltip('Back'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Chats'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Chat member').first);
       await tester.pumpAndSettle();
       expect(find.byType(ConversationPage), findsOneWidget);
@@ -152,7 +185,10 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Sign in'), findsWidgets);
       expect(find.byType(ConversationPage), findsNothing);
+      expect(find.text('Skip'), findsNothing);
+      expect(preferences.themeMode, ThemeMode.dark);
       await tester.pumpWidget(const SizedBox());
+      preferences.dispose();
       await account.changes.close();
     },
   );

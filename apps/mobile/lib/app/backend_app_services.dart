@@ -1,3 +1,4 @@
+import '../core/preferences/app_preferences.dart';
 import '../features/auth/domain/repositories/backend_account_repository.dart';
 import '../features/conversations/domain/repositories/conversations_repository.dart';
 import '../features/users/domain/users_repository.dart';
@@ -10,10 +11,12 @@ final class BackendAppServices {
     required this.users,
     required this.pause,
     required this.resume,
+    required this.preferences,
   });
   final BackendAccountRepository account;
   final ConversationsRepository conversations;
   final UsersRepository users;
   final void Function() pause;
   final Future<void> Function() resume;
+  final AppPreferences preferences;
 }

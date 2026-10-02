@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../failures/app_failure.dart';
+import 'mingle_brand.dart';
 import 'mingle_icons.dart';
 import 'mingle_motion.dart';
 
@@ -23,7 +24,7 @@ SystemUiOverlayStyle mingleSystemOverlay(Brightness brightness) =>
           : Brightness.dark,
     );
 
-ThemeData backendTheme(Brightness brightness) {
+ThemeData backendTheme(Brightness brightness, {Color? logoColor}) {
   final dark = brightness == Brightness.dark;
   final scheme = ColorScheme.fromSeed(seedColor: blush, brightness: brightness)
       .copyWith(
@@ -62,6 +63,7 @@ ThemeData backendTheme(Brightness brightness) {
     borderSide: BorderSide(color: scheme.outline),
   );
   return base.copyWith(
+    extensions: [MingleBrandPalette(logoColor ?? scheme.primary)],
     pageTransitionsTheme: const PageTransitionsTheme(
       builders: {
         TargetPlatform.android: MinglePageTransitions(),
