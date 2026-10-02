@@ -13,12 +13,14 @@ final class OutgoingMessage {
     required this.text,
     required this.status,
     this.replyToMessageId,
+    this.imageMediaId,
   });
   final String clientMessageId;
   final String conversationId;
   final String senderId;
   final String text;
   final String? replyToMessageId;
+  final String? imageMediaId;
   final OutgoingStatus status;
 
   OutgoingMessage withStatus(OutgoingStatus status) => OutgoingMessage(
@@ -27,6 +29,7 @@ final class OutgoingMessage {
     senderId: senderId,
     text: text,
     replyToMessageId: replyToMessageId,
+    imageMediaId: imageMediaId,
     status: status,
   );
 }
@@ -73,6 +76,7 @@ abstract interface class ConversationsRepository {
     String conversationId,
     String text, {
     String? replyToMessageId,
+    String? imageMediaId,
   });
   Future<ConversationMessage> sendOutgoing(String clientMessageId);
   Future<ConversationMessage> editMessage(

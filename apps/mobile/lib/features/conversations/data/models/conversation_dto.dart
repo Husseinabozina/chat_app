@@ -13,6 +13,7 @@ ConversationMessage messageFromJson(Map<String, dynamic> json) =>
       conversationId: json['conversationId'] as String,
       senderId: json['senderId'] as String,
       text: json['text'] as String?,
+      imageMediaId: json['imageMediaId'] as String?,
       replyToMessageId: json['replyToMessageId'] as String?,
       createdAt: asDate(json['createdAt']),
       editedAt: asNullableDate(json['editedAt']),

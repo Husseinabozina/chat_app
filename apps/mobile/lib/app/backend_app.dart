@@ -7,6 +7,7 @@ import '../core/presentation/chat_ui.dart';
 import '../core/presentation/mingle_brand.dart';
 import '../features/auth/domain/entities/auth_user.dart';
 import '../features/auth/presentation/pages/backend_account_page.dart';
+import '../features/media/presentation/media_scope.dart';
 import '../features/onboarding/presentation/onboarding_page.dart';
 import 'backend_app_services.dart';
 import 'backend_main_shell.dart';
@@ -106,7 +107,10 @@ class _BackendChatAppState extends State<BackendChatApp>
       ),
       child: AnnotatedRegion<SystemUiOverlayStyle>(
         value: mingleSystemOverlay(Theme.of(context).brightness),
-        child: child ?? const SizedBox.shrink(),
+        child: MediaScope(
+          repository: widget.services.media,
+          child: child ?? const SizedBox.shrink(),
+        ),
       ),
     ),
     home: _loading

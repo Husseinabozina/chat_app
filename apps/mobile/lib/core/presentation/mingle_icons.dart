@@ -28,6 +28,8 @@ enum MingleGlyph {
   copy,
   trash,
   settings,
+  photo,
+  camera,
 }
 
 class MingleIcon extends StatefulWidget {
@@ -150,6 +152,28 @@ class _GlyphPainter extends CustomPainter {
           ink,
         );
     switch (glyph) {
+      case MingleGlyph.photo:
+        round(3, 5, 29, 27, 5);
+        circle(22, 11, 2);
+        path(
+          Path()
+            ..moveTo(4, 24)
+            ..lineTo(12, 15)
+            ..lineTo(19, 23)
+            ..lineTo(24, 18)
+            ..lineTo(29, 24),
+        );
+      case MingleGlyph.camera:
+        round(3, 9, 29, 27, 5);
+        path(
+          Path()
+            ..moveTo(9, 9)
+            ..lineTo(12, 5)
+            ..lineTo(20, 5)
+            ..lineTo(23, 9),
+        );
+        circle(16, 18, 5);
+
       case MingleGlyph.settings:
         circle(16, 16, 9);
         circle(16, 16, 3.5);

@@ -1,3 +1,4 @@
+import { ImageMedia2026100200000 } from './migrations/2026100200000-image-media';
 import { loadEnvFile } from 'node:process';
 
 import { DataSource } from 'typeorm';
@@ -29,6 +30,7 @@ export const AppDataSource = new DataSource({
     AuthSessionIndexes2026093000100,
     ConversationMessageIndexes2026093000200,
     UserDiscoveryIndexes2026093000300,
+    ImageMedia2026100200000,
   ],
   synchronize: false,
   logging: false,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/presentation/chat_ui.dart';
+import '../../../media/presentation/media_scope.dart';
+import '../../../media/presentation/photo_draft_sheet.dart';
 import '../../domain/users_repository.dart';
 
 class ProfileForm extends StatefulWidget {
@@ -28,18 +30,55 @@ class _ProfileFormState extends State<ProfileForm> {
   late final _bio = TextEditingController(text: widget.profile.bio);
   bool _busy = false;
   String? _error;
+  String? _avatarUrl;
+  String? _avatarMediaId;
+  bool _photoBusy = false;
+
+  Future<void> _photo() async {
+    if (_busy || _photoBusy) return;
+    setState(() => _photoBusy = true);
+    try {
+      await showModalBottomSheet<bool>(
+        context: context,
+        isScrollControlled: true,
+        isDismissible: false,
+        enableDrag: false,
+        builder: (_) => PhotoDraftSheet(
+          purpose: 'avatar',
+          onUploaded: (id, _) async {
+            if (mounted) {
+              setState(() {
+                _avatarMediaId = id;
+                _avatarUrl = '/v1/media/$id/content';
+              });
+            }
+          },
+        ),
+      );
+    } catch (error) {
+      if (mounted) showFailure(context, error);
+    } finally {
+      if (mounted) setState(() => _photoBusy = false);
+    }
+  }
+
   Future<void> _save() async {
-    if (_busy || !_form.currentState!.validate()) return;
+    if (_busy || _photoBusy || !_form.currentState!.validate()) return;
     setState(() {
       _busy = true;
       _error = null;
     });
     try {
-      final p = await widget.users.updateMe(
+      var p = await widget.users.updateMe(
         username: _username.text,
         displayName: _name.text,
         bio: _bio.text,
       );
+      if (_avatarMediaId != null) {
+        if (!mounted) return;
+        await MediaScope.maybeOf(context)!.setAvatar(_avatarMediaId!);
+        p = await widget.users.getMe();
+      }
       if (mounted) widget.onSaved(p);
     } catch (e) {
       if (mounted) setState(() => _error = friendlyError(e));
@@ -81,8 +120,18 @@ class _ProfileFormState extends State<ProfileForm> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Center(
-                    child: InitialAvatar(widget.profile.label, radius: 42),
+                    child: InitialAvatar(
+                      widget.profile.label,
+                      radius: 42,
+                      avatarUrl: _avatarUrl ?? widget.profile.avatarUrl,
+                    ),
                   ),
+                  if (MediaScope.maybeOf(context) != null)
+                    TextButton.icon(
+                      onPressed: _busy || _photoBusy ? null : _photo,
+                      icon: const MingleIcon(MingleGlyph.camera),
+                      label: const Text('Change photo'),
+                    ),
                   const SizedBox(height: 24),
                   if (widget.completing)
                     const Padding(

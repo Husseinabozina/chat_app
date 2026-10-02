@@ -151,7 +151,13 @@ class _BackendMainShellState extends State<BackendMainShell> {
                   children: [
                     const WarmHeader('Your profile', 'A little about you.'),
                     const SizedBox(height: 24),
-                    Center(child: InitialAvatar(p.label, radius: 54)),
+                    Center(
+                      child: InitialAvatar(
+                        p.label,
+                        radius: 54,
+                        avatarUrl: p.avatarUrl,
+                      ),
+                    ),
                     const SizedBox(height: 16),
                     Text(
                       p.label,

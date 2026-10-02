@@ -18,6 +18,7 @@ abstract interface class ConversationsRestSource {
     String text, {
     String? clientMessageId,
     String? replyToMessageId,
+    String? imageMediaId,
   });
   Future<ConversationMessage> editMessage(String messageId, String text);
   Future<void> deleteMessage(String messageId);

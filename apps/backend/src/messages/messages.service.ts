@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+import { MediaService } from '../media/media.service';
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, QueryFailedError, type EntityManager } from 'typeorm';
@@ -23,6 +25,7 @@ export interface MessageResponse {
   conversationId: string;
   senderId: string;
   type: string;
+  imageMediaId: string | null;
   text: string | null;
   replyToMessageId: string | null;
   createdAt: Date;
@@ -45,6 +48,8 @@ export class MessagesService {
     private readonly dataSource: DataSource,
     @Inject(ConversationsService)
     private readonly conversationsService: ConversationsService,
+    @Inject(MediaService)
+    private readonly media: MediaService,
     @Inject(RealtimePublisher)
     private readonly realtimePublisher: RealtimePublisher,
   ) {}
@@ -103,9 +108,12 @@ export class MessagesService {
     conversationId: string,
     dto: SendMessageDto,
   ): Promise<MessageResponse> {
-    const text = dto.text.trim();
+    const text = dto.text?.trim() ?? '';
 
-    if (text.length === 0) {
+    if (
+      (dto.type === 'text' && (text.length === 0 || dto.imageMediaId)) ||
+      (dto.type === 'image' && !dto.imageMediaId)
+    ) {
       throw new ApiException(
         HttpStatus.BAD_REQUEST,
         'VALIDATION_ERROR',
@@ -165,19 +173,37 @@ export class MessagesService {
           }
         }
 
+        if (dto.imageMediaId)
+          await this.media.claim(
+            manager,
+            userId,
+            conversationId,
+            dto.imageMediaId,
+          );
+        const messageId = randomUUID();
         const message = await messages.save(
           messages.create({
+            id: messageId,
             clientMessageId: dto.clientMessageId,
             conversationId,
             senderId: userId,
-            type: 'text',
-            text,
+            type: dto.type,
+            text: text || null,
+            imageMediaId: dto.imageMediaId ?? null,
             replyToMessageId: dto.replyToMessageId ?? null,
             editedAt: null,
             deletedAt: null,
           }),
         );
 
+        if (dto.imageMediaId)
+          await this.media.claim(
+            manager,
+            userId,
+            conversationId,
+            dto.imageMediaId,
+            messageId,
+          );
         conversation.lastMessageId = message.id;
         conversation.updatedAt = message.createdAt;
         await conversations.save(conversation);
@@ -405,6 +431,7 @@ export class MessagesService {
       conversationId: message.conversationId,
       senderId: message.senderId,
       type: message.type,
+      imageMediaId: message.deletedAt ? null : (message.imageMediaId ?? null),
       text: message.text,
       replyToMessageId: message.replyToMessageId,
       createdAt: message.createdAt,

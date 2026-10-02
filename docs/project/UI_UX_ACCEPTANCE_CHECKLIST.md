@@ -55,7 +55,7 @@ Current implementation: PR #19 adds bundled rounded fonts, separate cloud/plane/
 
 - [ ] Header back/avatar/name/profile navigation and one clear typing representation reviewed.
 - [ ] Quiet warm history backdrop, distinct rounded own/received surfaces and readable message widths.
-- [ ] Consecutive-message grouping, date separators and an unread boundary where useful; date separators exist, grouping/unread treatment still require review.
+- [ ] Consecutive-message grouping, date separators and an unread boundary where useful; date separators exist, PR #24 adds grouping; native grouping/unread treatment still require review.
 - [ ] Sending/sent/read/failed/retry/edited/deleted states remain legible in both themes and at larger text sizes.
 - [ ] Reply preview is subordinate to new content; cancel/reply to deleted/unloaded messages behave clearly.
 - [ ] Edit mode is explicitly labelled; cancel/save and deletion while editing remain clear.
@@ -80,7 +80,7 @@ Current implementation: PR #19 adds bundled rounded fonts, separate cloud/plane/
 - [ ] Credentials and profile completion stay separate; display name/username/bio validation is clear.
 - [ ] Final avatar/photo area is added only with the scoped media implementation; initials remain valid fallback.
 - [ ] Own profile/Edit/Sign out reviewed; logout removes prior-account routes and data.
-- [ ] Only working appearance/notification/account settings appear. Appearance System/Light/Dark choice is planned; a full settings screen is not implemented in this slice.
+- [ ] Only working appearance/notification/account settings appear. PR #21 implements System/Light/Dark, reduced motion, edit/about/logout; #24 removes onboarding replay. Notification settings await push implementation.
 
 ## Native accessibility and behavior
 
@@ -96,7 +96,7 @@ Current implementation: PR #19 adds bundled rounded fonts, separate cloud/plane/
 
 ## Pending initial-release surfaces (separate implementation checkpoints)
 
-- [ ] Profile photo and image message contracts/storage, camera/library selection, preview/caption, upload feedback/failure/retry and larger image viewer.
+- [ ] Native acceptance of PR #25 profile photo/image messages: camera/library, preview/caption, upload feedback/failure/retry, cancellation, image viewer and privacy/error states. Implementation and actual local storage fixture are complete; native acceptance is pending.
 - [ ] Push notification delivery, real supported settings and correct conversation routing after app/session restore.
 - [ ] Supported appearance settings and final production navigation/release flow.
 
@@ -134,9 +134,9 @@ Additional entry-experience backlog, explicitly clarified with the user:
 The user explicitly deferred the earlier visual review and authorized logo, splash, onboarding and Settings without additional questions. `BRAND_ENTRY_SETTINGS_CHECKPOINT.md` records source/assets, the recoloring API and tests. These are implemented/host-verified, not automatically visually accepted:
 
 - Editable SVG mark, theme tint/central override, native icon exports and display name.
-- Native and real-initialization splash without an artificial delay.
-- Three first-run pages with Skip/Get started and saved completion; established sessions bypass and Settings can replay.
-- Settings: persistent System/Light/Dark, reduced motion respecting the OS, profile edit, introduction, About/licenses, confirmed logout.
+- Native and real-initialization splash; #24 adds a minimum 800 ms while restoration runs.
+- Three first-run pages with Skip/Get started and saved completion. PR #24 removes auto-completion/replay; #25 corrects old development flags once through revision 2.
+- Settings: persistent System/Light/Dark, reduced motion respecting the OS, profile edit, About/licenses, confirmed logout.
 - Existing account test exercises introduction, settings, persistence and logout; original assertions retained.
 
 Native visual boxes remain unchecked at the user's request. Android compilation remains unverified (SDK unavailable); local iOS native-resource build passed. Privacy/notifications/language/account deletion are not exposed before their behavior/contracts exist.
@@ -144,3 +144,10 @@ Native visual boxes remain unchecked at the user's request. Android compilation 
 ## Entry polish implementation evidence — 2026-10-02
 
 `fix/mobile-entry-visual-polish` repairs traced logo junctions/edges, preserves independent fold colors, and adds illustrative onboarding cards/back navigation/transition guards. Auth errors announce accessibly. See `ENTRY_VISUAL_POLISH_CHECKPOINT.md`. Asset comparison and automated checks do not tick native acceptance items above; user-owned manual run/consolidated review remains pending.
+
+## Product entry and media implementation evidence — 2026-10-02
+
+| Area | Evidence | Acceptance |
+|---|---|---|
+| PR #24 product entry | `06689b7`; Mobile CI #33 success; current default entry, one-time introduction and grouped bubbles | Native entry review pending |
+| PR #25 private photos | `5baf62f`; Backend CI #84 + Mobile CI #34 success; actual local sanitized upload/avatar/image-message fixture | Native/provider/full media authorization matrix pending |

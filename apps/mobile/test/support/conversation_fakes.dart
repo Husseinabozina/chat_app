@@ -74,6 +74,7 @@ final class FakeRest implements ConversationsRestSource {
     String text, {
     String? clientMessageId,
     String? replyToMessageId,
+    String? imageMediaId,
   }) async {
     sentIds.add(clientMessageId!);
     lastReply = replyToMessageId;

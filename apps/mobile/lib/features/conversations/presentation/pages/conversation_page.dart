@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../core/presentation/chat_ui.dart';
+import '../../../media/presentation/media_image.dart';
+import '../../../media/presentation/media_scope.dart';
+import '../../../media/presentation/photo_draft_sheet.dart';
 import '../../../users/domain/users_repository.dart';
 import '../../../users/presentation/pages/people_page.dart';
 import '../../domain/entities/conversation.dart';
@@ -39,6 +42,7 @@ class _ConversationPageState extends State<ConversationPage>
   bool _loading = true;
   bool _more = false;
   bool _savingEdit = false;
+  bool _photoOpen = false;
   bool _reading = false;
   bool _readScheduled = false;
   bool _foreground = true;
@@ -212,6 +216,45 @@ class _ConversationPageState extends State<ConversationPage>
     );
   }
 
+  Future<void> _photo() async {
+    if (_savingEdit || _editing != null || _photoOpen) return;
+    setState(() => _photoOpen = true);
+    final reply = _reply;
+    try {
+      await showModalBottomSheet<bool>(
+        context: context,
+        isScrollControlled: true,
+        isDismissible: false,
+        enableDrag: false,
+        builder: (_) => PhotoDraftSheet(
+          purpose: 'message',
+          conversationId: _id,
+          onUploaded: (id, caption) async {
+            if (!mounted) return;
+            final outgoing = widget.repository.prepareMessage(
+              _id,
+              caption,
+              imageMediaId: id,
+              replyToMessageId: reply?.id,
+            );
+            setState(() => _reply = null);
+            unawaited(
+              widget.repository
+                  .sendOutgoing(outgoing.clientMessageId)
+                  .catchError((Object error) {
+                    if (mounted) showFailure(context, error);
+                    return Future<ConversationMessage>.error(error);
+                  })
+                  .then<void>((_) {}, onError: (Object _) {}),
+            );
+          },
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _photoOpen = false);
+    }
+  }
+
   Future<void> _send() async {
     final value = _text.text.trim();
     if (value.isEmpty || messageLength(value) > 4000 || _savingEdit) return;
@@ -278,8 +321,8 @@ class _ConversationPageState extends State<ConversationPage>
           children: [
             for (final a in [
               'Reply',
-              'Copy',
-              if (own) 'Edit',
+              if (m.text?.isNotEmpty == true) 'Copy',
+              if (own && m.text?.isNotEmpty == true) 'Edit',
               if (own) 'Delete',
             ])
               ListTile(
@@ -400,7 +443,7 @@ class _ConversationPageState extends State<ConversationPage>
           onTap: _profile,
           child: Row(
             children: [
-              InitialAvatar(name, radius: 20),
+              InitialAvatar(name, radius: 20, avatarUrl: other.avatarUrl),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -506,6 +549,7 @@ class _ConversationPageState extends State<ConversationPage>
                                   m.clientMessageId,
                                 ),
                                 text: m.text,
+                                imageMediaId: m.imageMediaId,
                                 own: true,
                                 status: m.status == OutgoingStatus.failed
                                     ? 'Failed · Tap to retry'
@@ -613,6 +657,9 @@ class _ConversationPageState extends State<ConversationPage>
                                       : m.text ?? '',
                                   own: own,
                                   deleted: m.isDeleted,
+                                  imageMediaId: m.isDeleted
+                                      ? null
+                                      : m.imageMediaId,
                                   quote:
                                       m.isDeleted || m.replyToMessageId == null
                                       ? null
@@ -620,7 +667,11 @@ class _ConversationPageState extends State<ConversationPage>
                                       ? 'Reply to an earlier message'
                                       : reply.isDeleted
                                       ? 'Message deleted'
-                                      : reply.text,
+                                      : reply.text?.isNotEmpty == true
+                                      ? reply.text
+                                      : reply.imageMediaId != null
+                                      ? 'Photo'
+                                      : '',
                                   status:
                                       '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}${m.editedAt != null && !m.isDeleted ? ' · edited' : ''}${own && !m.isDeleted
                                           ? read
@@ -649,7 +700,11 @@ class _ConversationPageState extends State<ConversationPage>
                   subtitle: Text(
                     contextMessage.isDeleted
                         ? 'Message deleted'
-                        : contextMessage.text ?? '',
+                        : contextMessage.text?.isNotEmpty == true
+                        ? contextMessage.text!
+                        : contextMessage.imageMediaId != null
+                        ? 'Photo'
+                        : '',
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -670,6 +725,12 @@ class _ConversationPageState extends State<ConversationPage>
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
+                    if (MediaScope.maybeOf(context) != null && _editing == null)
+                      IconButton(
+                        tooltip: 'Attach photo',
+                        onPressed: _savingEdit || _photoOpen ? null : _photo,
+                        icon: const MingleIcon(MingleGlyph.photo),
+                      ),
                     Expanded(
                       child: TextField(
                         controller: _text,
@@ -773,6 +834,7 @@ class MessageCard extends StatelessWidget {
     required this.own,
     required this.status,
     this.quote,
+    this.imageMediaId,
     this.deleted = false,
     this.onTap,
     this.onLongPress,
@@ -787,6 +849,7 @@ class MessageCard extends StatelessWidget {
   final bool own;
   final String status;
   final String? quote;
+  final String? imageMediaId;
   final bool deleted;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
@@ -861,16 +924,41 @@ class MessageCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                    Text(
-                      text,
-                      textDirection: messageDirection(text),
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                        fontSize: 15.5,
-                        fontStyle: deleted
-                            ? FontStyle.italic
-                            : FontStyle.normal,
+                    if (imageMediaId != null)
+                      Padding(
+                        padding: EdgeInsets.only(bottom: text.isEmpty ? 0 : 10),
+                        child: Semantics(
+                          label: 'Photo message. Open photo.',
+                          button: true,
+                          child: InkWell(
+                            onTap: () => Navigator.of(context).push<void>(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    ImageViewerPage(reference: imageMediaId!),
+                              ),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(14),
+                              child: SizedBox(
+                                width: 240,
+                                height: 200,
+                                child: MediaImage(reference: imageMediaId!),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                    if (text.isNotEmpty)
+                      Text(
+                        text,
+                        textDirection: messageDirection(text),
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                          fontSize: 15.5,
+                          fontStyle: deleted
+                              ? FontStyle.italic
+                              : FontStyle.normal,
+                        ),
+                      ),
                     const SizedBox(height: 6),
                     Wrap(
                       spacing: 4,
