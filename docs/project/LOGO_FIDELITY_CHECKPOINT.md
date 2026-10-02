@@ -1,6 +1,6 @@
 # Original Mingle logo fidelity repair
 
-Date: 2026-10-02. Branch: `fix/mobile-logo-fidelity`. Base: actual PR #21 remote HEAD `49cd87c75a666f6bc174794a4a27a36474f44705`; Mobile CI #27 completed/success. New PR/CI pending publication.
+Date: 2026-10-02. Branch: `fix/mobile-logo-fidelity`. Base: actual PR #21 remote HEAD `49cd87c75a666f6bc174794a4a27a36474f44705`; Mobile CI #27 completed/success. Draft [PR #22](https://github.com/Husseinabozina/chat_app/pull/22); implementation `34f8fb0bec966395512a0fc1378c89190acffd64` verified by [Mobile CI #28](https://github.com/Husseinabozina/chat_app/actions/runs/37009580140), completed/success. Final documentation HEAD/checks are recorded in PR metadata.
 
 ## Why this changed
 
@@ -22,11 +22,11 @@ No onboarding, authentication, Settings, backend contract, migration, dependency
 
 - Default export succeeded. Optional blue recolor succeeded in an isolated temporary export tree, preserving highlights/folds and leaving committed pink resources intact.
 - Generated Dart formatting and analyzer clean. Exporter JavaScript syntax/formatting checked.
-- No new tests added. Existing Mobile CI will run the established mobile suite and complete backend/two-account integration; results must be recorded after publication.
+- No new tests added. Mobile CI #28 passed: quality job `110845826824` (65 files format clean, analyzer clean, 46 tests passed + one intentional ordinary live skip), integration job `110846145202` (complete backend gate and separate two-account REST/realtime test). Workflows retain read-only permissions and reproducible dependencies.
 - No new iOS/Android build or simulator visual review for this logo. User requested to build/run manually. Previous local iOS linker recovery succeeded in 32.9s before this change; those native configuration edits remain outside this PR.
 
 ## Manual preview and next checkpoint
 
 In the user's existing Flutter terminal, press `r` to hot reload the new in-app logo. Stop/re-run the app when checking launcher/native splash resources. Replay onboarding from Settings. Native functional/visual acceptance, Android runtime and physical/two-device behavior remain pending. After the logo checkpoint, the documented product work is profile/image-message media contracts, then push and supported notification settings.
 
-No merge or force push. Proposed order is #15 → #16 → #17 → #18 → #19 → #20 → #21 → this logo PR, after review and explicit authorization.
+No merge or force push. Proposed order is #15 → #16 → #17 → #18 → #19 → #20 → #21 → #22, after review and explicit authorization.
