@@ -27,7 +27,7 @@ At 1254×1254 with alpha >128, source vs Sharp-rendered SVG silhouette IoU is 0.
 
 Host read-only format/analyzer passed. Default export and an isolated blue recolor succeeded; committed resources remain pink. Existing established CI gates verify this checkpoint. No test suite, backend source, dependency/lockfile or workflow changes. Mobile CI #30 (run 37020880336) completed/success on implementation `776e9c1d88ad00c811e2f62a7fb224b87edfedb7`: quality 65 files format clean, analyzer clean, 46 tests passed + one intentional ordinary live skip; backend gate and separate real two-account REST/realtime test passed. Final documentation HEAD/checks are recorded in PR metadata.
 
-The user owns Flutter build/run. No new iOS build or simulator launch was initiated. Consolidated native visual, scaled text, keyboard, dark, Android and physical/two-device acceptance remains pending. Existing local native migrations/linker fixes/Podfile.lock remain outside this PR.
+The user owns Flutter build/run. Use Flutter hot restart (`R`) to reinitialize generated static logo paths, then replay through Profile → Settings → Show introduction. A hot reload alone may retain the old static geometry. Native launcher/splash require a manual rebuild. No new iOS build or simulator launch was initiated. Consolidated native visual, scaled text, keyboard, dark, Android and physical/two-device acceptance remains pending. Existing local native migrations/linker fixes/Podfile.lock remain outside this PR.
 
 ## Exact next product checkpoint
 

@@ -205,7 +205,7 @@ Later/deferred work:
 
 ## Exact next checkpoint
 
-1. Preview the corrected logo and illustrated onboarding with manual Flutter hot reload; rebuild for native launcher/splash. Replay through Profile → Settings → Show introduction. Consolidated native acceptance remains separate; current visual PR remains Draft pending that review.
+1. Preview the corrected logo and illustrated onboarding with manual Flutter hot restart (`R`); static generated path fields need reinitialization. Rebuild for native launcher/splash. Replay through Profile → Settings → Show introduction. Consolidated native acceptance remains separate; current visual PR remains Draft pending that review.
 2. Profile/image-message media contracts and implementation; current avatars remain illustrated fallbacks. Follow with push delivery/routing and supported notification settings.
 3. Consolidated native acceptance remains explicitly deferred by the user; collect the missing evidence when resumed, including Android once its SDK is available.
 4. Password recovery/social auth, localization, files/voice/presence/reactions require scope/contracts. No merges or force pushes without authorization.
