@@ -3,18 +3,18 @@
 Update this file before closing each future project checkpoint. Verify actual branch heads and CI runs from GitHub before changing the state below. Record native acceptance separately from host/CI checks.
 
 **Updated:** 2026-10-02
-**Current phase:** Logo geometry and entry visual polish on `fix/mobile-entry-visual-polish`, based on freshly verified PR #22 HEAD `d89dd9e869f180d42cd9fa60ddee19c194199b2d` (Mobile CI #29 success). Complementary traced regions/cubic curves repair dark junction incursions and edge waviness while preserving the pink fold and recoloring. Onboarding now illustrates People/conversation flows with back navigation and guarded transitions; auth errors announce accessibly. See `ENTRY_VISUAL_POLISH_CHECKPOINT.md`. Publication/current-head CI is recorded below and in PR metadata.
+**Current phase:** Logo geometry and entry visual polish on `fix/mobile-entry-visual-polish`, based on freshly verified PR #22 HEAD `d89dd9e869f180d42cd9fa60ddee19c194199b2d` (Mobile CI #29 success). Complementary traced regions/cubic curves repair dark junction incursions and edge waviness while preserving the pink fold and recoloring. Onboarding now illustrates People/conversation flows with back navigation and guarded transitions; auth errors announce accessibly. See `ENTRY_VISUAL_POLISH_CHECKPOINT.md`. Draft PR #23 implementation `776e9c1d88ad00c811e2f62a7fb224b87edfedb7` passed Mobile CI #30. Final documentation HEAD/checks are recorded in PR metadata.
 
-**Current acceptance boundary:** The user explicitly deferred the previous native visual review and authorized this implementation without further questions. Native resource build succeeded; latest full visual/motion/keyboard/dark/physical/two-device acceptance is still pending. Android native build is unverified because no local Android SDK is installed. See `BRAND_ENTRY_SETTINGS_CHECKPOINT.md` and `design-qa.md`. This is not a finished application; image/profile media, push, supported notification settings and release readiness remain.
+**Current acceptance boundary:** The user explicitly deferred the previous native visual review and authorized this implementation without further questions. Historical native resource builds succeeded before this checkpoint; no new native build was started. Latest full visual/motion/keyboard/dark/physical/two-device acceptance is still pending. Android native build is unverified because no local Android SDK is installed. See `BRAND_ENTRY_SETTINGS_CHECKPOINT.md` and `design-qa.md`. This is not a finished application; image/profile media, push, supported notification settings and release readiness remain.
 
 ## Last verified branch / PR / commit
 
-- Active checkpoint: `fix/mobile-entry-visual-polish`, based on exact PR #22 final HEAD `d89dd9e869f180d42cd9fa60ddee19c194199b2d`, [Mobile CI #29](https://github.com/Husseinabozina/chat_app/actions/runs/37009976819) success. New publication/verification pending; older evidence below is historical.
+- Active checkpoint: `fix/mobile-entry-visual-polish`, based on exact PR #22 final HEAD `d89dd9e869f180d42cd9fa60ddee19c194199b2d`, [Mobile CI #29](https://github.com/Husseinabozina/chat_app/actions/runs/37009976819) success. Draft [PR #23](https://github.com/Husseinabozina/chat_app/pull/23), verified implementation `776e9c1d88ad00c811e2f62a7fb224b87edfedb7`; [Mobile CI #30](https://github.com/Husseinabozina/chat_app/actions/runs/37020880336) completed/success. Final documentation HEAD/checks are recorded in PR metadata; older evidence below is historical.
 
 - Active logo repair branch: `fix/mobile-logo-fidelity`, based on actual remote PR #21 HEAD `49cd87c75a666f6bc174794a4a27a36474f44705` (verified before branching). Draft [PR #22](https://github.com/Husseinabozina/chat_app/pull/22); verified implementation `34f8fb0bec966395512a0fc1378c89190acffd64`, [Mobile CI #28](https://github.com/Husseinabozina/chat_app/actions/runs/37009580140) completed/success. See `LOGO_FIDELITY_CHECKPOINT.md`. Final documentation HEAD/checks are recorded in PR metadata to avoid self-referential hashes.
 - Latest verified baseline: [PR #21](https://github.com/Husseinabozina/chat_app/pull/21), [Mobile CI #27](https://github.com/Husseinabozina/chat_app/actions/runs/36994964281), completed/success on that exact HEAD. Older implementation evidence below remains historical.
 
-- Current verified branch: `feat/mobile-brand-entry-settings`, Draft PR [#21](https://github.com/Husseinabozina/chat_app/pull/21), based on actual PR #20 HEAD `a757c75da81c550b09e377af69f86a33a6e0556d`.
+- Historical verified branch: `feat/mobile-brand-entry-settings`, Draft PR [#21](https://github.com/Husseinabozina/chat_app/pull/21), based on actual PR #20 HEAD `a757c75da81c550b09e377af69f86a33a6e0556d`.
 - Latest verified implementation: `45d227930809c876c85d810e0b5070ca225bd562`, [Mobile CI #26](https://github.com/Husseinabozina/chat_app/actions/runs/36994453820) completed/success. Subsequent documentation HEAD/checks are recorded in PR metadata, avoiding a self-referential file hash.
 - Latest implementation compiled/installed/launched on iPhone 16e/iOS 26.2 (23.2s native build). This is build/launch evidence, not visual acceptance.
 - Baseline [Mobile CI #25](https://github.com/Husseinabozina/chat_app/actions/runs/36985197274): completed/success on that exact PR #20 HEAD.
@@ -44,9 +44,10 @@ Integrated `master` HEAD: `5f77dbd50efd9ae12f17d809a63c2746f35fc9ee` (PR #14 rea
 | #19 | `feat/mobile-pastel-visual-identity` | #18 branch | `abe502695e6f32512800e30c7ab09b4ec7e0a41a` | Draft; Mobile CI #23 success; pastel direction accepted by user |
 | #20 | `feat/mobile-motion-demo` | #19 branch | `313b800f0dd90128b5d92a7725552d5e61266802` (implementation) | Draft; CI #24 success; consolidated native acceptance pending |
 | #21 | `feat/mobile-brand-entry-settings` | #20 branch | `49cd87c75a666f6bc174794a4a27a36474f44705` | Draft; CI #27 success; native visual review explicitly deferred |
-| #22 | `fix/mobile-logo-fidelity` | #21 branch | `34f8fb0bec966395512a0fc1378c89190acffd64` (implementation) | Draft; CI #28 success; new logo native review pending |
+| #22 | `fix/mobile-logo-fidelity` | #21 branch | `d89dd9e869f180d42cd9fa60ddee19c194199b2d` | Draft; CI #29 success; geometry superseded by #23 |
+| #23 | `fix/mobile-entry-visual-polish` | #22 branch | `776e9c1d88ad00c811e2f62a7fb224b87edfedb7` (implementation) | Draft; CI #30 success; consolidated native review pending |
 
-Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21 → #22**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
+Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21 → #22 → #23**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
 
 Integrated earlier history:
 
@@ -123,6 +124,10 @@ PR #5 and PR #8 were closed as superseded by the main project conversation; thei
 - No architecture/product scope change is justified by visual cleanup alone.
 
 ## Current CI and verification
+
+### PR #23
+
+[Mobile CI #30](https://github.com/Husseinabozina/chat_app/actions/runs/37020880336) completed/success on implementation `776e9c1d88ad00c811e2f62a7fb224b87edfedb7`. Quality job `110883333272`: 65 files format clean, analyzer clean, 46 tests passed + one intentional ordinary live skip. Integration job `110883826398`: complete backend gate and separate real two-account REST/realtime test passed. No new suite, native run, backend/workflow/dependency/lockfile change. Final documentation HEAD/checks are recorded in PR metadata.
 
 ### PR #22
 

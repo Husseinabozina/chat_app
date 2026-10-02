@@ -1,6 +1,6 @@
 # Logo geometry and entry visual polish
 
-Date: 2026-10-02. Branch: `fix/mobile-entry-visual-polish`, based on actual PR #22 HEAD `d89dd9e869f180d42cd9fa60ddee19c194199b2d`. Baseline Mobile CI #29 completed/success (run 37009976819). Publication and final exact-head checks are recorded in PR metadata.
+Date: 2026-10-02. Branch: `fix/mobile-entry-visual-polish`, based on actual PR #22 HEAD `d89dd9e869f180d42cd9fa60ddee19c194199b2d`. Baseline Mobile CI #29 completed/success (run 37009976819). Draft [PR #23](https://github.com/Husseinabozina/chat_app/pull/23), implementation `776e9c1d88ad00c811e2f62a7fb224b87edfedb7`. Final exact-head checks are recorded in PR metadata.
 
 ## Logo repair and lessons
 
@@ -25,7 +25,7 @@ At 1254×1254 with alpha >128, source vs Sharp-rendered SVG silhouette IoU is 0.
 
 ## Verification and boundary
 
-Existing read-only format/analyzer and established CI gates verify this checkpoint. No test suite, backend source, dependency/lockfile or workflow changes. CI outcome is recorded after publication in CURRENT_STATE and PR metadata.
+Host read-only format/analyzer passed. Default export and an isolated blue recolor succeeded; committed resources remain pink. Existing established CI gates verify this checkpoint. No test suite, backend source, dependency/lockfile or workflow changes. Mobile CI #30 (run 37020880336) completed/success on implementation `776e9c1d88ad00c811e2f62a7fb224b87edfedb7`: quality 65 files format clean, analyzer clean, 46 tests passed + one intentional ordinary live skip; backend gate and separate real two-account REST/realtime test passed. Final documentation HEAD/checks are recorded in PR metadata.
 
 The user owns Flutter build/run. No new iOS build or simulator launch was initiated. Consolidated native visual, scaled text, keyboard, dark, Android and physical/two-device acceptance remains pending. Existing local native migrations/linker fixes/Podfile.lock remain outside this PR.
 
