@@ -3,11 +3,14 @@
 Update this file before closing each future project checkpoint. Verify actual branch heads and CI runs from GitHub before changing the state below. Record native acceptance separately from host/CI checks.
 
 **Updated:** 2026-10-02
-**Current phase:** Branded entry and Settings implementation on `feat/mobile-brand-entry-settings` above actual PR #20 HEAD `a757c75da81c550b09e377af69f86a33a6e0556d`. Editable/tintable logo, launcher assets, native/Flutter splash, persisted first-run onboarding and working appearance/motion/account Settings are implemented. Draft PR #21 published; Mobile CI #26 passed on implementation commit `45d227930809c876c85d810e0b5070ca225bd562`, including quality and complete backend/two-account integration.
+**Current phase:** Original-logo fidelity repair on `fix/mobile-logo-fidelity`, based on the freshly verified PR #21 HEAD `49cd87c75a666f6bc174794a4a27a36474f44705`. The original generated logo has been recovered, traced into four editable SVG layers, and rendered as native Flutter vector geometry with independent gradient colors. Launcher/native splash assets are regenerated. Product flows and backend architecture are unchanged. Draft PR #22 is published; Mobile CI #28 passed on implementation `34f8fb0bec966395512a0fc1378c89190acffd64`, including all existing quality/backend/two-account integration gates. Final documentation HEAD/checks are recorded in PR metadata.
 
 **Current acceptance boundary:** The user explicitly deferred the previous native visual review and authorized this implementation without further questions. Native resource build succeeded; latest full visual/motion/keyboard/dark/physical/two-device acceptance is still pending. Android native build is unverified because no local Android SDK is installed. See `BRAND_ENTRY_SETTINGS_CHECKPOINT.md` and `design-qa.md`. This is not a finished application; image/profile media, push, supported notification settings and release readiness remain.
 
 ## Last verified branch / PR / commit
+
+- Active logo repair branch: `fix/mobile-logo-fidelity`, based on actual remote PR #21 HEAD `49cd87c75a666f6bc174794a4a27a36474f44705` (verified before branching). Draft [PR #22](https://github.com/Husseinabozina/chat_app/pull/22); verified implementation `34f8fb0bec966395512a0fc1378c89190acffd64`, [Mobile CI #28](https://github.com/Husseinabozina/chat_app/actions/runs/37009580140) completed/success. See `LOGO_FIDELITY_CHECKPOINT.md`. Final documentation HEAD/checks are recorded in PR metadata to avoid self-referential hashes.
+- Latest verified baseline: [PR #21](https://github.com/Husseinabozina/chat_app/pull/21), [Mobile CI #27](https://github.com/Husseinabozina/chat_app/actions/runs/36994964281), completed/success on that exact HEAD. Older implementation evidence below remains historical.
 
 - Current verified branch: `feat/mobile-brand-entry-settings`, Draft PR [#21](https://github.com/Husseinabozina/chat_app/pull/21), based on actual PR #20 HEAD `a757c75da81c550b09e377af69f86a33a6e0556d`.
 - Latest verified implementation: `45d227930809c876c85d810e0b5070ca225bd562`, [Mobile CI #26](https://github.com/Husseinabozina/chat_app/actions/runs/36994453820) completed/success. Subsequent documentation HEAD/checks are recorded in PR metadata, avoiding a self-referential file hash.
@@ -38,9 +41,10 @@ Integrated `master` HEAD: `5f77dbd50efd9ae12f17d809a63c2746f35fc9ee` (PR #14 rea
 | #18 | `feat/mobile-backend-product-flow` | #17 branch | `01f5220bb8f80736749200331536ed7f4bcdee28` (docs; code `b4a31c6`) | Draft, functional native acceptance incomplete |
 | #19 | `feat/mobile-pastel-visual-identity` | #18 branch | `abe502695e6f32512800e30c7ab09b4ec7e0a41a` | Draft; Mobile CI #23 success; pastel direction accepted by user |
 | #20 | `feat/mobile-motion-demo` | #19 branch | `313b800f0dd90128b5d92a7725552d5e61266802` (implementation) | Draft; CI #24 success; consolidated native acceptance pending |
-| #21 | `feat/mobile-brand-entry-settings` | #20 branch | `45d227930809c876c85d810e0b5070ca225bd562` (implementation) | Draft; CI #26 success; native visual review explicitly deferred |
+| #21 | `feat/mobile-brand-entry-settings` | #20 branch | `49cd87c75a666f6bc174794a4a27a36474f44705` | Draft; CI #27 success; native visual review explicitly deferred |
+| #22 | `fix/mobile-logo-fidelity` | #21 branch | `34f8fb0bec966395512a0fc1378c89190acffd64` (implementation) | Draft; CI #28 success; new logo native review pending |
 
-Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
+Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21 → #22**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
 
 Integrated earlier history:
 
@@ -118,6 +122,10 @@ PR #5 and PR #8 were closed as superseded by the main project conversation; thei
 
 ## Current CI and verification
 
+### PR #22
+
+[Mobile CI #28](https://github.com/Husseinabozina/chat_app/actions/runs/37009580140) completed/success on implementation `34f8fb0bec966395512a0fc1378c89190acffd64`. Quality job `110845826824`: 65 Dart files unchanged by format check, analyzer clean, 46 mobile tests passed + one intentional ordinary live skip. Integration job `110846145202`: complete Node 24/PostgreSQL 17 backend gate plus the separate two-account REST/realtime mobile test passed. No backend/workflow/dependency/lockfile changes. New logo native build/rendered acceptance is not claimed. Final documentation HEAD/checks are recorded in PR metadata.
+
 ### PR #21
 
 [Mobile CI #26](https://github.com/Husseinabozina/chat_app/actions/runs/36994453820) completed/success on `45d227930809c876c85d810e0b5070ca225bd562`. Quality and the complete backend/two-account integration passed. No backend/workflow/dependency/lockfile changes. Native iOS implementation build/launch succeeded (23.2s); Android runtime/build and final rendered acceptance remain separate.
@@ -190,7 +198,7 @@ Later/deferred work:
 
 ## Exact next checkpoint
 
-1. Verify final documentation HEAD checks in PR metadata; no implementation changes after successful CI #26.
+1. User previews the restored logo with manual Flutter hot reload; rebuild to preview native launcher/splash. Onboarding can be replayed through Profile → Settings → Show introduction. Consolidated native acceptance remains separate; PR #22 stays Draft pending that review.
 2. Profile/image-message media contracts and implementation; current avatars remain illustrated fallbacks. Follow with push delivery/routing and supported notification settings.
 3. Consolidated native acceptance remains explicitly deferred by the user; collect the missing evidence when resumed, including Android once its SDK is available.
 4. Password recovery/social auth, localization, files/voice/presence/reactions require scope/contracts. No merges or force pushes without authorization.
@@ -203,3 +211,11 @@ Later/deferred work:
 - User requested code/automated checks first. Final rendered QA remains a separate gate, recorded in `design-qa.md`; no Lottie dependency was added.
 - Workflows unchanged: read-only permissions, locked mobile resolution, backend npm ci → format:check → lint → typecheck → build → migrations → tests; no diagnostic steps/artifact uploads.
 - Automatic native platform migrations and Podfile.lock remain local/unpublished.
+
+## Local recovery and logo repair (2026-10-02)
+
+- Canonical checkout: `/Volumes/Hussein/DevStorage/Projects/chat_app`; the former workspace checkout path is a symlink. Flutter/Node/PostgreSQL runtime remains outside Git in the task workspace. Local machine SDK paths are excluded from Git.
+- User's manual iOS run exposed missing Flutter linker symbols. Local Debug/Release configurations now explicitly link Flutter and search built products; the Runner scheme invokes Flutter framework preparation. A subsequent iPhone 16e build/launch succeeded in 32.9s before the logo repair. These local native configuration fixes, automatic platform migrations and Podfile.lock remain unpublished and must be reviewed together before a native-platform checkpoint.
+- The old local API process listened on port 55418 but timed out and consumed high CPU. Restarting only that API process restored `/v1/health` with database up and fast validation responses from login/register. No database reset or backend code change. The precise cause of the hang is unresolved; this is not evidence of a successful credential login.
+- Original logo is preserved at `docs/design/references/original-mingle-logo.png`; four paths follow its silhouette, with smooth gradients replacing raster grain. Runtime recoloring preserves separate plane folds. No new app dependency, workflow or lockfile change.
+- Host formatting/analyzer and developer export checks passed; Mobile CI #28 quality/backend/two-account integration passed. New-logo native build/rendered acceptance is not claimed. The user requested manual build ownership; no new simulator run was started for this logo repair.
