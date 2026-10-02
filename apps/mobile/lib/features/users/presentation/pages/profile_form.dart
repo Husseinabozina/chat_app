@@ -59,6 +59,7 @@ class _ProfileFormState extends State<ProfileForm> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
+      leading: widget.completing ? null : const MingleBackButton(),
       title: Text(widget.completing ? 'Complete your profile' : 'Edit profile'),
       actions: [
         if (widget.onLogout != null)
@@ -137,14 +138,17 @@ class _ProfileFormState extends State<ProfileForm> {
                       ),
                     ),
                   const SizedBox(height: 16),
-                  FilledButton(
-                    onPressed: _busy ? null : _save,
-                    child: Text(
-                      _busy
-                          ? 'Saving…'
-                          : (widget.completing
-                                ? 'Start chatting'
-                                : 'Save profile'),
+                  MinglePress(
+                    enabled: !_busy,
+                    child: FilledButton(
+                      onPressed: _busy ? null : _save,
+                      child: Text(
+                        _busy
+                            ? 'Saving…'
+                            : (widget.completing
+                                  ? 'Start chatting'
+                                  : 'Save profile'),
+                      ),
                     ),
                   ),
                 ],

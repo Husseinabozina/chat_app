@@ -11,12 +11,14 @@ class ChatsPage extends StatefulWidget {
     required this.users,
     required this.currentUserId,
     required this.onFindPeople,
+    this.onNewChat,
     super.key,
   });
   final ConversationsRepository repository;
   final UsersRepository users;
   final String currentUserId;
   final VoidCallback onFindPeople;
+  final VoidCallback? onNewChat;
   @override
   State<ChatsPage> createState() => _ChatsPageState();
 }
@@ -79,7 +81,10 @@ class _ChatsPageState extends State<ChatsPage> {
                           maxLength: 80,
                           decoration: const InputDecoration(
                             hintText: 'Search chats',
-                            prefixIcon: Icon(Icons.search),
+                            prefixIcon: Center(
+                              widthFactor: 1,
+                              child: MingleIcon(MingleGlyph.search),
+                            ),
                             counterText: '',
                           ),
                           onChanged: (v) => setState(() => _query = v),
@@ -103,6 +108,17 @@ class _ChatsPageState extends State<ChatsPage> {
                                 onSelected: (_) =>
                                     setState(() => _unread = true),
                               ),
+                              if (widget.onNewChat != null)
+                                MinglePress(
+                                  child: TextButton.icon(
+                                    onPressed: widget.onNewChat,
+                                    icon: const MingleIcon(
+                                      MingleGlyph.compose,
+                                      size: 20,
+                                    ),
+                                    label: const Text('New conversation'),
+                                  ),
+                                ),
                             ],
                           ),
                         ),
@@ -153,6 +169,11 @@ class _ChatsPageState extends State<ChatsPage> {
                             : 'No conversations yet. Find someone and say hello.',
                         action: widget.onFindPeople,
                         label: 'Find people',
+                        brandMoment:
+                            s.conversations.items.isEmpty &&
+                            _query.isEmpty &&
+                            !_unread &&
+                            s.failure == null,
                       ),
               ),
             SliverList.builder(

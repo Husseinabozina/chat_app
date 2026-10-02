@@ -2,13 +2,16 @@
 
 Update this file before closing each future project checkpoint. Verify actual branch heads and CI runs from GitHub before changing the state below. Record native acceptance separately from host/CI checks.
 
-**Updated:** 2026-10-01
-**Current phase:** Pastel Mingle presentation implemented above PR #18 and verified by Mobile CI #22. The user approved the complete Chats concept and authorized continuation. Xcode build/launch succeeded on iPhone 16e/iOS 26.2; comparison of the revised native screens is blocked because the Mac is locked and computer-use automatic unlock failed. This is not final visual acceptance. PR #19 remains Draft.
+**Updated:** 2026-10-02
+**Current phase:** Mingle custom icons, purposeful motion, distinct New conversation flow and richer local demo data implemented on `feat/mobile-motion-demo` above actual PR #19 HEAD `abe502695e6f32512800e30c7ab09b4ec7e0a41a`. Local automated checks pass. Latest checkpoint publication/CI is pending. The user accepted the native pastel direction and requested automated verification first, consolidating simulator review. This is not a finished app: onboarding, branded logo/app icon and splash remain unimplemented, alongside media/push/release work.
+
+**Current acceptance boundary:** Earlier native builds and populated Chats capture passed; final status-bar/empty-state corrections have not yet been reviewed natively. Full native motion/Reduce Motion/dark/keyboard acceptance is pending. The Mac is no longer locked. See `MOTION_DEMO_CHECKPOINT.md` and `design-qa.md`.
 
 ## Last verified branch / PR / commit
 
-- Branch: `feat/mobile-pastel-visual-identity`.
-- PR: [#19](https://github.com/Husseinabozina/chat_app/pull/19), open/Draft, based on PR #18 branch `feat/mobile-backend-product-flow` at actual HEAD `01f5220bb8f80736749200331536ed7f4bcdee28`.
+- Last fully CI-verified published branch: `feat/mobile-pastel-visual-identity`; current working branch: `feat/mobile-motion-demo`.
+- Baseline PR: [#19](https://github.com/Husseinabozina/chat_app/pull/19), open/Draft, final published HEAD `abe502695e6f32512800e30c7ab09b4ec7e0a41a`, based on PR #18 branch `feat/mobile-backend-product-flow` at actual HEAD `01f5220bb8f80736749200331536ed7f4bcdee28`.
+- Baseline latest [Mobile CI #23](https://github.com/Husseinabozina/chat_app/actions/runs/36911086830): completed/success on exact PR #19 documentation HEAD `abe502695e6f32512800e30c7ab09b4ec7e0a41a`, freshly checked 2026-10-02. The following #22 evidence is historical implementation verification.
 - Verified implementation commit: `9dbf88c359d446d8b9853573cedc478243e3006c`.
 - [Mobile CI #22](https://github.com/Husseinabozina/chat_app/actions/runs/36909761654): completed/success on that exact implementation HEAD; quality and real two-account integration both succeeded.
 - Implementation tree: `dc521cc56f8e864944fa809b5580b59c516efa8d`. It exactly matches the original local implementation commit `0dca83a3ee51ec44e3a8819ba896e9eb0fe64c14`, preserved in local branch `feat/mobile-pastel-visual-identity-local0d`. Publication used the GitHub connector after the native credential helper failed; remote metadata produced a different commit SHA with identical files and the same PR #18 parent. The remote branch was advanced with force=false.
@@ -28,9 +31,10 @@ Integrated `master` HEAD: `5f77dbd50efd9ae12f17d809a63c2746f35fc9ee` (PR #14 rea
 | #16 | `feat/mobile-api-realtime-foundation` | #15 branch | `b0a68f4908a60facea617655b358e478b22a7004` | Ready, unmerged |
 | #17 | `feat/mobile-repository-reconciliation` | #16 branch | `d1a1c683a63c9ace2b337d861bb83eef26e45763` | Ready, unmerged |
 | #18 | `feat/mobile-backend-product-flow` | #17 branch | `01f5220bb8f80736749200331536ed7f4bcdee28` (docs; code `b4a31c6`) | Draft, functional native acceptance incomplete |
-| #19 | `feat/mobile-pastel-visual-identity` | #18 branch | `9dbf88c359d446d8b9853573cedc478243e3006c` (implementation) | Draft, CI green; native visual comparison blocked |
+| #19 | `feat/mobile-pastel-visual-identity` | #18 branch | `abe502695e6f32512800e30c7ab09b4ec7e0a41a` | Draft; Mobile CI #23 success; pastel direction accepted by user |
+| Pending new PR | `feat/mobile-motion-demo` | #19 branch | Publication pending | Local implementation; final native acceptance pending |
 
-Proposed merge order: **#15 → #16 → #17 → #18 → #19**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
+Proposed merge order: **#15 → #16 → #17 → #18 → #19 → motion checkpoint PR**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
 
 Integrated earlier history:
 
@@ -57,7 +61,7 @@ PR #5 and PR #8 were closed as superseded by the main project conversation; thei
 - Approved identity: soft pastel pink/cream, warm rounded surfaces, friendly rounded typography, object/environment decoration, abstract/initial avatars; no dating motifs or detailed decorative faces.
 - Navigation: Chats/People/Profile; initial conversation filters All/Unread.
 - Screen structure and loading/empty/error/offline/action states are planned.
-- Rounded fonts and production raster artwork are now implemented in #19; the user approved the Chats concept at `docs/design/references/approved-chats-preview.png`. Native pixel-level acceptance remains pending. Cairo was requested for Arabic reports, not automatically for the app.
+- Rounded fonts and production raster artwork are implemented in #19; the user approved the Chats concept at `docs/design/references/approved-chats-preview.png` and subsequently accepted the native direction. Complete native fidelity/motion acceptance remains pending. Cairo was requested for Arabic reports, not automatically for the app.
 - The generated Chats preview is simplified and does not replace `docs/design/approved-ui-direction.md` or constitute approval of the final app appearance.
 - Implementation/acceptance gaps are tracked in `docs/project/UI_UX_ACCEPTANCE_CHECKLIST.md`.
 
@@ -87,7 +91,8 @@ PR #5 and PR #8 were closed as superseded by the main project conversation; thei
 - Reversed history shows newest messages at the bottom; read commands use visible incoming bounds on a current foreground route; canonical receipt order is `(createdAt,id)`.
 - Chats/People have scrollable headers; Arabic/Latin message direction and scaled/landscape widget behavior are covered. Full Arabic UI localization is not implemented.
 - Backend mode is enabled with `CHAT_API_BASE_URL`; when unset the existing Firebase entrypoint remains available.
-- New UI is functional; environment artwork, final rounded font and custom navigation styling remain visual work.
+- PR #19 implements bundled Quicksand/Nunito/Tajawal, pastel raster artwork and navigation. The current motion checkpoint adds 20 original icons, restrained motion with reduced-motion handling, three distinct bottom tabs, dedicated conversation chooser and explicit local demo fixture.
+- First-run onboarding and final branded logo/app icon/splash remain pending. Authentication is actual email/password with session restoration, not social login or password recovery.
 
 ## Locked architecture decisions
 
@@ -134,7 +139,7 @@ Workflows retain `contents: read`; mobile integration uses an ephemeral database
 - iPhone 16e simulator is available; absence of a simulator was not the blocker.
 - Initial automatic SPM migration downloaded Firebase source and failed during network transfer. The project retains existing CocoaPods integration through `flutter.config.enable-swift-package-manager: false`.
 - Stale local CocoaPods CDN indices were refreshed outside the repository. First native dependency/build preparation was prolonged; low disk space was reported and the user freed space.
-- The user took over the simulator build. At the latest read-only check an executable `build/ios/iphonesimulator/Runner.app/Runner` existed and no matching `xcodebuild` process was running. This establishes artifact presence only; terminal success, launch and screen/device acceptance are not yet recorded.
+- Native terminal build/launch success is now recorded: PR #19 build 749.7s; motion checkpoint builds 32.4s and 63.9s on iPhone 16e/iOS 26.2. Populated Chats was captured. These earlier builds precede final source corrections. Latest hot reload lost the device connection; final native appearance is not established.
 - Flutter-generated iOS/macOS project changes and a local `ios/Podfile.lock` remain uncommitted, separate from verified PR #18. Review these with native build evidence before inclusion in any checkpoint.
 - Reviewed automatic platform diff: Flutter UIScene/implicit-engine migration, CocoaPods workspace/framework/scripts/config wiring and platform includes; iOS target remains 15.0. This follow-up does not publish or manually edit these changes. No concurrent Flutter build/test or user-file cleanup was performed.
 - The temporary Node binary/database disappeared between sessions. A new task-owned Node 24.9.0 runtime and PostgreSQL 17.11 cluster were created under the workspace `work/runtime` outside the repository; migrations applied and loopback API port 55418 health succeeded. These are disposable local demo data, not restored prior test accounts.
@@ -155,7 +160,7 @@ Later/deferred work:
 ## Known issues / technical debt
 
 - Native account restoration across process termination/relaunch passed on iPhone 16e using production secure-storage composition. Two-device foreground/background/reconnect behavior and physical-device storage remain unverified.
-- Decorative artwork, final font, custom navigation and final visual acceptance remain pending; current UI must not be described as the fully approved final design.
+- Artwork, rounded fonts and custom navigation/icons are implemented; full visual/motion acceptance remains pending. Current UI must not be described as a finished application.
 - Full Arabic UI localization is pending; current message direction handling is not equivalent to it.
 - Dedicated cascade-deletion regression coverage from #8 has not been reproduced; avatar storage-key policy is deferred to media design.
 - Edit/delete product time-window policy is undecided.
@@ -167,15 +172,15 @@ Later/deferred work:
 
 ## Exact next checkpoint
 
-**Unlock the Mac and complete native visual comparison against the approved Chats concept, then finish native acceptance.** One-simulator smoke/session restoration is recorded; finish software-keyboard/native Arabic input/text scaling/dark mode and two-native-client lifecycle coverage, then decide how to publish the reviewed automatic native changes; implement missing approved visual details screen by screen against `UI_UX_ACCEPTANCE_CHECKLIST.md`. Complete targeted checks before marking that acceptance passed. Do not silently treat host CI as device/visual approval.
+1. Publish the icons/motion/demo checkpoint as a Draft above PR #19 and verify CI on its actual HEAD; update this file with the result.
+2. Finish one consolidated native acceptance pass: actual motion/empty state, status-bar correction, chooser, Reduce Motion, dark/keyboard/accessibility. Keep incomplete checks explicit; no repeated simulator loops during source implementation.
+3. Branded entry experience: final logo/app icon, native splash, first-run onboarding and existing auth/profile routing. Do not implement unsupported social/recovery controls without a contract.
+4. Profile/image messaging contracts, push routing, supported settings and release readiness remain subsequent initial-release checkpoints. Voice notes/files require scope decisions. No merge or force push without authorization.
 
-Then review #15 → #16 → #17 → #18 → #19 integration; merge only after explicit authorization. Implement production origin/CORS and handshake throttling before any public deployment. Scope media/avatar and push contracts for the remaining initial-release work. Keep this file updated at every checkpoint closure.
+## Current local quality evidence (2026-10-02)
 
-## Active visual checkpoint — 2026-10-01
-
-- User supplied the original pastel showcase, then requested a complete screen preview after seeing a large isolated avatar asset. The isolated landscape was intended only as a small circular fallback; it was not a background/product direction. The complete Chats concept was shown, the user approved it, and continuation was authorized. Both original and approved concept are saved under `docs/design/references`.
-- Existing screens now use a cream/blush/navy theme; bundled Quicksand display, Nunito body/UI and Tajawal Arabic fallback; transparent clouds/paper plane/leaves; illustrated avatar fallback plus initial badge; integrated Chats/People/new-chat/Profile navigation; rounded lists/forms/bubbles/composer.
-- Existing repositories, REST/realtime contracts, credential/profile separation, retry IDs and read rules remain unchanged. No unsupported social sign-in, voice, groups, calls, pinning or fake settings.
-- Workflows and pubspec lockfile are unchanged and reproducible. Backend verification in Mobile CI still runs npm ci → format:check → lint → typecheck → build → migrations → npm test; no diagnostic steps or artifact uploads were added.
-- Native build succeeded. Computer use reported a locked Mac and failed automatic unlock; the user was asked to unlock it manually. No alternate screen-capture route was used to bypass the block. See `design-qa.md` (final result: blocked) and `docs/project/PASTEL_UI_CHECKPOINT.md`.
-- Exact next action: after manual unlock, inspect/capture the revised native Chats, Conversation, auth and profile screens; compare normalized views against the supplied/approved references; correct P0/P1/P2 differences; update the QA evidence, CI and PR description. Do not claim a generated preview is a native screenshot.
+- Read-only format check: 59 Dart files unchanged; analyzer clean; existing mobile suite 46 passed + one ordinary live skip; separate real REST/Socket.IO integration one passed.
+- Seeder syntax/Prettier passed; rerun reused 12 demo profiles/eight directs/94 stable seed messages. Local database also contains user-added messages, so total message count can exceed fixture count.
+- User requested code/automated checks first. Final rendered QA remains a separate gate, recorded in `design-qa.md`; no Lottie dependency was added.
+- Workflows unchanged: read-only permissions, locked mobile resolution, backend npm ci → format:check → lint → typecheck → build → migrations → tests; no diagnostic steps/artifact uploads.
+- Automatic native platform migrations and Podfile.lock remain local/unpublished.

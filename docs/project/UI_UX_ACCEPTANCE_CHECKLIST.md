@@ -1,6 +1,6 @@
 # UI/UX Acceptance Checklist
 
-Updated: 2026-10-01. This checklist reconciles approved design decisions with the functional backend UI in PR #18. It does not expand product scope, choose a final font, or approve a generated preview.
+Updated: 2026-10-02. This checklist reconciles approved design decisions with the functional backend UI in PR #18. It does not expand product scope, choose a final font, or approve a generated preview.
 
 ## Authority and review method
 
@@ -33,7 +33,7 @@ PR #18 code HEAD `b4a31c6c7c17e7f12062c83261d700d94d8cc60d` passed Mobile CI #19
 - [ ] Integrate selective object/environment artwork: clouds, paper planes, windows, plants, books, landscapes or abstract architecture.
 - [ ] Avoid detailed decorative human faces, romantic imagery, matches/swipes/hearts as product language.
 - [ ] Keep artwork separate from functional controls/content; it must not obscure text or intercept taps.
-- [ ] Choose and validate the final rounded friendly font on English, Arabic, mixed text and long history. Current backend theme does not set a final custom font.
+- [ ] Choose and validate the final rounded friendly font on English, Arabic, mixed text and long history. PR #19 bundles Quicksand/Nunito/Tajawal; full native typography acceptance remains pending.
 - [ ] Review light/dark as separate designs and avoid color-only status communication.
 - [ ] Replace remaining default navigation treatment with the approved integrated rounded treatment, retaining Chats/People/Profile and platform usability.
 - [ ] Preserve real behavior while polishing; no fake presence, media, settings, pinned section or unsupported controls.
@@ -49,7 +49,7 @@ PR #18 code HEAD `b4a31c6c7c17e7f12062c83261d700d94d8cc60d` passed Mobile CI #19
 - [ ] Content/empty/no-results/loading/error/offline states reviewed on device, including loaded-window search wording and load-more when filtered empty.
 - [ ] Final rounded bottom navigation and preserved tab/scroll behavior reviewed.
 
-Current implementation: PR #19 adds bundled rounded fonts, separate cloud/plane/leaf artwork, illustrated fallback plus initial badge, native rounded rows/forms/bubbles and custom navigation. The user approved the complete Chats concept; inspection of the revised native rendering is pending manual Mac unlock. Implementation alone does not tick visual acceptance boxes.
+Current implementation: PR #19 adds bundled rounded fonts, separate cloud/plane/leaf artwork, illustrated fallback plus initial badge, native rounded rows/forms/bubbles and custom navigation. The user approved the complete Chats concept; the user subsequently accepted the native pastel direction. Custom glyphs/motion and a dedicated New conversation chooser are now implemented; comprehensive native acceptance remains pending. Implementation alone does not tick visual acceptance boxes.
 
 ### Conversation and composer
 
@@ -117,3 +117,14 @@ Record dated device screenshots/review decisions and targeted verification as th
 ### PR #19 evidence update — 2026-10-01
 
 Code `9dbf88c359d446d8b9853573cedc478243e3006c` passed Mobile CI #22 (quality + real two-account integration). Native build/launch succeeded on iPhone 16e/iOS 26.2 in 749.7s. New native screenshots/visual comparison are unavailable because the Mac is locked; the user was asked to unlock it. `design-qa.md` is explicitly blocked. Earlier native smoke remains historical PR #18 evidence, not automatic acceptance of the new appearance.
+
+### Icons/motion checkpoint — 2026-10-02
+
+The user requested automated verification first and consolidated simulator review. See `MOTION_DEMO_CHECKPOINT.md` for the exact implementation and evidence. Existing checks pass; no extra tests added. Twenty original glyphs, short purposeful motion, reduced-motion handling, distinct New conversation action and explicit loopback fixture are implemented. The latest status-bar correction still needs native confirmation. The final native motion/keyboard/dark/two-device boxes stay unchecked. Mac lock is a historical blocker, not the current blocker.
+
+Additional entry-experience backlog, explicitly clarified with the user:
+
+- [ ] Final branded logo and launcher icon.
+- [ ] Native Mingle splash with no arbitrary startup delay.
+- [ ] First-run onboarding/skip and persisted completion, followed by existing authentication and profile setup.
+- [ ] Password recovery requires backend contract; Google/Apple providers are not currently implemented or silently added to scope.

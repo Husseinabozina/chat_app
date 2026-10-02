@@ -69,6 +69,27 @@ class _BackendMainShellState extends State<BackendMainShell> {
     if (mounted && saved != null) setState(() => _profile = saved);
   }
 
+  Future<void> _newChat() => Navigator.of(context).push<void>(
+    MaterialPageRoute(
+      builder: (_) => Scaffold(
+        appBar: AppBar(
+          leading: const MingleBackButton(),
+          title: const Text('New conversation'),
+        ),
+        body: MingleBackdrop(
+          child: SafeArea(
+            child: PeoplePage(
+              users: widget.services.users,
+              conversations: widget.services.conversations,
+              currentUserId: widget.user.id,
+              selectForConversation: true,
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     if (_loading) {
@@ -97,7 +118,7 @@ class _BackendMainShellState extends State<BackendMainShell> {
     return Scaffold(
       body: MingleBackdrop(
         child: SafeArea(
-          child: IndexedStack(
+          child: MingleTabs(
             index: _tab,
             children: [
               ChatsPage(
@@ -105,6 +126,7 @@ class _BackendMainShellState extends State<BackendMainShell> {
                 users: widget.services.users,
                 currentUserId: widget.user.id,
                 onFindPeople: () => setState(() => _tab = 1),
+                onNewChat: _newChat,
               ),
               PeoplePage(
                 users: widget.services.users,
@@ -143,13 +165,13 @@ class _BackendMainShellState extends State<BackendMainShell> {
                     const SizedBox(height: 24),
                     OutlinedButton.icon(
                       onPressed: _edit,
-                      icon: const Icon(Icons.edit_outlined, size: 18),
+                      icon: const MingleIcon(MingleGlyph.edit, size: 20),
                       label: const Text('Edit profile'),
                     ),
                     const SizedBox(height: 16),
                     TextButton.icon(
                       onPressed: _logout,
-                      icon: const Icon(Icons.logout_rounded, size: 18),
+                      icon: const MingleIcon(MingleGlyph.logout, size: 20),
                       label: const Text('Sign out'),
                     ),
                   ],
@@ -162,7 +184,6 @@ class _BackendMainShellState extends State<BackendMainShell> {
       bottomNavigationBar: MingleNavigation(
         selectedIndex: _tab,
         onSelected: (i) => setState(() => _tab = i),
-        onNewChat: () => setState(() => _tab = 1),
       ),
     );
   }

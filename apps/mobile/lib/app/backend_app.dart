@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../core/presentation/chat_ui.dart';
 import '../features/auth/domain/entities/auth_user.dart';
@@ -79,6 +80,10 @@ class _BackendChatAppState extends State<BackendChatApp>
     title: 'Mingle',
     theme: backendTheme(Brightness.light),
     darkTheme: backendTheme(Brightness.dark),
+    builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
+      value: mingleSystemOverlay(Theme.of(context).brightness),
+      child: child ?? const SizedBox.shrink(),
+    ),
     home: _loading
         ? const Scaffold(body: Center(child: CircularProgressIndicator()))
         : _error != null

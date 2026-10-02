@@ -46,6 +46,9 @@ class _ConversationPageState extends State<ConversationPage>
   Object? _readError;
   ConversationMessage? _lastRead;
   Timer? _typingStop;
+  bool _historyReady = false;
+  final _arrivingIds = <String>{};
+  final _introducedClientIds = <(String, String)>{};
   String get _id => widget.conversation.id;
   List<ConversationMessage> get _messages =>
       _state.messages[_id]?.items.reversed.toList() ?? [];
@@ -64,6 +67,27 @@ class _ConversationPageState extends State<ConversationPage>
         WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
     _subscription = widget.repository.watchState().listen((s) {
       if (!mounted) return;
+      final previous = _state.messages[_id]?.items ?? [];
+      final latest = previous.isEmpty ? null : previous.last;
+      final oldIds = previous.map((m) => m.id).toSet();
+      if (_historyReady && !_more) {
+        for (final m in s.messages[_id]?.items ?? <ConversationMessage>[]) {
+          if (!oldIds.contains(m.id) &&
+              (latest == null || compareMessages(m, latest) > 0) &&
+              _introducedClientIds.add((m.senderId, m.clientMessageId))) {
+            _arrivingIds.add(m.id);
+          }
+        }
+        final oldOutgoing = _state.outgoing
+            .map((m) => m.clientMessageId)
+            .toSet();
+        for (final m in s.outgoing.where((m) => m.conversationId == _id)) {
+          if (!oldOutgoing.contains(m.clientMessageId) &&
+              _introducedClientIds.add((m.senderId, m.clientMessageId))) {
+            _arrivingIds.add(m.clientMessageId);
+          }
+        }
+      }
       setState(() => _state = s);
       _scheduleRead();
     });
@@ -106,6 +130,7 @@ class _ConversationPageState extends State<ConversationPage>
         setState(() {
           _loading = false;
           _more = false;
+          if (!older) _historyReady = _loadError == null;
         });
         _scheduleRead();
       }
@@ -257,7 +282,16 @@ class _ConversationPageState extends State<ConversationPage>
               if (own) 'Edit',
               if (own) 'Delete',
             ])
-              ListTile(title: Text(a), onTap: () => Navigator.of(c).pop(a)),
+              ListTile(
+                leading: MingleIcon(switch (a) {
+                  'Reply' => MingleGlyph.reply,
+                  'Copy' => MingleGlyph.copy,
+                  'Edit' => MingleGlyph.edit,
+                  _ => MingleGlyph.trash,
+                }),
+                title: Text(a),
+                onTap: () => Navigator.of(c).pop(a),
+              ),
           ],
         ),
       ),
@@ -357,6 +391,7 @@ class _ConversationPageState extends State<ConversationPage>
     _scheduleRead();
     return Scaffold(
       appBar: AppBar(
+        leading: const MingleBackButton(),
         flexibleSpace: const MingleBackdrop(
           intensity: .4,
           child: SizedBox.expand(),
@@ -372,16 +407,17 @@ class _ConversationPageState extends State<ConversationPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(name, maxLines: 1, overflow: TextOverflow.ellipsis),
-                    Text(
-                      typing
-                          ? 'typing…'
-                          : (other.username != null
-                                ? '@${other.username}'
-                                : 'Direct conversation'),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.labelSmall,
-                    ),
+                    if (typing)
+                      const MingleTyping()
+                    else
+                      Text(
+                        (other.username != null
+                            ? '@${other.username}'
+                            : 'Direct conversation'),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
                   ],
                 ),
               ),
@@ -466,6 +502,9 @@ class _ConversationPageState extends State<ConversationPage>
                               final m = outgoing[i];
                               return MessageCard(
                                 key: ValueKey(m.clientMessageId),
+                                animateArrival: _arrivingIds.remove(
+                                  m.clientMessageId,
+                                ),
                                 text: m.text,
                                 own: true,
                                 status: m.status == OutgoingStatus.failed
@@ -539,6 +578,7 @@ class _ConversationPageState extends State<ConversationPage>
                                     ),
                                   ),
                                 MessageCard(
+                                  animateArrival: _arrivingIds.remove(m.id),
                                   key: _messageKeys.putIfAbsent(
                                     m.id,
                                     GlobalKey.new,
@@ -597,7 +637,7 @@ class _ConversationPageState extends State<ConversationPage>
                             _reply = null;
                             _editing = null;
                           }),
-                    icon: const Icon(Icons.close),
+                    icon: const MingleIcon(MingleGlyph.close),
                   ),
                 ),
               Padding(
@@ -641,20 +681,31 @@ class _ConversationPageState extends State<ConversationPage>
                       ),
                     ),
                     const SizedBox(width: 8),
-                    IconButton.filled(
-                      tooltip: _editing == null ? 'Send message' : 'Save edit',
-                      style: IconButton.styleFrom(
-                        minimumSize: const Size(50, 50),
-                      ),
-                      onPressed:
-                          _text.text.trim().isEmpty ||
-                              messageLength(_text.text.trim()) > 4000 ||
-                              _savingEdit ||
-                              deletedEditing
-                          ? null
-                          : _send,
-                      icon: Icon(
-                        _editing == null ? Icons.send_rounded : Icons.check,
+                    MinglePress(
+                      enabled:
+                          _text.text.trim().isNotEmpty &&
+                          messageLength(_text.text.trim()) <= 4000 &&
+                          !_savingEdit &&
+                          !deletedEditing,
+                      child: IconButton.filled(
+                        tooltip: _editing == null
+                            ? 'Send message'
+                            : 'Save edit',
+                        style: IconButton.styleFrom(
+                          minimumSize: const Size(50, 50),
+                        ),
+                        onPressed:
+                            _text.text.trim().isEmpty ||
+                                messageLength(_text.text.trim()) > 4000 ||
+                                _savingEdit ||
+                                deletedEditing
+                            ? null
+                            : _send,
+                        icon: MingleIcon(
+                          _editing == null
+                              ? MingleGlyph.plane
+                              : MingleGlyph.check,
+                        ),
                       ),
                     ),
                   ],
@@ -700,6 +751,7 @@ class MessageCard extends StatelessWidget {
     this.deleted = false,
     this.onTap,
     this.onLongPress,
+    this.animateArrival = false,
     super.key,
   });
   final String text;
@@ -709,92 +761,108 @@ class MessageCard extends StatelessWidget {
   final bool deleted;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
+  final bool animateArrival;
   @override
-  Widget build(BuildContext context) => Align(
-    alignment: own
-        ? AlignmentDirectional.centerEnd
-        : AlignmentDirectional.centerStart,
-    child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.sizeOf(context).width * .76,
-        ),
-        child: Material(
-          color: own
-              ? Theme.of(context).colorScheme.primaryContainer
-              : Theme.of(context).brightness == Brightness.dark
-              ? Theme.of(context).colorScheme.surface
-              : const Color(0xFFFFFDFC),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadiusDirectional.only(
-              topStart: const Radius.circular(22),
-              topEnd: const Radius.circular(22),
-              bottomStart: Radius.circular(own ? 22 : 7),
-              bottomEnd: Radius.circular(own ? 7 : 22),
-            ),
-            side: BorderSide(
-              color: Theme.of(context).colorScheme.outlineVariant,
-            ),
+  Widget build(BuildContext context) => MingleArrival(
+    animate: animateArrival,
+    child: Align(
+      alignment: own
+          ? AlignmentDirectional.centerEnd
+          : AlignmentDirectional.centerStart,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.sizeOf(context).width * .76,
           ),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(22),
-            onTap: onTap,
-            onLongPress: onLongPress,
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (quote != null)
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      margin: const EdgeInsets.only(bottom: 8),
-                      decoration: BoxDecoration(
-                        border: BorderDirectional(
-                          start: BorderSide(
-                            color: Theme.of(context).colorScheme.primary,
-                            width: 3,
+          child: Material(
+            color: own
+                ? Theme.of(context).colorScheme.primaryContainer
+                : Theme.of(context).brightness == Brightness.dark
+                ? Theme.of(context).colorScheme.surface
+                : const Color(0xFFFFFDFC),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadiusDirectional.only(
+                topStart: const Radius.circular(22),
+                topEnd: const Radius.circular(22),
+                bottomStart: Radius.circular(own ? 22 : 7),
+                bottomEnd: Radius.circular(own ? 7 : 22),
+              ),
+              side: BorderSide(
+                color: Theme.of(context).colorScheme.outlineVariant,
+              ),
+            ),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(22),
+              onTap: onTap,
+              onLongPress: onLongPress,
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (quote != null)
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        margin: const EdgeInsets.only(bottom: 8),
+                        decoration: BoxDecoration(
+                          border: BorderDirectional(
+                            start: BorderSide(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: 3,
+                            ),
                           ),
                         ),
-                      ),
-                      child: Text(
-                        quote!,
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  Text(
-                    text,
-                    textDirection: messageDirection(text),
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                      fontSize: 15.5,
-                      fontStyle: deleted ? FontStyle.italic : FontStyle.normal,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Wrap(
-                    spacing: 4,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      Text(
-                        status,
-                        style: Theme.of(context).textTheme.labelSmall,
-                      ),
-                      if (own &&
-                          !deleted &&
-                          (status.endsWith('Read') || status.endsWith('Sent')))
-                        Icon(
-                          status.endsWith('Read')
-                              ? Icons.done_all_rounded
-                              : Icons.done_rounded,
-                          size: 14,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        child: Text(
+                          quote!,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                    ],
-                  ),
-                ],
+                      ),
+                    Text(
+                      text,
+                      textDirection: messageDirection(text),
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        fontSize: 15.5,
+                        fontStyle: deleted
+                            ? FontStyle.italic
+                            : FontStyle.normal,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(
+                          status,
+                          style: Theme.of(context).textTheme.labelSmall,
+                        ),
+                        if (own &&
+                            !deleted &&
+                            (status.endsWith('Read') ||
+                                status.endsWith('Sent')))
+                          AnimatedSwitcher(
+                            duration: MingleMotion.duration(
+                              context,
+                              milliseconds: 140,
+                            ),
+                            child: MingleIcon(
+                              status.endsWith('Read')
+                                  ? MingleGlyph.read
+                                  : MingleGlyph.check,
+                              key: ValueKey(status.endsWith('Read')),
+                              size: 16,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
