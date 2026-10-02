@@ -9,6 +9,8 @@ Update this file before closing each future project checkpoint. Verify actual br
 
 ## Last verified branch / PR / commit
 
+- Current push checkpoint: Draft [PR #26](https://github.com/Husseinabozina/chat_app/pull/26), initial implementation `fc61f3c2b81eaf908fd956be836f1e793adf473c`; [Backend CI #86](https://github.com/Husseinabozina/chat_app/actions/runs/37036404008) and [Mobile CI #36](https://github.com/Husseinabozina/chat_app/actions/runs/37036403953) completed/success. Follow-up reconciles failed local preference saves and token rotation during registration. Final exact HEAD/checks are recorded in PR metadata. Actual provider/native notification delivery is not verified.
+
 - Latest verified baseline: `feat/media-images`, Draft [PR #25](https://github.com/Husseinabozina/chat_app/pull/25), implementation `5baf62fe7941496b361f1477c378e1fe69136243`. [Backend CI #84](https://github.com/Husseinabozina/chat_app/actions/runs/37029887146) and [Mobile CI #34](https://github.com/Husseinabozina/chat_app/actions/runs/37029887362) completed/success on that exact commit. Local migration and actual private image upload/profile/message fixture succeeded; native picker/rendering and production provider remain unverified. Based on PR #24 implementation `06689b770171a607c7279320994e43a587cd07ad`, [Mobile CI #33](https://github.com/Husseinabozina/chat_app/actions/runs/37025464141) success. Final documentation HEAD/checks are recorded in PR metadata to avoid self-referential hashes; older evidence below is historical.
 
 - Historical checkpoint: `fix/mobile-entry-visual-polish`, based on exact PR #22 final HEAD `d89dd9e869f180d42cd9fa60ddee19c194199b2d`, [Mobile CI #29](https://github.com/Husseinabozina/chat_app/actions/runs/37009976819) success. Draft [PR #23](https://github.com/Husseinabozina/chat_app/pull/23), verified implementation `776e9c1d88ad00c811e2f62a7fb224b87edfedb7`; [Mobile CI #30](https://github.com/Husseinabozina/chat_app/actions/runs/37020880336) completed/success. Final documentation HEAD/checks are recorded in PR metadata; older evidence below is historical.
@@ -50,9 +52,9 @@ Integrated `master` HEAD: `5f77dbd50efd9ae12f17d809a63c2746f35fc9ee` (PR #14 rea
 | #23 | `fix/mobile-entry-visual-polish` | #22 branch | `1dd304b054e53b382fa98317a858ccbd8b66e60e` | Draft; CI #32 success; native acceptance pending |
 | #24 | `fix/mobile-product-entry` | #23 branch | `06689b770171a607c7279320994e43a587cd07ad` | Draft; CI #33 success; native acceptance pending |
 | #25 | `feat/media-images` | #24 branch | `ce43154864b9520a4f7178c180e764801e00c6a3` | Draft; Backend CI #85 + Mobile CI #35 success; native/provider acceptance pending |
-| next | `feat/push-notifications` | #25 branch | Publication pending | Push implementation; provider/native delivery and CI pending |
+| #26 | `feat/push-notifications` | #25 branch | `fc61f3c2b81eaf908fd956be836f1e793adf473c` (initial implementation) | Draft; Backend CI #86 + Mobile CI #36 success; final reconciliation checks in PR metadata; provider/native delivery pending |
 
-Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21 → #22 → #23 → #24 → #25 → push PR**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
+Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21 → #22 → #23 → #24 → #25 → #26**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
 
 Integrated earlier history:
 

@@ -34,3 +34,7 @@ Sources: https://vercel.com/docs/functions/websockets ; https://vercel.com/docs/
 ## Next
 
 Finish account/provider configuration and actual delivery/native acceptance; public deployment hardening/storage lifecycle and signing/release. Preserve user build ownership; no merges/force push. CURRENT_STATE and PR metadata must record exact final HEAD/checks.
+
+## Publication evidence
+
+Draft PR #26 initial implementation `fc61f3c2b81eaf908fd956be836f1e793adf473c` passed Backend CI #86 run37036404008 and Mobile CI #36 run37036403953. Follow-up preserves token refresh arriving during registration and reconciles remote registration after a local preference write failure. Final exact HEAD/checks are in PR metadata; actual provider delivery remains unverified.

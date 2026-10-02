@@ -28,6 +28,7 @@ final class FcmPushRepository implements PushRepository {
   String? _installation;
   int _generation = 0;
   bool _closed = false;
+  bool _tokenChanged = false;
   PushStatus _status = const PushStatus();
   bool get _supported =>
       !kIsWeb &&
@@ -76,6 +77,7 @@ final class FcmPushRepository implements PushRepository {
     _generation++;
     _userId = userId;
     _opened.clear();
+    _tokenChanged = false;
     _emit(const PushStatus());
     if (userId != null) unawaited(refresh());
   }
@@ -94,6 +96,7 @@ final class FcmPushRepository implements PushRepository {
         );
     _tokens ??= FirebaseMessaging.instance.onTokenRefresh.listen(
       (_) {
+        _tokenChanged = true;
         if (_status.enabled && !_status.busy) unawaited(refresh());
       },
       onError: (Object _) {
@@ -150,6 +153,7 @@ final class FcmPushRepository implements PushRepository {
     if (_closed || _userId == null || _status.busy) return;
     final generation = _generation;
     final userId = _userId!;
+    _tokenChanged = false;
     _emit(
       PushStatus(
         available: _status.available,
@@ -182,9 +186,16 @@ final class FcmPushRepository implements PushRepository {
       final desired = await storage.read(key: _preference(userId)) == 'true';
       if (!_current(generation)) return;
       _emit(PushStatus(available: true, enabled: desired, busy: true));
-      if (desired) await _register(generation, prompt: false);
+      if (desired) {
+        await _register(generation, prompt: false);
+      } else {
+        final installation = await _installationId();
+        if (!_current(generation)) return;
+        // Recover a remote registration if a previous local preference save failed.
+        await api.request('DELETE', '/devices/installations/$installation');
+      }
       if (_current(generation)) {
-        _emit(PushStatus(available: true, enabled: desired));
+        _settled(PushStatus(available: true, enabled: desired));
       }
     } catch (_) {
       if (_current(generation)) {
@@ -287,7 +298,7 @@ final class FcmPushRepository implements PushRepository {
         }
       }
       if (_current(generation)) {
-        _emit(PushStatus(available: true, enabled: enabled));
+        _settled(PushStatus(available: true, enabled: enabled));
       }
     } catch (error) {
       if (_current(generation)) {
@@ -301,7 +312,26 @@ final class FcmPushRepository implements PushRepository {
           ),
         );
       }
+      if (enabled && !previous && _current(generation)) {
+        // Compensate a failed local save after remote registration; resume also reconciles.
+        try {
+          final installation = await _installationId();
+          if (_current(generation)) {
+            await api.request('DELETE', '/devices/installations/$installation');
+          }
+        } catch (_) {
+          /* Offline recovery runs on resume. */
+        }
+      }
       rethrow;
+    }
+  }
+
+  void _settled(PushStatus value) {
+    _emit(value);
+    if (value.enabled && _tokenChanged && !_closed) {
+      _tokenChanged = false;
+      unawaited(refresh());
     }
   }
 
