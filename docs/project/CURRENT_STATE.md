@@ -3,13 +3,14 @@
 Update this file before closing each future project checkpoint. Verify actual branch heads and CI runs from GitHub before changing the state below. Record native acceptance separately from host/CI checks.
 
 **Updated:** 2026-10-02
-**Current phase:** Mingle custom icons, purposeful motion, distinct New conversation flow and richer local demo data implemented on `feat/mobile-motion-demo` above actual PR #19 HEAD `abe502695e6f32512800e30c7ab09b4ec7e0a41a`. Local automated checks pass. Latest checkpoint publication/CI is pending. The user accepted the native pastel direction and requested automated verification first, consolidating simulator review. This is not a finished app: onboarding, branded logo/app icon and splash remain unimplemented, alongside media/push/release work.
+**Current phase:** Mingle custom icons, purposeful motion, distinct New conversation flow and richer local demo data implemented on `feat/mobile-motion-demo` above actual PR #19 HEAD `abe502695e6f32512800e30c7ab09b4ec7e0a41a`. Local automated checks pass. Draft PR #20 is published; Mobile CI #24 passed on implementation HEAD `313b800f0dd90128b5d92a7725552d5e61266802`. The user accepted the native pastel direction and requested automated verification first, consolidating simulator review. This is not a finished app: onboarding, branded logo/app icon and splash remain unimplemented, alongside media/push/release work.
 
 **Current acceptance boundary:** Earlier native builds and populated Chats capture passed; final status-bar/empty-state corrections have not yet been reviewed natively. Full native motion/Reduce Motion/dark/keyboard acceptance is pending. The Mac is no longer locked. See `MOTION_DEMO_CHECKPOINT.md` and `design-qa.md`.
 
 ## Last verified branch / PR / commit
 
-- Last fully CI-verified published branch: `feat/mobile-pastel-visual-identity`; current working branch: `feat/mobile-motion-demo`.
+- Current verified branch: `feat/mobile-motion-demo`; Draft PR [#20](https://github.com/Husseinabozina/chat_app/pull/20), based on PR #19 branch at `abe502695e6f32512800e30c7ab09b4ec7e0a41a`.
+- Latest verified implementation commit: `313b800f0dd90128b5d92a7725552d5e61266802`. [Mobile CI #24](https://github.com/Husseinabozina/chat_app/actions/runs/36984743287): completed/success, both quality and two-account integration jobs passed. Subsequent documentation HEAD/check results are recorded in PR metadata to avoid a self-referential file hash.
 - Baseline PR: [#19](https://github.com/Husseinabozina/chat_app/pull/19), open/Draft, final published HEAD `abe502695e6f32512800e30c7ab09b4ec7e0a41a`, based on PR #18 branch `feat/mobile-backend-product-flow` at actual HEAD `01f5220bb8f80736749200331536ed7f4bcdee28`.
 - Baseline latest [Mobile CI #23](https://github.com/Husseinabozina/chat_app/actions/runs/36911086830): completed/success on exact PR #19 documentation HEAD `abe502695e6f32512800e30c7ab09b4ec7e0a41a`, freshly checked 2026-10-02. The following #22 evidence is historical implementation verification.
 - Verified implementation commit: `9dbf88c359d446d8b9853573cedc478243e3006c`.
@@ -32,7 +33,7 @@ Integrated `master` HEAD: `5f77dbd50efd9ae12f17d809a63c2746f35fc9ee` (PR #14 rea
 | #17 | `feat/mobile-repository-reconciliation` | #16 branch | `d1a1c683a63c9ace2b337d861bb83eef26e45763` | Ready, unmerged |
 | #18 | `feat/mobile-backend-product-flow` | #17 branch | `01f5220bb8f80736749200331536ed7f4bcdee28` (docs; code `b4a31c6`) | Draft, functional native acceptance incomplete |
 | #19 | `feat/mobile-pastel-visual-identity` | #18 branch | `abe502695e6f32512800e30c7ab09b4ec7e0a41a` | Draft; Mobile CI #23 success; pastel direction accepted by user |
-| Pending new PR | `feat/mobile-motion-demo` | #19 branch | Publication pending | Local implementation; final native acceptance pending |
+| #20 | `feat/mobile-motion-demo` | #19 branch | `313b800f0dd90128b5d92a7725552d5e61266802` (implementation) | Draft; CI #24 success; consolidated native acceptance pending |
 
 Proposed merge order: **#15 → #16 → #17 → #18 → #19 → motion checkpoint PR**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
 
@@ -112,6 +113,14 @@ PR #5 and PR #8 were closed as superseded by the main project conversation; thei
 
 ## Current CI and verification
 
+### PR #20
+
+[Mobile CI #24](https://github.com/Husseinabozina/chat_app/actions/runs/36984743287) completed/success on exact implementation HEAD `313b800f0dd90128b5d92a7725552d5e61266802`:
+
+- Quality job `110767080025`: locked dependencies, read-only formatting, analysis and existing tests passed.
+- Integration job `110767446164`: Node 24/PostgreSQL 17 backend npm ci, format, lint, typecheck, build, migrations and tests passed, followed by the real two-account REST/Socket.IO mobile test.
+- Native rendered acceptance is still separate; PR #20 remains Draft.
+
 ### PR #18
 
 [Mobile CI #19](https://github.com/Husseinabozina/chat_app/actions/runs/36857361322) succeeded on code HEAD `b4a31c6c7c17e7f12062c83261d700d94d8cc60d`:
@@ -172,7 +181,7 @@ Later/deferred work:
 
 ## Exact next checkpoint
 
-1. Publish the icons/motion/demo checkpoint as a Draft above PR #19 and verify CI on its actual HEAD; update this file with the result.
+1. Verify subsequent documentation HEAD checks in PR metadata; no implementation changes after successful CI #24.
 2. Finish one consolidated native acceptance pass: actual motion/empty state, status-bar correction, chooser, Reduce Motion, dark/keyboard/accessibility. Keep incomplete checks explicit; no repeated simulator loops during source implementation.
 3. Branded entry experience: final logo/app icon, native splash, first-run onboarding and existing auth/profile routing. Do not implement unsupported social/recovery controls without a contract.
 4. Profile/image messaging contracts, push routing, supported settings and release readiness remain subsequent initial-release checkpoints. Voice notes/files require scope decisions. No merge or force push without authorization.

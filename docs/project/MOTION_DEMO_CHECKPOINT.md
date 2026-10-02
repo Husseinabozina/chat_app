@@ -1,6 +1,6 @@
 # Mingle icons, motion and local demo checkpoint
 
-Updated: 2026-10-02. Branch: `feat/mobile-motion-demo`, based on actual PR #19 HEAD `abe502695e6f32512800e30c7ab09b4ec7e0a41a`. Publication/CI evidence is recorded below after verification.
+Updated: 2026-10-02. Branch: `feat/mobile-motion-demo`, based on actual PR #19 HEAD `abe502695e6f32512800e30c7ab09b4ec7e0a41a`. Draft PR [#20](https://github.com/Husseinabozina/chat_app/pull/20). Implementation commit: `313b800f0dd90128b5d92a7725552d5e61266802`.
 
 ## User direction
 
@@ -49,3 +49,9 @@ The fixture creates/reuses 12 fictional Arabic/English profiles, eight direct co
 Finish one consolidated native acceptance pass for this checkpoint. Then design/implement branded logo/app icon, native splash and first-run onboarding above the verified stack. Email/password authentication and separate text profile setup already work. Password recovery/social authentication require explicit backend contracts and remain pending; do not add decorative buttons for unsupported providers.
 
 Image/profile media, push delivery/routing, supported appearance settings and release readiness remain initial-release work. Voice notes/files/presence/reactions need scope/contract decisions; groups/calls/stories/matching remain outside initial scope.
+
+## Published verification
+
+[Mobile CI #24](https://github.com/Husseinabozina/chat_app/actions/runs/36984743287) passed on exact implementation commit `313b800f0dd90128b5d92a7725552d5e61266802`. Both quality job `110767080025` and real integration job `110767446164` completed/success; backend fixture format/lint/typecheck/build/migrations/tests and the final two-account mobile integration all passed. Subsequent documentation-only HEAD/checks are recorded in PR metadata.
+
+No merge or force push. Proposed order remains #15 → #16 → #17 → #18 → #19 → #20 after review/authorization. PR #5/#8 were already closed as superseded by the other conversation; this checkpoint did not change them.
