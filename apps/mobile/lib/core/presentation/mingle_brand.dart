@@ -142,7 +142,10 @@ class _MingleLogoPainter extends CustomPainter {
       palette.highlightStartColor,
       palette.highlightEndColor,
     );
+    canvas.save();
+    canvas.clipPath(MingleLogoPaths.highlight);
     layer(MingleLogoPaths.fold, palette.foldStartColor, palette.foldEndColor);
+    canvas.restore();
     canvas.restore();
   }
 

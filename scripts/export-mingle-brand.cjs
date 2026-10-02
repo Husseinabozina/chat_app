@@ -84,6 +84,14 @@ async function main() {
         dartPaths.push(
           `    ..moveTo(${tokens[position++]}, ${tokens[position++]})`,
         );
+      else if (command === "L")
+        dartPaths.push(
+          `    ..lineTo(${tokens[position++]}, ${tokens[position++]})`,
+        );
+      else if (command === "C")
+        dartPaths.push(
+          `    ..cubicTo(${tokens[position++]}, ${tokens[position++]}, ${tokens[position++]}, ${tokens[position++]}, ${tokens[position++]}, ${tokens[position++]})`,
+        );
       else if (command === "Q")
         dartPaths.push(
           `    ..quadraticBezierTo(${tokens[position++]}, ${tokens[position++]}, ${tokens[position++]}, ${tokens[position++]})`,

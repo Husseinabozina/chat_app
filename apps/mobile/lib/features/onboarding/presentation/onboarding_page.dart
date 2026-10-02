@@ -19,6 +19,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
   final _pages = PageController();
   int _index = 0;
   bool _busy = false;
+  bool _moving = false;
   String? _error;
   static const _copy = [
     (
@@ -54,15 +55,21 @@ class _OnboardingPageState extends State<OnboardingPage> {
     }
   }
 
-  void _next() {
-    if (MingleMotion.reduced(context)) {
-      _pages.jumpToPage(_index + 1);
-    } else {
-      _pages.animateToPage(
-        _index + 1,
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOutCubic,
-      );
+  Future<void> _move(int page) async {
+    if (_busy || _moving || !_pages.hasClients) return;
+    setState(() => _moving = true);
+    try {
+      if (MingleMotion.reduced(context)) {
+        _pages.jumpToPage(page);
+      } else {
+        await _pages.animateToPage(
+          page,
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _moving = false);
     }
   }
 
@@ -79,22 +86,32 @@ class _OnboardingPageState extends State<OnboardingPage> {
       child: SafeArea(
         child: Column(
           children: [
-            Align(
-              alignment: AlignmentDirectional.centerEnd,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 8,
-                ),
-                child: TextButton(
-                  onPressed: _busy ? null : _finish,
-                  child: Text(widget.replay ? 'Close' : 'Skip'),
-                ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: Row(
+                children: [
+                  if (_index > 0)
+                    IconButton(
+                      tooltip: 'Previous page',
+                      onPressed: _busy || _moving
+                          ? null
+                          : () => _move(_index - 1),
+                      icon: const MingleIcon(MingleGlyph.back),
+                    )
+                  else
+                    const SizedBox(width: 48, height: 48),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: _busy ? null : _finish,
+                    child: Text(widget.replay ? 'Close' : 'Skip'),
+                  ),
+                ],
               ),
             ),
             Expanded(
               child: PageView.builder(
                 controller: _pages,
+                physics: _busy ? const NeverScrollableScrollPhysics() : null,
                 itemCount: _copy.length,
                 onPageChanged: (i) => setState(() => _index = i),
                 itemBuilder: (context, i) => LayoutBuilder(
@@ -117,28 +134,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                 if (i == 0)
                                   const MingleBrand(size: 112)
                                 else
-                                  Container(
-                                    width: 144,
-                                    height: 144,
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primaryContainer
-                                          .withValues(alpha: .7),
-                                      borderRadius: BorderRadius.circular(48),
-                                    ),
-                                    child: Center(
-                                      child: MingleIcon(
-                                        i == 1
-                                            ? MingleGlyph.people
-                                            : MingleGlyph.chats,
-                                        size: 76,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                      ),
-                                    ),
-                                  ),
+                                  _IntroductionScene(people: i == 1),
                                 const SizedBox(height: 32),
                                 Text(
                                   _copy[i].$1,
@@ -183,7 +179,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             for (var i = 0; i < _copy.length; i++)
-                              Container(
+                              AnimatedContainer(
+                                duration: MingleMotion.duration(
+                                  context,
+                                  milliseconds: 180,
+                                ),
+                                curve: Curves.easeOutCubic,
                                 width: i == _index ? 24 : 7,
                                 height: 7,
                                 margin: const EdgeInsets.symmetric(
@@ -203,22 +204,25 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     if (_error != null)
                       Padding(
                         padding: const EdgeInsets.only(top: 12),
-                        child: Text(
-                          _error!,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.error,
+                        child: Semantics(
+                          liveRegion: true,
+                          child: Text(
+                            _error!,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.error,
+                            ),
                           ),
                         ),
                       ),
                     const SizedBox(height: 24),
                     MinglePress(
-                      enabled: !_busy,
+                      enabled: !_busy && !_moving,
                       child: FilledButton(
-                        onPressed: _busy
+                        onPressed: _busy || _moving
                             ? null
                             : _index == _copy.length - 1
                             ? _finish
-                            : _next,
+                            : () => _move(_index + 1),
                         child: Text(
                           _busy
                               ? 'Please wait…'
@@ -237,6 +241,140 @@ class _OnboardingPageState extends State<OnboardingPage> {
           ],
         ),
       ),
+    ),
+  );
+}
+
+/// Decorative examples explain the real People and messaging flows.
+/// They are not controls or accounts returned by the backend.
+class _IntroductionScene extends StatelessWidget {
+  const _IntroductionScene({required this.people});
+  final bool people;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return ExcludeSemantics(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 300),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: colors.surface.withValues(alpha: .92),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: colors.outlineVariant),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: people
+                  ? [
+                      Row(
+                        children: [
+                          MingleIcon(
+                            MingleGlyph.search,
+                            size: 20,
+                            color: colors.primary,
+                          ),
+                          const SizedBox(width: 10),
+                          const Expanded(
+                            child: Text(
+                              'Find a familiar name',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      const _IntroductionPerson(
+                        name: 'Nour',
+                        username: '@nour',
+                      ),
+                      const SizedBox(height: 16),
+                      const _IntroductionPerson(
+                        name: 'Omar',
+                        username: '@omar',
+                      ),
+                    ]
+                  : [
+                      const _IntroductionPerson(
+                        name: 'Nour',
+                        username: 'A little hello goes a long way',
+                      ),
+                      const SizedBox(height: 20),
+                      _IntroductionBubble(
+                        text: 'Hi! How’s your day?',
+                        own: false,
+                      ),
+                      const SizedBox(height: 10),
+                      _IntroductionBubble(
+                        text: 'Better with a good chat.',
+                        own: true,
+                      ),
+                    ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _IntroductionPerson extends StatelessWidget {
+  const _IntroductionPerson({required this.name, required this.username});
+  final String name;
+  final String username;
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      InitialAvatar(name, radius: 22),
+      const SizedBox(width: 12),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(name, style: Theme.of(context).textTheme.titleSmall),
+            Text(
+              username,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+class _IntroductionBubble extends StatelessWidget {
+  const _IntroductionBubble({required this.text, required this.own});
+  final String text;
+  final bool own;
+  @override
+  Widget build(BuildContext context) => Align(
+    alignment: own
+        ? AlignmentDirectional.centerEnd
+        : AlignmentDirectional.centerStart,
+    child: Container(
+      constraints: const BoxConstraints(maxWidth: 215),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: own
+            ? Theme.of(context).colorScheme.primaryContainer
+            : Theme.of(context).colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadiusDirectional.only(
+          topStart: const Radius.circular(18),
+          topEnd: const Radius.circular(18),
+          bottomStart: Radius.circular(own ? 18 : 5),
+          bottomEnd: Radius.circular(own ? 5 : 18),
+        ),
+      ),
+      child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
     ),
   );
 }

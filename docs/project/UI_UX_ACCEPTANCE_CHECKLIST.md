@@ -140,3 +140,7 @@ The user explicitly deferred the earlier visual review and authorized logo, spla
 - Existing account test exercises introduction, settings, persistence and logout; original assertions retained.
 
 Native visual boxes remain unchecked at the user's request. Android compilation remains unverified (SDK unavailable); local iOS native-resource build passed. Privacy/notifications/language/account deletion are not exposed before their behavior/contracts exist.
+
+## Entry polish implementation evidence — 2026-10-02
+
+`fix/mobile-entry-visual-polish` repairs traced logo junctions/edges, preserves independent fold colors, and adds illustrative onboarding cards/back navigation/transition guards. Auth errors announce accessibly. See `ENTRY_VISUAL_POLISH_CHECKPOINT.md`. Asset comparison and automated checks do not tick native acceptance items above; user-owned manual run/consolidated review remains pending.
