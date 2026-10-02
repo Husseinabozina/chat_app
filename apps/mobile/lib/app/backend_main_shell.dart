@@ -95,6 +95,7 @@ class _BackendMainShellState extends State<BackendMainShell> {
     MaterialPageRoute(
       builder: (_) => SettingsPage(
         preferences: widget.services.preferences,
+        push: widget.services.push,
         onEditProfile: _edit,
         onLogout: _logout,
       ),

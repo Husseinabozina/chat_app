@@ -1,3 +1,4 @@
+import { SessionPushDevices2026100200100 } from './migrations/2026100200100-session-push-devices';
 import { ImageMedia2026100200000 } from './migrations/2026100200000-image-media';
 import { loadEnvFile } from 'node:process';
 
@@ -31,6 +32,7 @@ export const AppDataSource = new DataSource({
     ConversationMessageIndexes2026093000200,
     UserDiscoveryIndexes2026093000300,
     ImageMedia2026100200000,
+    SessionPushDevices2026100200100,
   ],
   synchronize: false,
   logging: false,

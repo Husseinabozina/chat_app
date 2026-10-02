@@ -19,6 +19,12 @@ export class DeviceTokenEntity {
   @Column({ type: 'varchar', length: 20 })
   platform!: string;
 
+  @Column({ name: 'installation_id', type: 'uuid', nullable: true })
+  installationId!: string | null;
+
+  @Column({ name: 'session_id', type: 'uuid', nullable: true })
+  sessionId!: string | null;
+
   @Column({ name: 'device_id', type: 'varchar', length: 160, nullable: true })
   deviceId!: string | null;
 

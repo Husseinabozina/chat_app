@@ -250,14 +250,18 @@ Storage supports signed POST (exercised locally with MinIO); public provider com
 
 ---
 
-## 9. Device registration (planned; not implemented)
+## 9. Device registration (push implementation)
+
+All routes require the current bearer session. `GET /v1/devices/status` returns `{available, projectId}`; availability means explicit server configuration, not verified device/provider delivery.
 
 ```http
 POST /v1/devices
-DELETE /v1/devices/:deviceId
+DELETE /v1/devices/installations/:installationId
 ```
 
-Used to register/revoke push-notification tokens.
+Register body: `{installationId: "persistent-installation-uuid", token: "FCM-registration-token", platform: "ios" | "android"}`. Response `{id, enabled: true}`. Account/session are server-derived. Re-register rotates the token/transfers the installation to the current account and binds it to this backing session. At most 20 active recent devices per account. DELETE revokes only this account/session installation and returns 204; it is idempotent. Token/session expiry, logout revocation and invalid-provider cleanup exclude targets. Registration returns 503 when server push is disabled.
+
+Only newly persisted messages trigger best-effort push. Generic OS copy contains no message text/sender/photo. Data `{type: "message", userId, conversationId, messageId}`; IDs are not authorization. Client must reject another account and fetch `GET /v1/conversations/:conversationId` for membership-authorized canonical summary before routing, including after cold restore. Already handed-off notifications may remain after logout/deletion; unread/current membership/deletion are rechecked before send where possible. No push delivery receipt or durable retry/outbox guarantee.
 
 ---
 

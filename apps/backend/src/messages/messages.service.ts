@@ -1,3 +1,4 @@
+import { PushService } from '../push/push.service';
 import { randomUUID } from 'node:crypto';
 import { MediaService } from '../media/media.service';
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
@@ -50,6 +51,7 @@ export class MessagesService {
     private readonly conversationsService: ConversationsService,
     @Inject(MediaService)
     private readonly media: MediaService,
+    @Inject(PushService) private readonly push: PushService,
     @Inject(RealtimePublisher)
     private readonly realtimePublisher: RealtimePublisher,
   ) {}
@@ -215,6 +217,7 @@ export class MessagesService {
       });
 
       if (result.created) {
+        this.push.enqueue(result.message.id);
         await this.publishSafely(() =>
           this.publishMessageCreated(result.message),
         );

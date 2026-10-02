@@ -58,8 +58,9 @@ src/
   health/
   messages/
   media/
+  push/
   realtime/
   users/
 ```
 
-The current REST endpoints and response contracts are documented in `docs/api/api-contract-v1.md`. Private media is implemented in PR #25: configure storage before photo use; existing text/auth works without a bucket. See `docs/project/MEDIA_CHECKPOINT.md`. Push registration/delivery and public deployment remain future checkpoints.
+The current REST endpoints and response contracts are documented in `docs/api/api-contract-v1.md`. Private media is implemented in PR #25: configure storage before photo use; existing text/auth works without a bucket. See `docs/project/MEDIA_CHECKPOINT.md`. Push registration/FCM adapter is implemented but requires explicit credentials/configuration and actual delivery acceptance; see `docs/project/PUSH_CHECKPOINT.md`. Public deployment remains pending.

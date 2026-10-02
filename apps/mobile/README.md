@@ -112,3 +112,7 @@ The corrected entry flow uses onboarding revision 2. Earlier development prefere
 ## Profile and message photos
 
 Profile → Edit profile → Change photo → Photos/Camera → Use photo → Save profile. In a conversation use the custom photo attachment button, choose a picture, preview/add an optional caption, then send. Tap the image to zoom; failed sends retain the client ID for retry. Upload requires configured private object storage, not just PostgreSQL/API. See `docs/project/MEDIA_CHECKPOINT.md` for setup, limits and verification boundaries.
+
+## Message notifications
+
+Profile → Settings → New messages requests OS permission only on explicit opt-in, then registers the current installation/session. Disable revokes the server installation first. Missing server/provider setup is shown as unavailable. Existing firebase_messaging is behind a push domain port; cold/background taps verify target account and membership before opening a conversation. Native entitlements/permissions require a new user-owned build and actual FCM/APNs credentials; host CI does not prove delivery. See `docs/project/PUSH_CHECKPOINT.md`.

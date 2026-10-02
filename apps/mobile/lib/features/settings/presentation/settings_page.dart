@@ -3,15 +3,18 @@ import 'package:flutter/material.dart';
 import '../../../core/preferences/app_preferences.dart';
 import '../../../core/presentation/chat_ui.dart';
 import '../../../core/presentation/mingle_brand.dart';
+import '../../push/domain/push_repository.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({
     required this.preferences,
     required this.onEditProfile,
     required this.onLogout,
+    this.push,
     super.key,
   });
   final AppPreferences preferences;
+  final PushRepository? push;
   final Future<void> Function() onEditProfile;
   final Future<void> Function() onLogout;
   @override
@@ -145,6 +148,39 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
               ),
             ),
+            if (widget.push != null) ...[
+              _heading('Notifications'),
+              StreamBuilder<PushStatus>(
+                stream: widget.push!.watchStatus(),
+                initialData: widget.push!.status,
+                builder: (context, snapshot) {
+                  final state = snapshot.data!;
+                  return Card(
+                    child: Column(
+                      children: [
+                        SwitchListTile.adaptive(
+                          title: const Text('New messages'),
+                          subtitle: Text(
+                            state.detail ?? 'A quiet heads-up when a message arrives. Message text stays off the notification.',
+                          ),
+                          value: state.enabled,
+                          onChanged: _busy || state.busy || !state.available
+                              ? null
+                              : (value) =>
+                                    _save(() => widget.push!.setEnabled(value)),
+                        ),
+                        if (state.busy) const LinearProgressIndicator(),
+                        if (state.detail != null && !state.busy)
+                          TextButton(
+                            onPressed: widget.push!.refresh,
+                            child: const Text('Try again'),
+                          ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ],
             _heading('Account'),
             Card(
               child: ListTile(
