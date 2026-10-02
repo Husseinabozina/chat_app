@@ -30,10 +30,16 @@ Arguments are mark/background `#RRGGBB` colors. The SVG master uses `currentColo
 - Local iOS simulator debug build succeeded in 42.8s using the preserved local automatic platform migration files. This build verifies native resources and the entry/settings implementation before the final small central-logo-color API addition; latest Dart code is covered by host checks/CI. It is not native visual acceptance.
 - Android SDK is absent locally; Android XML/resources were checked, but no Android native build or runtime acceptance is claimed.
 - Existing native migration/Podfile.lock changes remain local. Only the intended iOS display-name edit is staged from the already-dirty Info.plist; migration edits are excluded.
-- New PR/actual implementation SHA and final CI are recorded after publication. Existing workflows remain read-only/reproducible and unchanged.
+- Draft PR [#21](https://github.com/Husseinabozina/chat_app/pull/21). Implementation `45d227930809c876c85d810e0b5070ca225bd562`: [Mobile CI #26](https://github.com/Husseinabozina/chat_app/actions/runs/36994453820) completed/success; quality and complete backend/two-account integration passed. Final documentation HEAD/checks are in PR metadata. Existing workflows remain read-only/reproducible and unchanged.
 
 ## Remaining
 
 Native visual review is deferred at the user's request; this does not establish visual acceptance. Full keyboard/Reduce Motion/dark/two-device/physical checks remain pending. Settings notification/privacy/language/account deletion require implemented contracts/localization before controls can be added.
 
 Next product checkpoint: profile/image-message media contracts and implementation, then push delivery/routing and supported settings. Voice/files/presence/reactions need scope decisions. Groups/calls/matching remain outside the initial scope. No merge or force push.
+
+## Latest native implementation evidence
+
+The final implementation (including central logo recoloring API) compiled/installed/launched on iPhone 16e/iOS 26.2 in a 23.2s native build. The simulator was initially shut down, so first discovery found no device; booting only the existing task-owned 16e resolved that. No other project simulator was touched. API/PostgreSQL local fixture services were restarted after the earlier permissions transition; separate live integration passed. The running app was not visually exercised/captured, respecting the user's explicit deferral.
+
+Proposed merge order: #15 → #16 → #17 → #18 → #19 → #20 → #21, after review/authorization. No merge or force push performed.

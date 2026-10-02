@@ -3,16 +3,18 @@
 Update this file before closing each future project checkpoint. Verify actual branch heads and CI runs from GitHub before changing the state below. Record native acceptance separately from host/CI checks.
 
 **Updated:** 2026-10-02
-**Current phase:** Branded entry and Settings implementation on `feat/mobile-brand-entry-settings` above actual PR #20 HEAD `a757c75da81c550b09e377af69f86a33a6e0556d`. Editable/tintable logo, launcher assets, native/Flutter splash, persisted first-run onboarding and working appearance/motion/account Settings are implemented. Local host checks pass; current PR publication/CI pending.
+**Current phase:** Branded entry and Settings implementation on `feat/mobile-brand-entry-settings` above actual PR #20 HEAD `a757c75da81c550b09e377af69f86a33a6e0556d`. Editable/tintable logo, launcher assets, native/Flutter splash, persisted first-run onboarding and working appearance/motion/account Settings are implemented. Draft PR #21 published; Mobile CI #26 passed on implementation commit `45d227930809c876c85d810e0b5070ca225bd562`, including quality and complete backend/two-account integration.
 
 **Current acceptance boundary:** The user explicitly deferred the previous native visual review and authorized this implementation without further questions. Native resource build succeeded; latest full visual/motion/keyboard/dark/physical/two-device acceptance is still pending. Android native build is unverified because no local Android SDK is installed. See `BRAND_ENTRY_SETTINGS_CHECKPOINT.md` and `design-qa.md`. This is not a finished application; image/profile media, push, supported notification settings and release readiness remain.
 
 ## Last verified branch / PR / commit
 
-- Current working branch: `feat/mobile-brand-entry-settings`, based on verified PR #20 documentation HEAD `a757c75da81c550b09e377af69f86a33a6e0556d`. Publication/CI for the new checkpoint is pending.
+- Current verified branch: `feat/mobile-brand-entry-settings`, Draft PR [#21](https://github.com/Husseinabozina/chat_app/pull/21), based on actual PR #20 HEAD `a757c75da81c550b09e377af69f86a33a6e0556d`.
+- Latest verified implementation: `45d227930809c876c85d810e0b5070ca225bd562`, [Mobile CI #26](https://github.com/Husseinabozina/chat_app/actions/runs/36994453820) completed/success. Subsequent documentation HEAD/checks are recorded in PR metadata, avoiding a self-referential file hash.
+- Latest implementation compiled/installed/launched on iPhone 16e/iOS 26.2 (23.2s native build). This is build/launch evidence, not visual acceptance.
 - Baseline [Mobile CI #25](https://github.com/Husseinabozina/chat_app/actions/runs/36985197274): completed/success on that exact PR #20 HEAD.
-- Current verified branch: `feat/mobile-motion-demo`; Draft PR [#20](https://github.com/Husseinabozina/chat_app/pull/20), based on PR #19 branch at `abe502695e6f32512800e30c7ab09b4ec7e0a41a`.
-- Latest verified implementation commit: `313b800f0dd90128b5d92a7725552d5e61266802`. [Mobile CI #24](https://github.com/Husseinabozina/chat_app/actions/runs/36984743287): completed/success, both quality and two-account integration jobs passed. Subsequent documentation HEAD/check results are recorded in PR metadata to avoid a self-referential file hash.
+- Previous verified branch: `feat/mobile-motion-demo`; Draft PR [#20](https://github.com/Husseinabozina/chat_app/pull/20), based on PR #19 branch at `abe502695e6f32512800e30c7ab09b4ec7e0a41a`.
+- Previous verified implementation commit: `313b800f0dd90128b5d92a7725552d5e61266802`. [Mobile CI #24](https://github.com/Husseinabozina/chat_app/actions/runs/36984743287): completed/success, both quality and two-account integration jobs passed. Subsequent documentation HEAD/check results are recorded in PR metadata to avoid a self-referential file hash.
 - Baseline PR: [#19](https://github.com/Husseinabozina/chat_app/pull/19), open/Draft, final published HEAD `abe502695e6f32512800e30c7ab09b4ec7e0a41a`, based on PR #18 branch `feat/mobile-backend-product-flow` at actual HEAD `01f5220bb8f80736749200331536ed7f4bcdee28`.
 - Baseline latest [Mobile CI #23](https://github.com/Husseinabozina/chat_app/actions/runs/36911086830): completed/success on exact PR #19 documentation HEAD `abe502695e6f32512800e30c7ab09b4ec7e0a41a`, freshly checked 2026-10-02. The following #22 evidence is historical implementation verification.
 - Verified implementation commit: `9dbf88c359d446d8b9853573cedc478243e3006c`.
@@ -36,8 +38,9 @@ Integrated `master` HEAD: `5f77dbd50efd9ae12f17d809a63c2746f35fc9ee` (PR #14 rea
 | #18 | `feat/mobile-backend-product-flow` | #17 branch | `01f5220bb8f80736749200331536ed7f4bcdee28` (docs; code `b4a31c6`) | Draft, functional native acceptance incomplete |
 | #19 | `feat/mobile-pastel-visual-identity` | #18 branch | `abe502695e6f32512800e30c7ab09b4ec7e0a41a` | Draft; Mobile CI #23 success; pastel direction accepted by user |
 | #20 | `feat/mobile-motion-demo` | #19 branch | `313b800f0dd90128b5d92a7725552d5e61266802` (implementation) | Draft; CI #24 success; consolidated native acceptance pending |
+| #21 | `feat/mobile-brand-entry-settings` | #20 branch | `45d227930809c876c85d810e0b5070ca225bd562` (implementation) | Draft; CI #26 success; native visual review explicitly deferred |
 
-Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → brand/entry/settings PR**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
+Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
 
 Integrated earlier history:
 
@@ -115,6 +118,10 @@ PR #5 and PR #8 were closed as superseded by the main project conversation; thei
 
 ## Current CI and verification
 
+### PR #21
+
+[Mobile CI #26](https://github.com/Husseinabozina/chat_app/actions/runs/36994453820) completed/success on `45d227930809c876c85d810e0b5070ca225bd562`. Quality and the complete backend/two-account integration passed. No backend/workflow/dependency/lockfile changes. Native iOS implementation build/launch succeeded (23.2s); Android runtime/build and final rendered acceptance remain separate.
+
 ### PR #20
 
 [Mobile CI #24](https://github.com/Husseinabozina/chat_app/actions/runs/36984743287) completed/success on exact implementation HEAD `313b800f0dd90128b5d92a7725552d5e61266802`:
@@ -183,15 +190,15 @@ Later/deferred work:
 
 ## Exact next checkpoint
 
-1. Publish/verify the branded entry/settings checkpoint on its actual HEAD and record its CI result before closing.
+1. Verify final documentation HEAD checks in PR metadata; no implementation changes after successful CI #26.
 2. Profile/image-message media contracts and implementation; current avatars remain illustrated fallbacks. Follow with push delivery/routing and supported notification settings.
 3. Consolidated native acceptance remains explicitly deferred by the user; collect the missing evidence when resumed, including Android once its SDK is available.
 4. Password recovery/social auth, localization, files/voice/presence/reactions require scope/contracts. No merges or force pushes without authorization.
 
 ## Current local quality evidence (2026-10-02)
 
-- Current entry/settings host checks: 64 Dart files; analyzer clean; existing mobile suite 46 passed + one intentional live skip. Existing account-flow coverage extended for actual onboarding/settings/persistence; previous separate real integration evidence is historical until reverified on this checkpoint.
-- Native iOS resources built successfully (42.8s) with existing local automatic migrations; asset sizes/alpha/XML/plist valid. Central recoloring API was finalized afterward and is covered by current host checks. No current Android native build claim.
+- Current entry/settings host checks: 64 Dart files; analyzer clean; existing mobile suite 46 passed + one intentional live skip. Existing account-flow coverage extended for actual onboarding/settings/persistence; separate live REST/Socket.IO integration also passed on this checkpoint; full CI #26 backend fixture/two-account gate passed.
+- Native iOS resources built successfully (42.8s) with existing local automatic migrations; asset sizes/alpha/XML/plist valid. Final central recoloring API is included in the subsequent 23.2s iPhone 16e build/launch on implementation HEAD; rendered acceptance remains deferred. No current Android native build claim.
 - Seeder syntax/Prettier passed; rerun reused 12 demo profiles/eight directs/94 stable seed messages. Local database also contains user-added messages, so total message count can exceed fixture count.
 - User requested code/automated checks first. Final rendered QA remains a separate gate, recorded in `design-qa.md`; no Lottie dependency was added.
 - Workflows unchanged: read-only permissions, locked mobile resolution, backend npm ci → format:check → lint → typecheck → build → migrations → tests; no diagnostic steps/artifact uploads.
