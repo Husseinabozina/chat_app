@@ -105,6 +105,7 @@ final class FcmPushRepository implements PushRepository {
             PushStatus(
               available: _status.available,
               enabled: _status.enabled,
+              busy: _status.busy,
               detail: 'Could not refresh notifications. Try again.',
             ),
           );
@@ -301,17 +302,6 @@ final class FcmPushRepository implements PushRepository {
         _settled(PushStatus(available: true, enabled: enabled));
       }
     } catch (error) {
-      if (_current(generation)) {
-        _emit(
-          PushStatus(
-            available: true,
-            enabled: previous,
-            detail: error is AppFailure
-                ? error.userMessage
-                : 'Could not update notifications. Try again.',
-          ),
-        );
-      }
       if (enabled && !previous && _current(generation)) {
         // Compensate a failed local save after remote registration; resume also reconciles.
         try {
@@ -322,6 +312,17 @@ final class FcmPushRepository implements PushRepository {
         } catch (_) {
           /* Offline recovery runs on resume. */
         }
+      }
+      if (_current(generation)) {
+        _emit(
+          PushStatus(
+            available: true,
+            enabled: previous,
+            detail: error is AppFailure
+                ? error.userMessage
+                : 'Could not update notifications. Try again.',
+          ),
+        );
       }
       rethrow;
     }
