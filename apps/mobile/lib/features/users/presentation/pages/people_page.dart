@@ -13,11 +13,13 @@ class PeoplePage extends StatefulWidget {
     required this.users,
     required this.conversations,
     required this.currentUserId,
+    this.selectForConversation = false,
     super.key,
   });
   final UsersRepository users;
   final ConversationsRepository conversations;
   final String currentUserId;
+  final bool selectForConversation;
   @override
   State<PeoplePage> createState() => _PeoplePageState();
 }
@@ -29,6 +31,30 @@ class _PeoplePageState extends State<PeoplePage> {
   CursorPage<UserProfile>? _page;
   bool _busy = false;
   Object? _error;
+  String? _openingId;
+  Future<void> _openConversation(UserProfile p) async {
+    if (_openingId != null) return;
+    setState(() => _openingId = p.id);
+    try {
+      final c = await widget.conversations.openDirect(p.id);
+      if (!mounted) return;
+      await Navigator.of(context).pushReplacement(
+        MaterialPageRoute<void>(
+          builder: (_) => ConversationPage(
+            repository: widget.conversations,
+            users: widget.users,
+            conversation: c,
+            currentUserId: widget.currentUserId,
+          ),
+        ),
+      );
+    } catch (e) {
+      if (mounted) showFailure(context, e);
+    } finally {
+      if (mounted) setState(() => _openingId = null);
+    }
+  }
+
   void _changed(String value) {
     _debounce?.cancel();
     _generation++;
@@ -91,13 +117,21 @@ class _PeoplePageState extends State<PeoplePage> {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              const WarmHeader('People', 'A new conversation is a name away.'),
+              WarmHeader(
+                widget.selectForConversation ? 'Say hello' : 'People',
+                widget.selectForConversation
+                    ? 'Search, then choose someone to message.'
+                    : 'A new conversation is a name away.',
+              ),
               const SizedBox(height: 16),
               TextField(
                 maxLength: 80,
                 decoration: const InputDecoration(
                   hintText: 'Search name or username',
-                  prefixIcon: Icon(Icons.search),
+                  prefixIcon: Center(
+                    widthFactor: 1,
+                    child: MingleIcon(MingleGlyph.search),
+                  ),
                   counterText: '',
                 ),
                 onChanged: _changed,
@@ -150,20 +184,32 @@ class _PeoplePageState extends State<PeoplePage> {
                   horizontal: 16,
                   vertical: 10,
                 ),
-                trailing: const Icon(Icons.chevron_right_rounded, size: 20),
+                trailing: _openingId == p.id
+                    ? const SizedBox.square(
+                        dimension: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : MingleIcon(
+                        widget.selectForConversation
+                            ? MingleGlyph.chats
+                            : MingleGlyph.next,
+                        size: 22,
+                      ),
                 leading: InitialAvatar(p.label),
                 title: Text(p.label),
                 subtitle: Text(p.username == null ? '' : '@${p.username}'),
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => PublicProfilePage(
-                      userId: p.id,
-                      users: widget.users,
-                      conversations: widget.conversations,
-                      currentUserId: widget.currentUserId,
-                    ),
-                  ),
-                ),
+                onTap: widget.selectForConversation
+                    ? (_openingId == null ? () => _openConversation(p) : null)
+                    : () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => PublicProfilePage(
+                            userId: p.id,
+                            users: widget.users,
+                            conversations: widget.conversations,
+                            currentUserId: widget.currentUserId,
+                          ),
+                        ),
+                      ),
               ),
             ),
           );
@@ -245,7 +291,10 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Profile')),
+    appBar: AppBar(
+      leading: const MingleBackButton(),
+      title: const Text('Profile'),
+    ),
     body: MingleBackdrop(
       child: _error != null
           ? StatusPanel(friendlyError(_error!), action: _load)
@@ -282,9 +331,12 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
                   const SizedBox(height: 24),
                   if (widget.allowMessage &&
                       widget.userId != widget.currentUserId)
-                    FilledButton(
-                      onPressed: _busy ? null : _message,
-                      child: Text(_busy ? 'Opening…' : 'Message'),
+                    MinglePress(
+                      enabled: !_busy,
+                      child: FilledButton(
+                        onPressed: _busy ? null : _message,
+                        child: Text(_busy ? 'Opening…' : 'Message'),
+                      ),
                     ),
                 ],
               ),

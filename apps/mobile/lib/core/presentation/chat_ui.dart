@@ -1,12 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../failures/app_failure.dart';
+import 'mingle_icons.dart';
+import 'mingle_motion.dart';
+
+export 'mingle_icons.dart';
+export 'mingle_motion.dart';
 
 const blush = Color(0xFFCA326E);
 const mingleInk = Color(0xFF22254E);
 const mingleCream = Color(0xFFFFF8F5);
 const minglePink = Color(0xFFFFDCE7);
 const mingleMuted = Color(0xFF666A86);
+
+SystemUiOverlayStyle mingleSystemOverlay(Brightness brightness) =>
+    SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarBrightness: brightness,
+      statusBarIconBrightness: brightness == Brightness.dark
+          ? Brightness.light
+          : Brightness.dark,
+    );
 
 ThemeData backendTheme(Brightness brightness) {
   final dark = brightness == Brightness.dark;
@@ -47,6 +62,16 @@ ThemeData backendTheme(Brightness brightness) {
     borderSide: BorderSide(color: scheme.outline),
   );
   return base.copyWith(
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: MinglePageTransitions(),
+        TargetPlatform.iOS: MinglePageTransitions(),
+        TargetPlatform.macOS: MinglePageTransitions(),
+        TargetPlatform.windows: MinglePageTransitions(),
+        TargetPlatform.linux: MinglePageTransitions(),
+        TargetPlatform.fuchsia: MinglePageTransitions(),
+      },
+    ),
     scaffoldBackgroundColor: dark ? const Color(0xFF1D1B24) : mingleCream,
     textTheme: text.copyWith(
       headlineLarge: heading(text.headlineLarge),
@@ -62,6 +87,7 @@ ThemeData backendTheme(Brightness brightness) {
       ),
     ),
     appBarTheme: AppBarTheme(
+      systemOverlayStyle: mingleSystemOverlay(brightness),
       backgroundColor: Colors.transparent,
       foregroundColor: scheme.onSurface,
       surfaceTintColor: Colors.transparent,
@@ -243,10 +269,12 @@ class StatusPanel extends StatelessWidget {
     super.key,
     this.action,
     this.label = 'Retry',
+    this.brandMoment = false,
   });
   final String message;
   final VoidCallback? action;
   final String label;
+  final bool brandMoment;
   @override
   Widget build(BuildContext context) => Center(
     child: Padding(
@@ -254,21 +282,10 @@ class StatusPanel extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ExcludeSemantics(
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer
-                    .withValues(alpha: .65),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.forum_outlined,
-                size: 36,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-          ),
+          if (brandMoment)
+            const MingleHello()
+          else
+            const MingleIcon(MingleGlyph.chats, size: 42),
           const SizedBox(height: 20),
           Text(
             message,
@@ -278,7 +295,9 @@ class StatusPanel extends StatelessWidget {
           if (action != null)
             Padding(
               padding: const EdgeInsets.only(top: 20),
-              child: FilledButton(onPressed: action, child: Text(label)),
+              child: MinglePress(
+                child: FilledButton(onPressed: action, child: Text(label)),
+              ),
             ),
         ],
       ),
@@ -322,57 +341,54 @@ class MingleNavigation extends StatelessWidget {
   const MingleNavigation({
     required this.selectedIndex,
     required this.onSelected,
-    required this.onNewChat,
     super.key,
   });
   final int selectedIndex;
   final ValueChanged<int> onSelected;
-  final VoidCallback onNewChat;
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    Widget tab(int index, String label, IconData icon, IconData selectedIcon) =>
-        Expanded(
-          child: Semantics(
-            selected: selectedIndex == index,
-            button: true,
-            child: InkWell(
-              onTap: () => onSelected(index),
-              borderRadius: BorderRadius.circular(20),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 12,
-                  horizontal: 4,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      selectedIndex == index ? selectedIcon : icon,
+    Widget tab(int index, String label, MingleGlyph icon) => Expanded(
+      child: Semantics(
+        selected: selectedIndex == index,
+        button: true,
+        child: MinglePress(
+          child: InkWell(
+            onTap: () => onSelected(index),
+            borderRadius: BorderRadius.circular(20),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  MingleIcon(
+                    icon,
+                    selected: selectedIndex == index,
+                    color: selectedIndex == index
+                        ? scheme.primary
+                        : scheme.onSurface,
+                    size: 27,
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: selectedIndex == index
+                          ? FontWeight.w800
+                          : FontWeight.w600,
                       color: selectedIndex == index
                           ? scheme.primary
                           : scheme.onSurface,
-                      size: 23,
                     ),
-                    const SizedBox(height: 5),
-                    Text(
-                      label,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: selectedIndex == index
-                            ? FontWeight.w800
-                            : FontWeight.w600,
-                        color: selectedIndex == index
-                            ? scheme.primary
-                            : scheme.onSurface,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
-        );
+        ),
+      ),
+    );
     return Material(
       color: scheme.surface,
       shape: RoundedRectangleBorder(
@@ -386,37 +402,25 @@ class MingleNavigation extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              tab(
-                0,
-                'Chats',
-                Icons.chat_bubble_outline_rounded,
-                Icons.chat_bubble_rounded,
-              ),
-              tab(
-                1,
-                'People',
-                Icons.people_outline_rounded,
-                Icons.people_rounded,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: IconButton.filled(
-                  onPressed: onNewChat,
-                  tooltip: 'New chat',
-                  style: IconButton.styleFrom(minimumSize: const Size(52, 52)),
-                  icon: const Icon(Icons.add_rounded, size: 30),
-                ),
-              ),
-              tab(
-                2,
-                'Profile',
-                Icons.person_outline_rounded,
-                Icons.person_rounded,
-              ),
+              tab(0, 'Chats', MingleGlyph.chats),
+              tab(1, 'People', MingleGlyph.people),
+              tab(2, 'Profile', MingleGlyph.profile),
             ],
           ),
         ),
       ),
     );
   }
+}
+
+class MingleBackButton extends StatelessWidget {
+  const MingleBackButton({super.key});
+  @override
+  Widget build(BuildContext context) => MinglePress(
+    child: IconButton(
+      tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+      onPressed: () => Navigator.of(context).maybePop(),
+      icon: const MingleIcon(MingleGlyph.back),
+    ),
+  );
 }

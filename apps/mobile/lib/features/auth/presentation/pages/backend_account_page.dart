@@ -97,9 +97,9 @@ class _BackendAccountPageState extends State<BackendAccountPage> {
                         enabled: !_busy,
                         decoration: const InputDecoration(
                           labelText: 'Email',
-                          prefixIcon: Icon(
-                            Icons.mail_outline_rounded,
-                            size: 20,
+                          prefixIcon: Center(
+                            widthFactor: 1,
+                            child: MingleIcon(MingleGlyph.mail, size: 22),
                           ),
                         ),
                         keyboardType: TextInputType.emailAddress,
@@ -124,9 +124,9 @@ class _BackendAccountPageState extends State<BackendAccountPage> {
                         ],
                         decoration: InputDecoration(
                           labelText: 'Password',
-                          prefixIcon: const Icon(
-                            Icons.lock_outline_rounded,
-                            size: 20,
+                          prefixIcon: const Center(
+                            widthFactor: 1,
+                            child: MingleIcon(MingleGlyph.lock, size: 22),
                           ),
                           suffixIcon: IconButton(
                             tooltip: _obscure
@@ -134,10 +134,8 @@ class _BackendAccountPageState extends State<BackendAccountPage> {
                                 : 'Hide password',
                             onPressed: () =>
                                 setState(() => _obscure = !_obscure),
-                            icon: Icon(
-                              _obscure
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
+                            icon: MingleIcon(
+                              _obscure ? MingleGlyph.eye : MingleGlyph.eyeOff,
                             ),
                           ),
                         ),
@@ -163,12 +161,15 @@ class _BackendAccountPageState extends State<BackendAccountPage> {
                           ),
                         ),
                       const SizedBox(height: 24),
-                      FilledButton(
-                        onPressed: _busy ? null : _submit,
-                        child: Text(
-                          _busy
-                              ? 'Please wait…'
-                              : (_register ? 'Create account' : 'Sign in'),
+                      MinglePress(
+                        enabled: !_busy,
+                        child: FilledButton(
+                          onPressed: _busy ? null : _submit,
+                          child: Text(
+                            _busy
+                                ? 'Please wait…'
+                                : (_register ? 'Create account' : 'Sign in'),
+                          ),
                         ),
                       ),
                       TextButton(

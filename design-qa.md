@@ -1,6 +1,6 @@
 # Pastel native UI comparison
 
-Date: 2026-10-01. Workflow: product-design image-to-code/design-qa.
+Date: 2026-10-02. Workflow: product-design image-to-code/design-qa.
 
 ## Visual truth and scope
 
@@ -11,20 +11,20 @@ Date: 2026-10-01. Workflow: product-design image-to-code/design-qa.
 
 ## Capture and comparison evidence
 
-- New implementation screenshot: **not captured**. CUA reported: Mac locked; automatic unlock failed. User was asked to unlock manually. No lower-level capture/UI path was used to bypass this block.
+- Earlier native motion implementation screenshot: workspace `output/motion-ui/chats.png`, 790 × 1676 including Simulator chrome. This is a populated/light Chats capture, preceding final status-bar and explicit empty-state corrections. User accepted the native pastel direction and requested custom icons/motion. The former Mac lock is resolved.
 - Native build/launch succeeded (749.7s). Runtime remained attached for hot reload/restart.
 - Historical old profile screenshot: workspace `output/pastel-ui/profile-before.png`, 790 × 1676 including Simulator window/device frame. It is from PR #18's old appearance and is not the new implementation evidence.
 - Density normalization: pending native capture. Normalize/crop actual app content and compare at the same logical viewport/state; do not stretch the board or confuse device chrome with application content.
-- Full-view combined comparison: unavailable.
-- Focused heading/search/rows/nav comparison: unavailable.
+- Full-view combined comparison of latest corrected implementation: pending. The user requested automated verification first and consolidated visual review; no new combined comparison is claimed here.
+- Focused heading/search/rows/nav comparison of final corrected implementation: pending.
 
 ## Findings
 
 - [P1] Native fidelity cannot yet be verified.
   Location: Chats and remaining existing screens.
-  Evidence: source concept is available and approved; revised implementation screenshot is blocked by host screen lock.
+  Evidence: the source concept and an earlier native capture exist, but no normalized combined comparison of the latest corrected implementation has been completed. Full motion/Reduce Motion/dark/keyboard acceptance remains outstanding.
   Impact: fonts, decoration placement, proportions and copy cannot be reviewed from a build/CI result.
-  Fix: after manual unlock, capture the native app, create a normalized combined comparison with the source, fix substantive differences and capture again.
+  Fix: use one consolidated final native review to capture the corrected app and compare normalized full/focused regions with the source. Fix substantive findings before final visual acceptance.
 
 ## Required fidelity surfaces
 
@@ -39,11 +39,13 @@ Date: 2026-10-01. Workflow: product-design image-to-code/design-qa.
 1. User compared the old functional appearance with supplied references; missing artwork/custom typography/navigation identified.
 2. Implementation introduced those elements; local/CI functional checks passed.
 3. User approved the complete Chats concept after clarifying the isolated avatar's intended small placement.
-4. Native comparison attempted; host lock prevents capture. No visual pass or P0/P1/P2 fix iteration is claimed.
+4. Historical native comparison was blocked by screen lock. On 2026-10-02 the Mac was unlocked, populated Chats was captured and the user accepted the native direction.
+5. Custom icons/motion/demo were implemented. A low-contrast light-mode native status bar was observed on People and explicit theme-aware overlay styles were added. Final hot reload reported lost device connection; no post-fix visual pass is claimed.
+6. The user requested automated verification first, with visual review consolidated. The code/CI checkpoint can remain Draft independently of this outstanding gate.
 
 ## Implementation checklist
 
-1. Wait for manual Mac unlock.
+1. Restore the task-owned app attachment for the final consolidated native review.
 2. Capture native Chats at the intended light/portrait state.
 3. Normalize content regions and produce full/focused combined comparison evidence.
 4. Fix P0/P1/P2 findings, recapture and compare again.
@@ -51,3 +53,9 @@ Date: 2026-10-01. Workflow: product-design image-to-code/design-qa.
 6. Update this file, CURRENT_STATE, acceptance checklist and PR verification. Keep PR Draft until the review is complete.
 
 final result: blocked
+
+## Latest implementation scope
+
+`feat/mobile-motion-demo` preserves the approved raster artwork/rounded fonts and adds user-authorized original vector icons, reduced-motion-aware interactions, explicit empty-state plane scene, distinct New conversation chooser and loopback-only demo data. Existing automated checks are documented in `docs/project/MOTION_DEMO_CHECKPOINT.md`. These are functional/source checks, not a rendered QA pass.
+
+Final result remains blocked by unfinished consolidated native review and post-fix status-bar evidence, not by host screen lock.
