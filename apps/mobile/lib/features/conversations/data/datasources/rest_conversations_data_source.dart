@@ -80,13 +80,15 @@ final class RestConversationsDataSource implements ConversationsRestSource {
     String text, {
     String? clientMessageId,
     String? replyToMessageId,
+    String? imageMediaId,
   }) async {
     final data = await _api.request(
       'POST',
       '/conversations/$conversationId/messages',
       body: {
         'clientMessageId': clientMessageId ?? const Uuid().v4(),
-        'type': 'text',
+        'type': imageMediaId == null ? 'text' : 'image',
+        'imageMediaId': ?imageMediaId,
         'text': text,
         'replyToMessageId': replyToMessageId,
         'attachments': <Object>[],

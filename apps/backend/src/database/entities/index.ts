@@ -1,3 +1,4 @@
+import { MediaUploadEntity } from './media-upload.entity';
 import { AttachmentEntity } from './attachment.entity';
 import { ConversationMemberEntity } from './conversation-member.entity';
 import { ConversationEntity } from './conversation.entity';
@@ -14,10 +15,12 @@ export const databaseEntities = [
   ConversationMemberEntity,
   MessageEntity,
   AttachmentEntity,
+  MediaUploadEntity,
 ];
 
 export {
   AttachmentEntity,
+  MediaUploadEntity,
   ConversationEntity,
   ConversationMemberEntity,
   DeviceTokenEntity,

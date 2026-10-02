@@ -17,5 +17,19 @@ services:
       timeout: 5s
       retries: 10
 
+  media:
+    image: quay.io/minio/minio:RELEASE.2025-10-15T17-29-55Z
+    profiles: [media]
+    command: server /data --console-address :9001
+    environment:
+      MINIO_ROOT_USER: ${MEDIA_ACCESS_KEY:-mingle-local-dev}
+      MINIO_ROOT_PASSWORD: ${MEDIA_SECRET_KEY:-local-development-only-change-before-deployment}
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    volumes:
+      - chat_app_media_data:/data
+
 volumes:
   chat_app_postgres_data:
+  chat_app_media_data:

@@ -534,6 +534,7 @@ final class ApiConversationsRepository implements ConversationsRepository {
     String conversationId,
     String text, {
     String? replyToMessageId,
+    String? imageMediaId,
   }) {
     final userId = _requireUser();
     final message = OutgoingMessage(
@@ -542,6 +543,7 @@ final class ApiConversationsRepository implements ConversationsRepository {
       senderId: userId,
       text: text,
       replyToMessageId: replyToMessageId,
+      imageMediaId: imageMediaId,
       status: OutgoingStatus.pending,
     );
     _outgoing[message.clientMessageId] = message;
@@ -584,6 +586,7 @@ final class ApiConversationsRepository implements ConversationsRepository {
         outgoing.text,
         clientMessageId: outgoing.clientMessageId,
         replyToMessageId: outgoing.replyToMessageId,
+        imageMediaId: outgoing.imageMediaId,
       );
       _check(generation);
       _mergeMessage(result);

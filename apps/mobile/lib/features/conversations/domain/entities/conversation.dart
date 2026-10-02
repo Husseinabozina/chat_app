@@ -20,6 +20,7 @@ final class ConversationMessage {
     required this.senderId,
     required this.createdAt,
     this.text,
+    this.imageMediaId,
     this.replyToMessageId,
     this.editedAt,
     this.deletedAt,
@@ -31,6 +32,7 @@ final class ConversationMessage {
   final String conversationId;
   final String senderId;
   final String? text;
+  final String? imageMediaId;
   final String? replyToMessageId;
   final DateTime createdAt;
   final DateTime? editedAt;

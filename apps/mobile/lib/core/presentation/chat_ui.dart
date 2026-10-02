@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../features/media/presentation/media_image.dart';
 import '../failures/app_failure.dart';
 import 'mingle_brand.dart';
 import 'mingle_icons.dart';
@@ -177,6 +178,7 @@ ThemeData backendTheme(Brightness brightness, {Color? logoColor}) {
 }
 
 String friendlyError(Object error) => switch (error) {
+  AppFailure(userMessage: final String message) => message,
   AppFailure(kind: FailureKind.unauthorized) =>
     'Please sign in again or check your details.',
   AppFailure(kind: FailureKind.conflict) =>
@@ -218,9 +220,10 @@ class MingleBackdrop extends StatelessWidget {
 }
 
 class InitialAvatar extends StatelessWidget {
-  const InitialAvatar(this.name, {super.key, this.radius = 24});
+  const InitialAvatar(this.name, {super.key, this.radius = 24, this.avatarUrl});
   final String name;
   final double radius;
+  final String? avatarUrl;
   @override
   Widget build(BuildContext context) => ExcludeSemantics(
     child: SizedBox.square(
@@ -230,39 +233,48 @@ class InitialAvatar extends StatelessWidget {
         children: [
           Positioned.fill(
             child: ClipOval(
-              child: Image.asset(
-                'assets/art/landscape_avatar.png',
-                fit: BoxFit.cover,
-              ),
+              child: avatarUrl == null
+                  ? Image.asset(
+                      'assets/art/landscape_avatar.png',
+                      fit: BoxFit.cover,
+                    )
+                  : MediaImage(
+                      reference: avatarUrl!,
+                      fallback: Image.asset(
+                        'assets/art/landscape_avatar.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
             ),
           ),
-          PositionedDirectional(
-            end: -2,
-            bottom: -2,
-            child: Container(
-              constraints: BoxConstraints(
-                minWidth: radius * .68,
-                minHeight: radius * .68,
-              ),
-              padding: const EdgeInsets.all(2),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.outlineVariant,
+          if (avatarUrl == null)
+            PositionedDirectional(
+              end: -2,
+              bottom: -2,
+              child: Container(
+                constraints: BoxConstraints(
+                  minWidth: radius * .68,
+                  minHeight: radius * .68,
                 ),
-              ),
-              child: Text(
-                name.isEmpty ? '?' : name.characters.first.toUpperCase(),
-                style: TextStyle(
-                  fontSize: radius * .44,
-                  fontWeight: FontWeight.w800,
+                padding: const EdgeInsets.all(2),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
                 ),
-                textScaler: TextScaler.noScaling,
+                child: Text(
+                  name.isEmpty ? '?' : name.characters.first.toUpperCase(),
+                  style: TextStyle(
+                    fontSize: radius * .44,
+                    fontWeight: FontWeight.w800,
+                  ),
+                  textScaler: TextScaler.noScaling,
+                ),
               ),
             ),
-          ),
         ],
       ),
     ),

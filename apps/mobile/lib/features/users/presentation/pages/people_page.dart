@@ -195,7 +195,7 @@ class _PeoplePageState extends State<PeoplePage> {
                             : MingleGlyph.next,
                         size: 22,
                       ),
-                leading: InitialAvatar(p.label),
+                leading: InitialAvatar(p.label, avatarUrl: p.avatarUrl),
                 title: Text(p.label),
                 subtitle: Text(p.username == null ? '' : '@${p.username}'),
                 onTap: widget.selectForConversation
@@ -305,7 +305,13 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Center(child: InitialAvatar(_profile!.label, radius: 56)),
+                  Center(
+                    child: InitialAvatar(
+                      _profile!.label,
+                      radius: 56,
+                      avatarUrl: _profile!.avatarUrl,
+                    ),
+                  ),
                   const SizedBox(height: 24),
                   Text(
                     _profile!.label,

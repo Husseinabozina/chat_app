@@ -12,6 +12,7 @@ import '../features/auth/data/repositories/backend_session_controller.dart';
 import '../features/conversations/data/datasources/realtime_chat_data_source.dart';
 import '../features/conversations/data/datasources/rest_conversations_data_source.dart';
 import '../features/conversations/data/repositories/api_conversations_repository.dart';
+import '../features/media/data/api_media_repository.dart';
 import '../features/users/data/api_users_repository.dart';
 
 /// Backend composition for the direct-conversation product entrypoint.
@@ -78,6 +79,7 @@ final class BackendDataDependencies {
     account: session,
     conversations: repository,
     users: ApiUsersRepository(_api),
+    media: ApiMediaRepository(_api, _httpClient),
     pause: repository.pauseRealtime,
     resume: repository.resumeRealtime,
     preferences: preferences,

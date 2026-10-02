@@ -108,3 +108,5 @@ The current native iOS project keeps its CocoaPods integration (`flutter.config.
 ## Opening flow
 
 The branded Flutter opening screen lasts at least 800 ms while device preferences and account restoration run concurrently. First-time onboarding appears when its completion flag is unset, even if a session is restored. Get started/Skip persists completion; subsequent launches and logout do not replay it. There is no onboarding toggle/replay entry in Settings. Development history may already have completion saved on a simulator; ordinary hot restart does not reset device preferences. Native launcher/splash require a rebuild; no forced logout or preference reset is performed.
+
+The corrected entry flow uses onboarding revision 2. Earlier development preference records may have been marked complete automatically on account restore, so they show the introduction once after upgrading. Theme/motion and credentials are retained. Completing/Skipping revision 2 prevents subsequent replay; there is no product setting to turn it on/off.

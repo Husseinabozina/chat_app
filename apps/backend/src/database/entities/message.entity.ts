@@ -28,6 +28,9 @@ export class MessageEntity {
   @Column({ name: 'reply_to_message_id', type: 'uuid', nullable: true })
   replyToMessageId!: string | null;
 
+  @Column({ name: 'image_media_id', type: 'uuid', nullable: true })
+  imageMediaId!: string | null;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt!: Date;
 

@@ -13,13 +13,18 @@ export class SendMessageDto {
   @IsUUID()
   clientMessageId!: string;
 
-  @IsIn(['text'])
-  type!: 'text';
+  @IsIn(['text', 'image'])
+  type!: 'text' | 'image';
 
+  @IsOptional()
   @IsString()
-  @MinLength(1)
+  @MinLength(0)
   @MaxLength(4000)
-  text!: string;
+  text?: string;
+
+  @IsOptional()
+  @IsUUID()
+  imageMediaId?: string;
 
   @IsOptional()
   @IsUUID()

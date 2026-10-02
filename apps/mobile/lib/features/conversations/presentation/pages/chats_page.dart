@@ -205,7 +205,10 @@ class _ChatsPageState extends State<ChatsPage> {
                         horizontal: 14,
                         vertical: 8,
                       ),
-                      leading: InitialAvatar(name),
+                      leading: InitialAvatar(
+                        name,
+                        avatarUrl: c.otherUser.avatarUrl,
+                      ),
                       title: Text(
                         name,
                         maxLines: 1,
@@ -221,6 +224,8 @@ class _ChatsPageState extends State<ChatsPage> {
                             ? 'Say hello'
                             : last.deletedAt != null
                             ? 'Message deleted'
+                            : last.type == 'image'
+                            ? 'Photo${last.text?.isNotEmpty == true ? ' · ${last.text}' : ''}'
                             : last.text ?? '',
                         textDirection: messageDirection(last?.text ?? ''),
                         maxLines: 1,

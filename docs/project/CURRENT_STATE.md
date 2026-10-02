@@ -3,11 +3,13 @@
 Update this file before closing each future project checkpoint. Verify actual branch heads and CI runs from GitHub before changing the state below. Record native acceptance separately from host/CI checks.
 
 **Updated:** 2026-10-02
-**Current phase:** Real product entry correction on `fix/mobile-product-entry`, based on PR #23 final HEAD `1dd304b054e53b382fa98317a858ccbd8b66e60e` (Mobile CI #32 success). Current Mingle is the default app entry; the Firebase prototype is explicit-only. First-run onboarding no longer auto-completes on account restore, Settings replay is removed, branding remains readable during initialization, and adjacent messages group visually. See `PRODUCT_ENTRY_CHECKPOINT.md`. Publication/current-head CI is recorded in PR metadata.
+**Current phase:** Private profile/photo-message implementation on `feat/media-images`, based on PR #24 implementation `06689b770171a607c7279320994e43a587cd07ad` (Mobile CI #33 success). Actual uploads/validated private storage, message image persistence/retry/realtime, profile-photo save, picker/preview/viewer and one-time corrected onboarding revision2 are implemented. See `MEDIA_CHECKPOINT.md`; publication/current-head CI is recorded in PR metadata. No native build/visual acceptance claim.
 
-**Current acceptance boundary:** The user explicitly deferred the previous native visual review and authorized this implementation without further questions. Historical native resource builds succeeded before this checkpoint; no new native build was started. Latest full visual/motion/keyboard/dark/physical/two-device acceptance is still pending. Android native build is unverified because no local Android SDK is installed. See `BRAND_ENTRY_SETTINGS_CHECKPOINT.md` and `design-qa.md`. This is not a finished application; image/profile media, push, supported notification settings and release readiness remain.
+**Current acceptance boundary:** The user explicitly deferred the previous native visual review and authorized this implementation without further questions. Historical native resource builds succeeded before this checkpoint; no new native build was started. Latest full visual/motion/keyboard/dark/physical/two-device acceptance is still pending. Android native build is unverified because no local Android SDK is installed. See `BRAND_ENTRY_SETTINGS_CHECKPOINT.md` and `design-qa.md`. This is not a released application; new photo features need native/provider acceptance, and push/supported notification settings/release readiness remain.
 
 ## Last verified branch / PR / commit
+
+- Active media branch `feat/media-images`, based on PR #24 implementation `06689b770171a607c7279320994e43a587cd07ad`, [Mobile CI #33](https://github.com/Husseinabozina/chat_app/actions/runs/37025464141) success. New media publication/exact-head checks pending; older evidence below is historical.
 
 - Active checkpoint: `fix/mobile-entry-visual-polish`, based on exact PR #22 final HEAD `d89dd9e869f180d42cd9fa60ddee19c194199b2d`, [Mobile CI #29](https://github.com/Husseinabozina/chat_app/actions/runs/37009976819) success. Draft [PR #23](https://github.com/Husseinabozina/chat_app/pull/23), verified implementation `776e9c1d88ad00c811e2f62a7fb224b87edfedb7`; [Mobile CI #30](https://github.com/Husseinabozina/chat_app/actions/runs/37020880336) completed/success. Final documentation HEAD/checks are recorded in PR metadata; older evidence below is historical.
 
@@ -45,9 +47,11 @@ Integrated `master` HEAD: `5f77dbd50efd9ae12f17d809a63c2746f35fc9ee` (PR #14 rea
 | #20 | `feat/mobile-motion-demo` | #19 branch | `313b800f0dd90128b5d92a7725552d5e61266802` (implementation) | Draft; CI #24 success; consolidated native acceptance pending |
 | #21 | `feat/mobile-brand-entry-settings` | #20 branch | `49cd87c75a666f6bc174794a4a27a36474f44705` | Draft; CI #27 success; native visual review explicitly deferred |
 | #22 | `fix/mobile-logo-fidelity` | #21 branch | `d89dd9e869f180d42cd9fa60ddee19c194199b2d` | Draft; CI #29 success; geometry superseded by #23 |
-| #23 | `fix/mobile-entry-visual-polish` | #22 branch | `776e9c1d88ad00c811e2f62a7fb224b87edfedb7` (implementation) | Draft; CI #30 success; consolidated native review pending |
+| #23 | `fix/mobile-entry-visual-polish` | #22 branch | `1dd304b054e53b382fa98317a858ccbd8b66e60e` | Draft; CI #32 success; native acceptance pending |
+| #24 | `fix/mobile-product-entry` | #23 branch | `06689b770171a607c7279320994e43a587cd07ad` | Draft; CI #33 success; native acceptance pending |
+| next | `feat/media-images` | #24 branch | Publication pending | Private media implementation; CI pending |
 
-Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21 → #22 → #23**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
+Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21 → #22 → #23 → #24 → media PR**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
 
 Integrated earlier history:
 
@@ -180,7 +184,7 @@ Workflows retain `contents: read`; mobile integration uses an ephemeral database
 
 ## Pending initial-release work and later features
 
-Pending initial-release scope includes final UI/native acceptance, profile images/image messages, push notification delivery/routing, supported notification settings and deployment. System/Light/Dark appearance selection and basic account Settings are now implemented with device persistence. Media/push require explicit contracts before implementation; they are not removed from V1 merely because they are deferred from this checkpoint.
+Pending initial-release scope includes final UI/native acceptance (including newly implemented photos), push notification delivery/routing, supported notification settings and deployment. System/Light/Dark appearance selection and basic account Settings are now implemented with device persistence. Media/push require explicit contracts before implementation; they are not removed from V1 merely because they are deferred from this checkpoint.
 
 Later/deferred work:
 
@@ -206,7 +210,7 @@ Later/deferred work:
 ## Exact next checkpoint
 
 1. Manual Flutter hot restart (`R`) previews current product entry. Introduction appears only with an unset completion flag, then sign-in/restored account; no Settings replay. Native launcher/splash require rebuilding. No reset of saved onboarding/session data is performed. Consolidated native acceptance remains separate.
-2. Profile/image-message media contracts and implementation; current avatars remain illustrated fallbacks. Follow with push delivery/routing and supported notification settings.
+2. Push device-token lifecycle, FCM credential configuration, conversation notification routing and supported Settings. Validate private photo storage/picker/viewer on native devices; avatars now use uploaded media when present.
 3. Consolidated native acceptance remains explicitly deferred by the user; collect the missing evidence when resumed, including Android once its SDK is available.
 4. Password recovery/social auth, localization, files/voice/presence/reactions require scope/contracts. No merges or force pushes without authorization.
 
@@ -238,3 +242,11 @@ Later/deferred work:
 
 - Supersedes earlier opt-in backend and Settings onboarding replay behavior: normal main.dart is now Mingle, branding is shown during startup, first-run onboarding requires explicit completion/Skip, and Settings no longer offers replay. Saved completion remains saved across logout/relaunch.
 - Adjacent same-sender messages group visually without changing durable/read/retry behavior. Existing local platform modifications remain excluded.
+
+## Current media checkpoint (2026-10-02)
+
+- PR #24 product entry `06689b770171a607c7279320994e43a587cd07ad`: Mobile CI #33 run37025464141 success. Mingle is default; no Settings onboarding replay; startup branding and grouped messages implemented.
+- `feat/media-images` starts from that verified code. Private signed upload/validation, atomic image-message claim, membership-checked download grants, photo picking/preview/avatar save/viewer and stable-ID retry now implemented; Mobile/Backend CI publication pending. Existing fake source accepts the new optional image parameter; no new suite.
+- Legacy development onboarding flags are migrated through revision2 because earlier account restore could auto-complete them. Users see introduction once, then the persisted session/sign-in; credentials/theme are retained.
+- Private local object storage is real, data on external disk; API/database healthy after preserving signing secret and restarting. Actual local demo photo/image message added. No cloud deployment or new native build.
+- Remaining: push/FCM configuration and routing, production storage/provider verification, cleanup scheduling/orphan reconciliation, deployment hardening and consolidated native acceptance.

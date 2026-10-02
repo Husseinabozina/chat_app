@@ -40,7 +40,12 @@ class AppPreferences extends ChangeNotifier {
             _ => ThemeMode.system,
           };
           _reduceMotion = value['reduceMotion'] == true;
-          _onboardingComplete = value['onboardingComplete'] == true;
+          // Earlier development builds also marked restored sessions complete
+          // without showing the introduction. Require explicit completion once
+          // for the corrected product flow; retain appearance and credentials.
+          _onboardingComplete =
+              value['onboardingComplete'] == true &&
+              value['onboardingRevision'] == 2;
         }
       } on FormatException {
         // An invalid preference document is recoverable, not an auth failure.
@@ -64,6 +69,7 @@ class AppPreferences extends ChangeNotifier {
           'theme': nextTheme.name,
           'reduceMotion': nextMotion,
           'onboardingComplete': nextOnboarding,
+          'onboardingRevision': 2,
         }),
       );
       _themeMode = nextTheme;
