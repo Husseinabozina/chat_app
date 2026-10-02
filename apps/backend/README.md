@@ -1,6 +1,6 @@
 # Backend
 
-NestJS API for the messaging platform. The current backend provides authentication, user discovery, direct conversations, and durable text-message and read-state REST endpoints. Realtime transport is a later checkpoint.
+NestJS API for the messaging platform. The current backend provides authentication, user discovery, direct conversations, and durable text/image-message and read-state REST endpoints, authenticated Socket.IO publication, and private photo storage authorization.
 
 ## Stack
 
@@ -57,7 +57,9 @@ src/
   database/
   health/
   messages/
+  media/
+  realtime/
   users/
 ```
 
-The current REST endpoints and response contracts are documented in `docs/api/api-contract-v1.md`. Media uploads, push notifications, and WebSocket delivery remain separate checkpoints.
+The current REST endpoints and response contracts are documented in `docs/api/api-contract-v1.md`. Private media is implemented in PR #25: configure storage before photo use; existing text/auth works without a bucket. See `docs/project/MEDIA_CHECKPOINT.md`. Push registration/delivery and public deployment remain future checkpoints.

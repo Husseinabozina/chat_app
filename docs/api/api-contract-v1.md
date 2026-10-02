@@ -212,29 +212,45 @@ The server updates the authenticated member's read pointer and emits a realtime 
 
 ---
 
-## 8. Media upload initiation
+## 8. Private photo upload (implemented in PR #25)
+
+All media routes require the bearer access token. One image per message is supported; multiple attachments/files/video remain deferred.
 
 ```http
 POST /v1/media/uploads
 ```
 
-Body:
-
 ```json
 {
-  "purpose": "chat-image",
+  "purpose": "message",
+  "conversationId": "conversation-uuid",
   "mimeType": "image/jpeg",
   "sizeBytes": 123456
 }
 ```
 
-Returns an upload target/session plus a stable media reference.
+Use `purpose: "avatar"` without a conversation for a profile photo. JPEG/PNG/WebP, at most 6 MiB; conversation membership is checked. Returns `{mediaId, upload: {url, fields}, expiresInSeconds: 300}`. Send a multipart POST to that storage URL with all signed fields and the `file` part last. Never send the API bearer token to storage.
 
-The client then uploads bytes and uses the returned media reference when sending the message.
+```http
+POST /v1/media/:mediaId/complete
+```
+
+Owner-only completion validates bytes/format/pixels/orientation, rejects animated input, strips metadata and stores sanitized JPEG. Returns `{mediaId, width, height}`. Completion is idempotent; raw upload completion deadline is 20 minutes and ready unclaimed IDs expire after 7 days.
+
+For a message send `type: "image"`, `imageMediaId: "ready-media-uuid"`, optional `text` caption and normal `clientMessageId`/reply fields to the existing message endpoint. Membership, owner, purpose and conversation are checked under the transaction; an image cannot be reused for another message. Response adds nullable `imageMediaId`. Text messages require nonempty text; image captions may be empty. Edit requires nonempty text. Soft-deleted messages return no image reference.
+
+```http
+PATCH /v1/media/:mediaId/avatar
+GET /v1/media/:mediaId/content
+```
+
+Avatar attachment is owner-only and returns `avatarUrl: "/v1/media/:mediaId/content"`. Persist this API reference. The authenticated content route returns `{url, expiresInSeconds: 300, width, height}` for a signed download; do not persist its URL. Active profile photos are visible to authenticated users; message photos require membership and a live/nondeleted message. Unattached photo preview is owner-only. Previously granted URLs may remain usable until their five-minute expiry after deletion. There is no anonymous public bucket.
+
+Storage supports signed POST (exercised locally with MinIO); public provider compatibility and deployment remain unverified. No image bytes travel over Socket.IO. Media-specific errors currently use the common HTTP exception envelope rather than the planned dedicated MEDIA_* codes listed below.
 
 ---
 
-## 9. Device registration
+## 9. Device registration (planned; not implemented)
 
 ```http
 POST /v1/devices

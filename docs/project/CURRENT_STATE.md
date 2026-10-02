@@ -3,17 +3,17 @@
 Update this file before closing each future project checkpoint. Verify actual branch heads and CI runs from GitHub before changing the state below. Record native acceptance separately from host/CI checks.
 
 **Updated:** 2026-10-02
-**Current phase:** Private profile/photo-message implementation on `feat/media-images`, based on PR #24 implementation `06689b770171a607c7279320994e43a587cd07ad` (Mobile CI #33 success). Actual uploads/validated private storage, message image persistence/retry/realtime, profile-photo save, picker/preview/viewer and one-time corrected onboarding revision2 are implemented. See `MEDIA_CHECKPOINT.md`; publication/current-head CI is recorded in PR metadata. No native build/visual acceptance claim.
+**Current phase:** Private profile/photo-message implementation on `feat/media-images`, based on PR #24 implementation `06689b770171a607c7279320994e43a587cd07ad` (Mobile CI #33 success). Actual uploads/validated private storage, message image persistence/retry/realtime, profile-photo save, picker/preview/viewer and one-time corrected onboarding revision2 are implemented. See `MEDIA_CHECKPOINT.md`; Draft PR #25 implementation `5baf62fe7941496b361f1477c378e1fe69136243` passed Backend CI #84 and Mobile CI #34; final documentation HEAD/checks are recorded in PR metadata. No native build/visual acceptance claim.
 
 **Current acceptance boundary:** The user explicitly deferred the previous native visual review and authorized this implementation without further questions. Historical native resource builds succeeded before this checkpoint; no new native build was started. Latest full visual/motion/keyboard/dark/physical/two-device acceptance is still pending. Android native build is unverified because no local Android SDK is installed. See `BRAND_ENTRY_SETTINGS_CHECKPOINT.md` and `design-qa.md`. This is not a released application; new photo features need native/provider acceptance, and push/supported notification settings/release readiness remain.
 
 ## Last verified branch / PR / commit
 
-- Active media branch `feat/media-images`, based on PR #24 implementation `06689b770171a607c7279320994e43a587cd07ad`, [Mobile CI #33](https://github.com/Husseinabozina/chat_app/actions/runs/37025464141) success. New media publication/exact-head checks pending; older evidence below is historical.
+- Current checkpoint: `feat/media-images`, Draft [PR #25](https://github.com/Husseinabozina/chat_app/pull/25), implementation `5baf62fe7941496b361f1477c378e1fe69136243`. [Backend CI #84](https://github.com/Husseinabozina/chat_app/actions/runs/37029887146) and [Mobile CI #34](https://github.com/Husseinabozina/chat_app/actions/runs/37029887362) completed/success on that exact commit. Local migration and actual private image upload/profile/message fixture succeeded; native picker/rendering and production provider remain unverified. Based on PR #24 implementation `06689b770171a607c7279320994e43a587cd07ad`, [Mobile CI #33](https://github.com/Husseinabozina/chat_app/actions/runs/37025464141) success. Final documentation HEAD/checks are recorded in PR metadata to avoid self-referential hashes; older evidence below is historical.
 
-- Active checkpoint: `fix/mobile-entry-visual-polish`, based on exact PR #22 final HEAD `d89dd9e869f180d42cd9fa60ddee19c194199b2d`, [Mobile CI #29](https://github.com/Husseinabozina/chat_app/actions/runs/37009976819) success. Draft [PR #23](https://github.com/Husseinabozina/chat_app/pull/23), verified implementation `776e9c1d88ad00c811e2f62a7fb224b87edfedb7`; [Mobile CI #30](https://github.com/Husseinabozina/chat_app/actions/runs/37020880336) completed/success. Final documentation HEAD/checks are recorded in PR metadata; older evidence below is historical.
+- Historical checkpoint: `fix/mobile-entry-visual-polish`, based on exact PR #22 final HEAD `d89dd9e869f180d42cd9fa60ddee19c194199b2d`, [Mobile CI #29](https://github.com/Husseinabozina/chat_app/actions/runs/37009976819) success. Draft [PR #23](https://github.com/Husseinabozina/chat_app/pull/23), verified implementation `776e9c1d88ad00c811e2f62a7fb224b87edfedb7`; [Mobile CI #30](https://github.com/Husseinabozina/chat_app/actions/runs/37020880336) completed/success. Final documentation HEAD/checks are recorded in PR metadata; older evidence below is historical.
 
-- Active logo repair branch: `fix/mobile-logo-fidelity`, based on actual remote PR #21 HEAD `49cd87c75a666f6bc174794a4a27a36474f44705` (verified before branching). Draft [PR #22](https://github.com/Husseinabozina/chat_app/pull/22); verified implementation `34f8fb0bec966395512a0fc1378c89190acffd64`, [Mobile CI #28](https://github.com/Husseinabozina/chat_app/actions/runs/37009580140) completed/success. See `LOGO_FIDELITY_CHECKPOINT.md`. Final documentation HEAD/checks are recorded in PR metadata to avoid self-referential hashes.
+- Historical logo repair branch: `fix/mobile-logo-fidelity`, based on actual remote PR #21 HEAD `49cd87c75a666f6bc174794a4a27a36474f44705` (verified before branching). Draft [PR #22](https://github.com/Husseinabozina/chat_app/pull/22); verified implementation `34f8fb0bec966395512a0fc1378c89190acffd64`, [Mobile CI #28](https://github.com/Husseinabozina/chat_app/actions/runs/37009580140) completed/success. See `LOGO_FIDELITY_CHECKPOINT.md`. Final documentation HEAD/checks are recorded in PR metadata to avoid self-referential hashes.
 - Latest verified baseline: [PR #21](https://github.com/Husseinabozina/chat_app/pull/21), [Mobile CI #27](https://github.com/Husseinabozina/chat_app/actions/runs/36994964281), completed/success on that exact HEAD. Older implementation evidence below remains historical.
 
 - Historical verified branch: `feat/mobile-brand-entry-settings`, Draft PR [#21](https://github.com/Husseinabozina/chat_app/pull/21), based on actual PR #20 HEAD `a757c75da81c550b09e377af69f86a33a6e0556d`.
@@ -49,9 +49,9 @@ Integrated `master` HEAD: `5f77dbd50efd9ae12f17d809a63c2746f35fc9ee` (PR #14 rea
 | #22 | `fix/mobile-logo-fidelity` | #21 branch | `d89dd9e869f180d42cd9fa60ddee19c194199b2d` | Draft; CI #29 success; geometry superseded by #23 |
 | #23 | `fix/mobile-entry-visual-polish` | #22 branch | `1dd304b054e53b382fa98317a858ccbd8b66e60e` | Draft; CI #32 success; native acceptance pending |
 | #24 | `fix/mobile-product-entry` | #23 branch | `06689b770171a607c7279320994e43a587cd07ad` | Draft; CI #33 success; native acceptance pending |
-| next | `feat/media-images` | #24 branch | Publication pending | Private media implementation; CI pending |
+| #25 | `feat/media-images` | #24 branch | `5baf62fe7941496b361f1477c378e1fe69136243` (implementation) | Draft; Backend CI #84 + Mobile CI #34 success; native/provider acceptance pending |
 
-Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21 → #22 → #23 → #24 → media PR**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
+Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21 → #22 → #23 → #24 → #25**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
 
 Integrated earlier history:
 
@@ -95,6 +95,7 @@ PR #5 and PR #8 were closed as superseded by the main project conversation; thei
 - PR #15: authenticated Socket.IO `/realtime`, server-controlled user/session rooms, post-commit message/conversation/read events, transient typing and logout disconnect.
 - PR #17: membership-authorized REST read-state recovery plus additive canonical read positions, recovering receipts missed offline.
 - PR #18 introduces no backend source/API/schema/migration change.
+- PR #25 adds authenticated private image upload/validation and profile/message references. Explicit migration; one image per message, S3-compatible signed POST, metadata removal and immutable sanitized JPEG. IDs persist; download URLs expire in five minutes.
 
 ### Mobile
 
@@ -109,7 +110,9 @@ PR #5 and PR #8 were closed as superseded by the main project conversation; thei
 - Chats/People have scrollable headers; Arabic/Latin message direction and scaled/landscape widget behavior are covered. Full Arabic UI localization is not implemented.
 - Current Mingle is the main entry; debug API defaults to local port 55418. Release/profile requires CHAT_API_BASE_URL. The Firebase prototype is explicit-only through main_legacy.dart.
 - PR #19 implements bundled Quicksand/Nunito/Tajawal, pastel raster artwork and navigation. The current motion checkpoint adds 20 original icons, restrained motion with reduced-motion handling, three distinct bottom tabs, dedicated conversation chooser and explicit local demo fixture.
-- New entry/settings checkpoint: editable/tintable logo, native launcher/splash resources, branded initialization, persisted first-run onboarding/skip/replay, System/Light/Dark and reduced-motion Settings, profile edit/about/confirmed logout. Authentication remains actual email/password with session restoration; social login and password recovery are not implemented.
+- New entry/settings checkpoint: editable/tintable logo, native launcher/splash resources, branded initialization, persisted first-run onboarding/skip (Settings replay removed by #24; #25 migrates old automatic flags to revision 2), System/Light/Dark and reduced-motion Settings, profile edit/about/confirmed logout. Authentication remains actual email/password with session restoration; social login and password recovery are not implemented.
+
+- PR #25 implements camera/library selection, preview/caption/upload retry, actual profile photos, photo-message rendering and a zoomable viewer. These need native acceptance; local private uploads are verified.
 
 ## Locked architecture decisions
 
@@ -128,6 +131,10 @@ PR #5 and PR #8 were closed as superseded by the main project conversation; thei
 - No architecture/product scope change is justified by visual cleanup alone.
 
 ## Current CI and verification
+
+### PR #25 / #24
+
+PR #25 implementation `5baf62fe7941496b361f1477c378e1fe69136243`: Backend CI #84 and Mobile CI #34 completed/success. Both workflows remain read-only, with no diagnostics or temporary artifact steps. Existing complete backend gates, ordinary mobile checks and real two-account integration passed; the new media authorization/device-picker matrix is not covered by those suites. PR #24 implementation `06689b7`: Mobile CI #33 success. Final documentation HEAD/checks are recorded in PR metadata.
 
 ### PR #23
 
@@ -199,7 +206,7 @@ Later/deferred work:
 - Native account restoration across process termination/relaunch passed on iPhone 16e using production secure-storage composition. Two-device foreground/background/reconnect behavior and physical-device storage remain unverified.
 - Artwork, rounded fonts and custom navigation/icons are implemented; full visual/motion acceptance remains pending. Current UI must not be described as a finished application.
 - Full Arabic UI localization is pending; current message direction handling is not equivalent to it.
-- Dedicated cascade-deletion regression coverage from #8 has not been reproduced; avatar storage-key policy is deferred to media design.
+- Dedicated cascade-deletion regression coverage from #8 has not been reproduced; PR #25 uses private immutable storage keys and API references for avatars; production lifecycle/orphan reconciliation and full media authorization coverage remain debt.
 - Edit/delete product time-window policy is undecided.
 - Conversation summaries have no durable revision; conservative invalidation/refetch may add REST traffic.
 - Equal edit timestamps are resolved by REST refetch; independent revisions could reduce ambiguity.
@@ -207,16 +214,18 @@ Later/deferred work:
 - Production allowed-origin/CORS policy and socket handshake attempt throttling must be implemented before public deployment.
 - Publication is best effort after commit; a crash before emission can lose an event. REST resync is the V1 recovery path.
 
+- Media production debt: local MinIO is a development fixture; verify chosen provider signed-POST support, private bucket policy, cleanup scheduling and rollback-orphan reconciliation. Current upload count quota is per-hour but not serialized across concurrent grants; decoder concurrency is bounded per app instance.
+
 ## Exact next checkpoint
 
-1. Manual Flutter hot restart (`R`) previews current product entry. Introduction appears only with an unset completion flag, then sign-in/restored account; no Settings replay. Native launcher/splash require rebuilding. No reset of saved onboarding/session data is performed. Consolidated native acceptance remains separate.
+1. Manual Flutter hot restart (`R`) previews current product entry. Introduction appears once if revision2 has not been explicitly completed, then sign-in/restored account; no Settings replay. Native launcher/splash require rebuilding. Old automatic development completion flags are corrected once; saved sessions/theme are retained. Consolidated native acceptance remains separate.
 2. Push device-token lifecycle, FCM credential configuration, conversation notification routing and supported Settings. Validate private photo storage/picker/viewer on native devices; avatars now use uploaded media when present.
 3. Consolidated native acceptance remains explicitly deferred by the user; collect the missing evidence when resumed, including Android once its SDK is available.
 4. Password recovery/social auth, localization, files/voice/presence/reactions require scope/contracts. No merges or force pushes without authorization.
 
 ## Current local quality evidence (2026-10-02)
 
-- Current entry/settings host checks: 64 Dart files; analyzer clean; existing mobile suite 46 passed + one intentional live skip. Existing account-flow coverage extended for actual onboarding/settings/persistence; separate live REST/Socket.IO integration also passed on this checkpoint; full CI #26 backend fixture/two-account gate passed.
+- Current entry/settings historical host checks: 64 Dart files; analyzer clean; existing mobile suite 46 passed + one intentional live skip. Existing account-flow coverage extended for actual onboarding/settings/persistence; separate live REST/Socket.IO integration also passed on this checkpoint; full CI #26 backend fixture/two-account gate passed.
 - Native iOS resources built successfully (42.8s) with existing local automatic migrations; asset sizes/alpha/XML/plist valid. Final central recoloring API is included in the subsequent 23.2s iPhone 16e build/launch on implementation HEAD; rendered acceptance remains deferred. No current Android native build claim.
 - Seeder syntax/Prettier passed; rerun reused 12 demo profiles/eight directs/94 stable seed messages. Local database also contains user-added messages, so total message count can exceed fixture count.
 - User requested code/automated checks first. Final rendered QA remains a separate gate, recorded in `design-qa.md`; no Lottie dependency was added.
@@ -234,9 +243,9 @@ Later/deferred work:
 ## Latest entry polish implementation (2026-10-02)
 
 - The ZCode trace lessons are incorporated into a reference-specific development script: complementary dark/light regions and cubic fitting, with a separately colored clipped lower fold. Earlier PR #22 silhouette-only evidence did not detect the identified internal artifacts; this checkpoint supersedes its geometry.
-- Onboarding now explains People and messaging with decorative preview cards, Previous navigation, guarded page transitions and reduced-motion progress. Auth errors announce through a live region; Settings replay remains available.
+- Onboarding now explains People and messaging with decorative preview cards, Previous navigation, guarded page transitions and reduced-motion progress. Auth errors announce through a live region. Settings replay in that historical checkpoint is removed by #24.
 - No new native build/simulator launch, backend/schema/dependency/lockfile/workflow change or extra test suite. Local automatic native migration/linker modifications and Podfile.lock remain unpublished.
-- General PNG-to-SVG plugin work is explicitly deferred. Next product checkpoint remains profile/image media contracts and implementation, then push and release work.
+- General PNG-to-SVG plugin work is explicitly deferred. The profile/image media implementation now exists in #25; next is push and release work.
 
 ## Product entry correction (2026-10-02)
 
@@ -246,7 +255,7 @@ Later/deferred work:
 ## Current media checkpoint (2026-10-02)
 
 - PR #24 product entry `06689b770171a607c7279320994e43a587cd07ad`: Mobile CI #33 run37025464141 success. Mingle is default; no Settings onboarding replay; startup branding and grouped messages implemented.
-- `feat/media-images` starts from that verified code. Private signed upload/validation, atomic image-message claim, membership-checked download grants, photo picking/preview/avatar save/viewer and stable-ID retry now implemented; Mobile/Backend CI publication pending. Existing fake source accepts the new optional image parameter; no new suite.
+- `feat/media-images` starts from that verified code. Private signed upload/validation, atomic image-message claim, membership-checked download grants, photo picking/preview/avatar save/viewer and stable-ID retry now implemented; Backend CI #84 and Mobile CI #34 passed on implementation `5baf62f`. Existing fake source accepts the new optional image parameter; no new suite.
 - Legacy development onboarding flags are migrated through revision2 because earlier account restore could auto-complete them. Users see introduction once, then the persisted session/sign-in; credentials/theme are retained.
 - Private local object storage is real, data on external disk; API/database healthy after preserving signing secret and restarting. Actual local demo photo/image message added. No cloud deployment or new native build.
 - Remaining: push/FCM configuration and routing, production storage/provider verification, cleanup scheduling/orphan reconciliation, deployment hardening and consolidated native acceptance.

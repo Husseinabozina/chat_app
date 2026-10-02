@@ -8,7 +8,7 @@ Flutter client for the messaging platform.
 - Dart: 3.13+
 - Android minimum SDK: 24
 - iOS minimum target: 15.0
-- State management: Cubit via flutter_bloc
+- State management: repository streams and local widget state in current Mingle; Cubit via flutter_bloc in the archived Firebase prototype
 - Architecture: feature-first Clean Architecture principles
 
 ## Structure
@@ -30,17 +30,15 @@ lib/
   injection/
 ```
 
-The UI now depends on domain repository contracts instead of Firebase SDK classes. Firebase is isolated behind data-layer repository implementations and composed centrally in `injection/app_dependencies.dart`.
-
-Cubit is used for asynchronous auth and chat state. The current visual design and legacy Firebase-backed behavior are intentionally preserved while architecture boundaries are introduced.
+Current Mingle presentation depends on backend repository contracts. `BackendDataDependencies` composes its REST, realtime and media adapters. The archived Firebase prototype keeps its Cubit/data adapters in `injection/app_dependencies.dart` and is selected explicitly through `main_legacy.dart`.
 
 ## Backend data foundation
 
 `BackendDataDependencies` composes secure session storage, an authenticated REST client, direct-conversation REST datasources, and a Socket.IO realtime datasource. It reads the backend origin from `CHAT_API_BASE_URL` when instantiated (for example, `https://api.example.com`). The REST datasource uses `/v1`; the realtime datasource uses `/realtime`.
 
-`main.dart` always opens the current Mingle backend product. Debug runs default to the local API on port 55418: iOS/macOS use 127.0.0.1, Android emulator uses 10.0.2.2. Override with `--dart-define=CHAT_API_BASE_URL=...` for physical devices or a different server. Release/profile builds require an explicit API origin. The archived Firebase prototype is available only through `-t lib/main_legacy.dart`. Email/password account creation is followed by name/username/bio setup; photo upload remains deferred.
+`main.dart` always opens the current Mingle backend product. Debug runs default to the local API on port 55418: iOS/macOS use 127.0.0.1, Android emulator uses 10.0.2.2. Override with `--dart-define=CHAT_API_BASE_URL=...` for physical devices or a different server. Release/profile builds require an explicit API origin. The archived Firebase prototype is available only through `-t lib/main_legacy.dart`. Email/password account creation is followed by name/username/bio setup; profile photos are staged and attached only on Save profile.
 
-The realtime datasource emits typed domain events, refreshes the access token before connecting, and reconnects with bounded backoff. Repository reconciliation and backend auth lifecycle are implemented. The backend UI consumes domain ports via `BackendAppServices`: account restoration, chats, people search/public profiles, profile completion/editing, and direct text conversations. Device integration and final visual acceptance are separate from host integration tests.
+The realtime datasource emits typed domain events, refreshes the access token before connecting, and reconnects with bounded backoff. Repository reconciliation and backend auth lifecycle are implemented. The backend UI consumes domain ports via `BackendAppServices`: account restoration, chats, people search/public profiles, profile completion/editing, and direct text/image conversations. Device integration and final visual acceptance are separate from host integration tests.
 
 ## Backend repository and session lifecycle
 
@@ -103,10 +101,14 @@ The current native iOS project keeps its CocoaPods integration (`flutter.config.
 1. Complete native device verification and visual acceptance of the backend UI.
 2. Review the open PR stack and integrate only after merge authorization.
 3. Public deployment hardening (allowed origins and socket handshake attempt throttling).
-4. Media/push/offline persistence only after their contracts are scoped.
+4. Push registration/delivery/routing and cloud deployment, then native release acceptance. Durable offline persistence remains deferred.
 
 ## Opening flow
 
-The branded Flutter opening screen lasts at least 800 ms while device preferences and account restoration run concurrently. First-time onboarding appears when its completion flag is unset, even if a session is restored. Get started/Skip persists completion; subsequent launches and logout do not replay it. There is no onboarding toggle/replay entry in Settings. Development history may already have completion saved on a simulator; ordinary hot restart does not reset device preferences. Native launcher/splash require a rebuild; no forced logout or preference reset is performed.
+The branded Flutter opening screen lasts at least 800 ms while device preferences and account restoration run concurrently. First-time onboarding appears when its completion flag is unset, even if a session is restored. Get started/Skip persists completion; subsequent launches and logout do not replay it. There is no onboarding toggle/replay entry in Settings. Native launcher/splash resources require a rebuild; no forced logout or full preference reset is performed.
 
 The corrected entry flow uses onboarding revision 2. Earlier development preference records may have been marked complete automatically on account restore, so they show the introduction once after upgrading. Theme/motion and credentials are retained. Completing/Skipping revision 2 prevents subsequent replay; there is no product setting to turn it on/off.
+
+## Profile and message photos
+
+Profile → Edit profile → Change photo → Photos/Camera → Use photo → Save profile. In a conversation use the custom photo attachment button, choose a picture, preview/add an optional caption, then send. Tap the image to zoom; failed sends retain the client ID for retry. Upload requires configured private object storage, not just PostgreSQL/API. See `docs/project/MEDIA_CHECKPOINT.md` for setup, limits and verification boundaries.

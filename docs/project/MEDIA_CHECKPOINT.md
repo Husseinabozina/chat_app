@@ -24,7 +24,7 @@ From repository root run `node scripts/setup-media-storage.mjs` explicitly; it p
 
 ## Verification boundary
 
-Host format/analyzer, backend lint/typecheck/build and migration succeeded. Existing Mobile/Backend CI is run on publication; no additional test suite was added (existing fake port signature updated for optional media parameter). New native picker/camera/image rendering is not visually accepted: user owns build/run; no simulator or iOS build initiated. Existing CI does not exercise the full media authorization matrix or device picker. Record final exact-head checks in PR metadata/CURRENT_STATE.
+Host format/analyzer, backend lint/typecheck/build and migration succeeded. Implementation `5baf62fe7941496b361f1477c378e1fe69136243` in Draft PR #25 passed Backend CI #84 (run37029887146) and Mobile CI #34 (run37029887362), including the established two-account REST/realtime integration; no additional test suite was added (existing fake port signature updated for optional media parameter). New native picker/camera/image rendering is not visually accepted: user owns build/run; no simulator or iOS build initiated. Existing CI does not exercise the full media authorization matrix or device picker. Record final exact-head checks in PR metadata/CURRENT_STATE.
 
 ## Next
 
