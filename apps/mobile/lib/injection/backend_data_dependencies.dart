@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 import '../app/backend_app_services.dart';
 import '../core/network/api_session.dart';
 import '../core/network/rest_api_client.dart';
+import '../core/preferences/app_preferences.dart';
+import '../core/preferences/secure_preferences_store.dart';
 import '../features/auth/data/datasources/backend_auth_data_source.dart';
 import '../features/auth/data/repositories/backend_session_controller.dart';
 import '../features/conversations/data/datasources/realtime_chat_data_source.dart';
@@ -21,6 +23,7 @@ final class BackendDataDependencies {
     required this._api,
     required this.repository,
     required this.session,
+    required this.preferences,
   });
 
   factory BackendDataDependencies.fromEnvironment() {
@@ -52,6 +55,9 @@ final class BackendDataDependencies {
       realtime: realtime,
       repository: repository,
       session: BackendSessionController(auth, api, repository),
+      preferences: AppPreferences(
+        const SecurePreferencesStore(FlutterSecureStorage()),
+      ),
       api: api,
       httpClient: httpClient,
     );
@@ -63,6 +69,7 @@ final class BackendDataDependencies {
     users: ApiUsersRepository(_api),
     pause: repository.pauseRealtime,
     resume: repository.resumeRealtime,
+    preferences: preferences,
   );
 
   final BackendAuthDataSource auth;
@@ -70,6 +77,7 @@ final class BackendDataDependencies {
   final RealtimeChatDataSource realtime;
   final ApiConversationsRepository repository;
   final BackendSessionController session;
+  final AppPreferences preferences;
   final RestApiClient _api;
   final http.Client _httpClient;
 
@@ -79,5 +87,6 @@ final class BackendDataDependencies {
     await realtime.close();
     await _api.close();
     _httpClient.close();
+    preferences.dispose();
   }
 }

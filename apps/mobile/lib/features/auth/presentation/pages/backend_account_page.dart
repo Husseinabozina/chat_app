@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/presentation/chat_ui.dart';
+import '../../../../core/presentation/mingle_brand.dart';
 import '../../domain/repositories/backend_account_repository.dart';
 
 class BackendAccountPage extends StatefulWidget {
@@ -67,13 +68,7 @@ class _BackendAccountPageState extends State<BackendAccountPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(
-                        'Mingle',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
+                      const MingleBrand(size: 64),
                       const SizedBox(height: 28),
                       Text(
                         _register ? 'Create your\naccount' : 'Welcome\nback',

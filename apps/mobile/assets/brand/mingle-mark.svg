@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" color="#CA326E">
+  <title>Mingle — a conversation taking flight</title>
+  <path d="M54 20C46 14 35 13 26 16C13 20 7 31 9 43C11 56 21 64 34 65L24 81C40 79 54 72 64 62C68 58 71 53 72 48" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M35 31L88 9Q91 8 90 11L76 58Q75 60 73 58L61 45L48 54L49 39ZM47 31L79 18L55 35ZM58 40L82 18L73 50Z" fill="currentColor" fill-rule="evenodd"/>
+</svg>
