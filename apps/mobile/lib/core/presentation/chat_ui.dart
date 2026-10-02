@@ -63,7 +63,11 @@ ThemeData backendTheme(Brightness brightness, {Color? logoColor}) {
     borderSide: BorderSide(color: scheme.outline),
   );
   return base.copyWith(
-    extensions: [MingleBrandPalette(logoColor ?? scheme.primary)],
+    extensions: [
+      logoColor == null
+          ? const MingleBrandPalette(Color(0xFFCA306C))
+          : MingleBrandPalette.fromColor(logoColor),
+    ],
     pageTransitionsTheme: const PageTransitionsTheme(
       builders: {
         TargetPlatform.android: MinglePageTransitions(),

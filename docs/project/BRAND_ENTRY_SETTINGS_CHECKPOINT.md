@@ -4,6 +4,8 @@ Date: 2026-10-02. Branch: `feat/mobile-brand-entry-settings`, based on actual PR
 
 ## Implemented
 
+**Logo follow-up:** The monochrome/tinted logo described below is historical PR #21 behavior. The original colored source was subsequently recovered and restored in `fix/mobile-logo-fidelity`; see `LOGO_FIDELITY_CHECKPOINT.md`. The other entry/settings behavior remains applicable.
+
 - Original monochrome paper-plane/chat-bubble vector master: `apps/mobile/assets/brand/mingle-mark.svg`. It extends the current rounded icon vocabulary. No romantic motifs. No completed image-generation result was available after the permissions interruption; the final implementation is an editable vector, as required by the subsequent recoloring request.
 - Transparent PNG export is tinted at runtime, not baked to one brand color. `MingleBrandPalette` is a theme extension; `BackendChatApp(logoColor: ...)` changes every default logo independently of controls. `MingleLogo(color: ...)` supports an individual override. Default follows the light/dark accent. The wordmark stays live rounded text.
 - iOS/Android launcher PNGs exported from the same source. iOS required sizes and opaque alpha policy validated. Launcher colors are build assets: changing them needs regeneration/rebuild, not merely changing the runtime theme. App display name is Mingle on both platforms.
@@ -18,10 +20,12 @@ Date: 2026-10-02. Branch: `feat/mobile-brand-entry-settings`, based on actual PR
 Tool: Node with `sharp` 0.35.4 available in its module path. Exports are committed; this development tool never runs in app startup or CI.
 
 ```sh
-NODE_PATH=/path/to/node_modules node scripts/export-mingle-brand.cjs '#CA326E' '#FFF8F5'
+NODE_PATH=/path/to/node_modules node scripts/export-mingle-brand.cjs
+# Optional recolor, retaining separate light folds:
+NODE_PATH=/path/to/node_modules node scripts/export-mingle-brand.cjs '#247F9C' '#FFF8F5'
 ```
 
-Arguments are mark/background `#RRGGBB` colors. The SVG master uses `currentColor`. Export script updates the transparent app mask, native splash densities, and existing launcher slots. Native background resource colors are separate light/dark tokens; adjust them explicitly if changing the overall splash palette.
+No arguments preserve the original SVG gradient palette. Optional arguments are mark/background `#RRGGBB` colors. Export updates native Dart vector geometry, transparent PNGs, native splash densities and existing launcher slots. Runtime colors live in `MingleBrandPalette`; use `fromColor`, `copyWith(logoColor: ...)`, `BackendChatApp(logoColor: ...)` or `MingleLogo(color: ...)` for recoloring. Native background resource colors are separate light/dark tokens. Native launcher/splash changes need a rebuild; runtime vector changes can hot reload.
 
 ## Verification
 
