@@ -55,11 +55,9 @@ class _BackendChatAppState extends State<BackendChatApp>
       await Future.wait([
         widget.services.preferences.load(),
         widget.services.account.initialize(),
+        // Keep the opening mark readable even when local storage resolves at once.
+        Future<void>.delayed(const Duration(milliseconds: 800)),
       ]);
-      // Established sessions continue directly; introduction can be replayed.
-      if (_user != null && !widget.services.preferences.onboardingComplete) {
-        await widget.services.preferences.completeOnboarding();
-      }
     } catch (e) {
       if (mounted) setState(() => _error = e);
     } finally {

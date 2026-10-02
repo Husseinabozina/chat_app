@@ -4,13 +4,8 @@ import '../../../core/presentation/chat_ui.dart';
 import '../../../core/presentation/mingle_brand.dart';
 
 class OnboardingPage extends StatefulWidget {
-  const OnboardingPage({
-    required this.onFinished,
-    this.replay = false,
-    super.key,
-  });
+  const OnboardingPage({required this.onFinished, super.key});
   final Future<void> Function() onFinished;
-  final bool replay;
   @override
   State<OnboardingPage> createState() => _OnboardingPageState();
 }
@@ -103,7 +98,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   const Spacer(),
                   TextButton(
                     onPressed: _busy ? null : _finish,
-                    child: Text(widget.replay ? 'Close' : 'Skip'),
+                    child: const Text('Skip'),
                   ),
                 ],
               ),
@@ -227,9 +222,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           _busy
                               ? 'Please wait…'
                               : _index == _copy.length - 1
-                              ? widget.replay
-                                    ? 'Done'
-                                    : 'Get started'
+                              ? 'Get started'
                               : 'Continue',
                         ),
                       ),

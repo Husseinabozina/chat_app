@@ -550,6 +550,29 @@ class _ConversationPageState extends State<ConversationPage>
                                 date.year != previous.year ||
                                 date.month != previous.month ||
                                 date.day != previous.day;
+                            final older = index + 1 < messages.length
+                                ? messages[index + 1]
+                                : null;
+                            final newer = index > 0
+                                ? messages[index - 1]
+                                : null;
+                            bool groupedWith(ConversationMessage? neighbor) =>
+                                neighbor != null &&
+                                !m.isDeleted &&
+                                !neighbor.isDeleted &&
+                                neighbor.senderId == m.senderId &&
+                                m.replyToMessageId == null &&
+                                neighbor.replyToMessageId == null &&
+                                m.createdAt
+                                        .difference(neighbor.createdAt)
+                                        .abs() <
+                                    const Duration(minutes: 5) &&
+                                m.createdAt.toLocal().year ==
+                                    neighbor.createdAt.toLocal().year &&
+                                m.createdAt.toLocal().month ==
+                                    neighbor.createdAt.toLocal().month &&
+                                m.createdAt.toLocal().day ==
+                                    neighbor.createdAt.toLocal().day;
                             return Column(
                               key: ValueKey(m.id),
                               children: [
@@ -578,6 +601,8 @@ class _ConversationPageState extends State<ConversationPage>
                                     ),
                                   ),
                                 MessageCard(
+                                  groupedBefore: groupedWith(older),
+                                  groupedAfter: groupedWith(newer),
                                   animateArrival: _arrivingIds.remove(m.id),
                                   key: _messageKeys.putIfAbsent(
                                     m.id,
@@ -752,8 +777,12 @@ class MessageCard extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.animateArrival = false,
+    this.groupedBefore = false,
+    this.groupedAfter = false,
     super.key,
   });
+  final bool groupedBefore;
+  final bool groupedAfter;
   final String text;
   final bool own;
   final String status;
@@ -770,7 +799,7 @@ class MessageCard extends StatelessWidget {
           ? AlignmentDirectional.centerEnd
           : AlignmentDirectional.centerStart,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
+        padding: EdgeInsets.only(top: groupedBefore ? 1 : 6, bottom: 1),
         child: ConstrainedBox(
           constraints: BoxConstraints(
             maxWidth: MediaQuery.sizeOf(context).width * .76,
@@ -783,10 +812,22 @@ class MessageCard extends StatelessWidget {
                 : const Color(0xFFFFFDFC),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadiusDirectional.only(
-                topStart: const Radius.circular(22),
-                topEnd: const Radius.circular(22),
-                bottomStart: Radius.circular(own ? 22 : 7),
-                bottomEnd: Radius.circular(own ? 7 : 22),
+                topStart: Radius.circular(!own && groupedBefore ? 7 : 22),
+                topEnd: Radius.circular(own && groupedBefore ? 7 : 22),
+                bottomStart: Radius.circular(
+                  own
+                      ? 22
+                      : groupedAfter
+                      ? 7
+                      : 5,
+                ),
+                bottomEnd: Radius.circular(
+                  !own
+                      ? 22
+                      : groupedAfter
+                      ? 7
+                      : 5,
+                ),
               ),
               side: BorderSide(
                 color: Theme.of(context).colorScheme.outlineVariant,

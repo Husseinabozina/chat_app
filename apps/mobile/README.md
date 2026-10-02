@@ -38,7 +38,7 @@ Cubit is used for asynchronous auth and chat state. The current visual design an
 
 `BackendDataDependencies` composes secure session storage, an authenticated REST client, direct-conversation REST datasources, and a Socket.IO realtime datasource. It reads the backend origin from `CHAT_API_BASE_URL` when instantiated (for example, `https://api.example.com`). The REST datasource uses `/v1`; the realtime datasource uses `/realtime`.
 
-The backend product is opt-in: run with `--dart-define=CHAT_API_BASE_URL=http://127.0.0.1:3000` (iOS simulator) or your HTTPS API origin. When configured, `main.dart` skips Firebase initialization and opens the backend account/direct-conversation flow. Without the define, the legacy Firebase entrypoint remains available. Email/password account creation is followed by name/username/bio setup; photo upload remains deferred.
+`main.dart` always opens the current Mingle backend product. Debug runs default to the local API on port 55418: iOS/macOS use 127.0.0.1, Android emulator uses 10.0.2.2. Override with `--dart-define=CHAT_API_BASE_URL=...` for physical devices or a different server. Release/profile builds require an explicit API origin. The archived Firebase prototype is available only through `-t lib/main_legacy.dart`. Email/password account creation is followed by name/username/bio setup; photo upload remains deferred.
 
 The realtime datasource emits typed domain events, refreshes the access token before connecting, and reconnects with bounded backoff. Repository reconciliation and backend auth lifecycle are implemented. The backend UI consumes domain ports via `BackendAppServices`: account restoration, chats, people search/public profiles, profile completion/editing, and direct text conversations. Device integration and final visual acceptance are separate from host integration tests.
 
@@ -88,7 +88,7 @@ flutter run
 ## Backend UI and integration checks
 
 ```bash
-flutter run --dart-define=CHAT_API_BASE_URL=http://127.0.0.1:3000
+flutter run --dart-define=CHAT_API_BASE_URL=http://127.0.0.1:55418
 flutter test test/live/backend_flow_test.dart --dart-define=CHAT_INTEGRATION_URL=http://127.0.0.1:3000
 ```
 
@@ -104,3 +104,7 @@ The current native iOS project keeps its CocoaPods integration (`flutter.config.
 2. Review the open PR stack and integrate only after merge authorization.
 3. Public deployment hardening (allowed origins and socket handshake attempt throttling).
 4. Media/push/offline persistence only after their contracts are scoped.
+
+## Opening flow
+
+The branded Flutter opening screen lasts at least 800 ms while device preferences and account restoration run concurrently. First-time onboarding appears when its completion flag is unset, even if a session is restored. Get started/Skip persists completion; subsequent launches and logout do not replay it. There is no onboarding toggle/replay entry in Settings. Development history may already have completion saved on a simulator; ordinary hot restart does not reset device preferences. Native launcher/splash require a rebuild; no forced logout or preference reset is performed.

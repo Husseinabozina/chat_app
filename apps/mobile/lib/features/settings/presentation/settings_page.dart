@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../core/preferences/app_preferences.dart';
 import '../../../core/presentation/chat_ui.dart';
 import '../../../core/presentation/mingle_brand.dart';
-import '../../onboarding/presentation/onboarding_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({
@@ -38,15 +37,6 @@ class _SettingsPageState extends State<SettingsPage> {
       if (mounted) setState(() => _busy = false);
     }
   }
-
-  Future<void> _replay() => Navigator.of(context).push<void>(
-    MaterialPageRoute(
-      builder: (routeContext) => OnboardingPage(
-        replay: true,
-        onFinished: () async => Navigator.of(routeContext).pop(),
-      ),
-    ),
-  );
 
   Future<void> _signOut() async {
     final confirmed = await showDialog<bool>(
@@ -168,13 +158,6 @@ class _SettingsPageState extends State<SettingsPage> {
             Card(
               child: Column(
                 children: [
-                  ListTile(
-                    leading: const MingleIcon(MingleGlyph.plane),
-                    title: const Text('Show introduction'),
-                    trailing: const MingleIcon(MingleGlyph.next, size: 20),
-                    onTap: _replay,
-                  ),
-                  const Divider(height: 1),
                   ListTile(
                     leading: const MingleIcon(MingleGlyph.chats),
                     title: const Text('About Mingle'),
