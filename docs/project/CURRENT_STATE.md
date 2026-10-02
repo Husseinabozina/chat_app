@@ -3,11 +3,13 @@
 Update this file before closing each future project checkpoint. Verify actual branch heads and CI runs from GitHub before changing the state below. Record native acceptance separately from host/CI checks.
 
 **Updated:** 2026-10-02
-**Current phase:** Original-logo fidelity repair on `fix/mobile-logo-fidelity`, based on the freshly verified PR #21 HEAD `49cd87c75a666f6bc174794a4a27a36474f44705`. The original generated logo has been recovered, traced into four editable SVG layers, and rendered as native Flutter vector geometry with independent gradient colors. Launcher/native splash assets are regenerated. Product flows and backend architecture are unchanged. Draft PR #22 is published; Mobile CI #28 passed on implementation `34f8fb0bec966395512a0fc1378c89190acffd64`, including all existing quality/backend/two-account integration gates. Final documentation HEAD/checks are recorded in PR metadata.
+**Current phase:** Logo geometry and entry visual polish on `fix/mobile-entry-visual-polish`, based on freshly verified PR #22 HEAD `d89dd9e869f180d42cd9fa60ddee19c194199b2d` (Mobile CI #29 success). Complementary traced regions/cubic curves repair dark junction incursions and edge waviness while preserving the pink fold and recoloring. Onboarding now illustrates People/conversation flows with back navigation and guarded transitions; auth errors announce accessibly. See `ENTRY_VISUAL_POLISH_CHECKPOINT.md`. Publication/current-head CI is recorded below and in PR metadata.
 
 **Current acceptance boundary:** The user explicitly deferred the previous native visual review and authorized this implementation without further questions. Native resource build succeeded; latest full visual/motion/keyboard/dark/physical/two-device acceptance is still pending. Android native build is unverified because no local Android SDK is installed. See `BRAND_ENTRY_SETTINGS_CHECKPOINT.md` and `design-qa.md`. This is not a finished application; image/profile media, push, supported notification settings and release readiness remain.
 
 ## Last verified branch / PR / commit
+
+- Active checkpoint: `fix/mobile-entry-visual-polish`, based on exact PR #22 final HEAD `d89dd9e869f180d42cd9fa60ddee19c194199b2d`, [Mobile CI #29](https://github.com/Husseinabozina/chat_app/actions/runs/37009976819) success. New publication/verification pending; older evidence below is historical.
 
 - Active logo repair branch: `fix/mobile-logo-fidelity`, based on actual remote PR #21 HEAD `49cd87c75a666f6bc174794a4a27a36474f44705` (verified before branching). Draft [PR #22](https://github.com/Husseinabozina/chat_app/pull/22); verified implementation `34f8fb0bec966395512a0fc1378c89190acffd64`, [Mobile CI #28](https://github.com/Husseinabozina/chat_app/actions/runs/37009580140) completed/success. See `LOGO_FIDELITY_CHECKPOINT.md`. Final documentation HEAD/checks are recorded in PR metadata to avoid self-referential hashes.
 - Latest verified baseline: [PR #21](https://github.com/Husseinabozina/chat_app/pull/21), [Mobile CI #27](https://github.com/Husseinabozina/chat_app/actions/runs/36994964281), completed/success on that exact HEAD. Older implementation evidence below remains historical.
@@ -198,7 +200,7 @@ Later/deferred work:
 
 ## Exact next checkpoint
 
-1. User previews the restored logo with manual Flutter hot reload; rebuild to preview native launcher/splash. Onboarding can be replayed through Profile → Settings → Show introduction. Consolidated native acceptance remains separate; PR #22 stays Draft pending that review.
+1. Preview the corrected logo and illustrated onboarding with manual Flutter hot reload; rebuild for native launcher/splash. Replay through Profile → Settings → Show introduction. Consolidated native acceptance remains separate; current visual PR remains Draft pending that review.
 2. Profile/image-message media contracts and implementation; current avatars remain illustrated fallbacks. Follow with push delivery/routing and supported notification settings.
 3. Consolidated native acceptance remains explicitly deferred by the user; collect the missing evidence when resumed, including Android once its SDK is available.
 4. Password recovery/social auth, localization, files/voice/presence/reactions require scope/contracts. No merges or force pushes without authorization.
@@ -219,3 +221,10 @@ Later/deferred work:
 - The old local API process listened on port 55418 but timed out and consumed high CPU. Restarting only that API process restored `/v1/health` with database up and fast validation responses from login/register. No database reset or backend code change. The precise cause of the hang is unresolved; this is not evidence of a successful credential login.
 - Original logo is preserved at `docs/design/references/original-mingle-logo.png`; four paths follow its silhouette, with smooth gradients replacing raster grain. Runtime recoloring preserves separate plane folds. No new app dependency, workflow or lockfile change.
 - Host formatting/analyzer and developer export checks passed; Mobile CI #28 quality/backend/two-account integration passed. New-logo native build/rendered acceptance is not claimed. The user requested manual build ownership; no new simulator run was started for this logo repair.
+
+## Latest entry polish implementation (2026-10-02)
+
+- The ZCode trace lessons are incorporated into a reference-specific development script: complementary dark/light regions and cubic fitting, with a separately colored clipped lower fold. Earlier PR #22 silhouette-only evidence did not detect the identified internal artifacts; this checkpoint supersedes its geometry.
+- Onboarding now explains People and messaging with decorative preview cards, Previous navigation, guarded page transitions and reduced-motion progress. Auth errors announce through a live region; Settings replay remains available.
+- No new native build/simulator launch, backend/schema/dependency/lockfile/workflow change or extra test suite. Local automatic native migration/linker modifications and Podfile.lock remain unpublished.
+- General PNG-to-SVG plugin work is explicitly deferred. Next product checkpoint remains profile/image media contracts and implementation, then push and release work.

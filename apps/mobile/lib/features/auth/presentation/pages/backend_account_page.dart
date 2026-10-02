@@ -127,8 +127,9 @@ class _BackendAccountPageState extends State<BackendAccountPage> {
                             tooltip: _obscure
                                 ? 'Show password'
                                 : 'Hide password',
-                            onPressed: () =>
-                                setState(() => _obscure = !_obscure),
+                            onPressed: _busy
+                                ? null
+                                : () => setState(() => _obscure = !_obscure),
                             icon: MingleIcon(
                               _obscure ? MingleGlyph.eye : MingleGlyph.eyeOff,
                             ),
@@ -147,12 +148,25 @@ class _BackendAccountPageState extends State<BackendAccountPage> {
                       if (_error != null)
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          child: Text(
-                            _error!,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.error,
+                          child: Semantics(
+                            liveRegion: true,
+                            child: Container(
+                              padding: const EdgeInsets.all(14),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .errorContainer,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Text(
+                                _error!,
+                                style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onErrorContainer,
+                                ),
+                              ),
                             ),
-                            semanticsLabel: _error,
                           ),
                         ),
                       const SizedBox(height: 24),
