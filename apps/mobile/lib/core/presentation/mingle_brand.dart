@@ -184,7 +184,18 @@ class MingleSplash extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const MingleBrand(size: 112),
+                    const ExcludeSemantics(
+                      child: Image(
+                        image: AssetImage('assets/art/mingle-launcher.png'),
+                        width: 112,
+                        height: 112,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Mingle',
+                      style: Theme.of(context).textTheme.headlineLarge,
+                    ),
                     const SizedBox(height: 16),
                     Text(
                       'Real conversations.\nBrighter days.',

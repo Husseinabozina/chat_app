@@ -30,7 +30,8 @@ if (!password || password.length < 8)
     "Set MINGLE_DEMO_PASSWORD to the disposable local account password (at least 8 characters).",
   );
 const email = process.env.MINGLE_DEMO_EMAIL ?? "showcase@example.test";
-if (!email.endsWith("@example.test"))
+const viewerToken = process.env.MINGLE_DEMO_VIEWER_TOKEN;
+if (!viewerToken && !email.endsWith("@example.test"))
   throw new Error(
     "The demo viewer must use the reserved @example.test domain.",
   );
@@ -244,7 +245,22 @@ try {
   const health = await request("/health");
   if (health.database !== "up")
     throw new Error("The local database must be healthy.");
-  const viewer = await account(email);
+  const viewer = viewerToken
+    ? {
+        accessToken: viewerToken,
+        user: await request("/users/me", {
+          session: { accessToken: viewerToken },
+        }),
+      }
+    : await account(email);
+  if (
+    process.env.MINGLE_DEMO_VIEWER_ID &&
+    viewer.user.id !== process.env.MINGLE_DEMO_VIEWER_ID
+  ) {
+    throw new Error(
+      "The authenticated viewer does not match the requested account.",
+    );
+  }
   const profile = await request("/users/me", { session: viewer });
   if (!profile.username || !profile.displayName) {
     await request("/users/me", {
@@ -355,7 +371,7 @@ try {
     }
   }
   console.log(
-    `Demo ready for ${email}: 12 discoverable profiles, 8 direct conversations, ${messageCount} stable seed messages. Search People for "showcase".`,
+    `Demo ready for @${viewer.user.username}: 12 discoverable profiles, 8 direct conversations, ${messageCount} stable seed messages. Search People for "showcase".`,
   );
   console.log(
     "All timestamps and receipts are real API records. Reruns reuse conversations/message IDs; existing read positions remain monotonic.",

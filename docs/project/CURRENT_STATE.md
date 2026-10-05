@@ -2,12 +2,14 @@
 
 Update this file before closing each future project checkpoint. Verify actual branch heads and CI runs from GitHub before changing the state below. Record native acceptance separately from host/CI checks.
 
-**Updated:** 2026-10-05
+**Updated:** 2026-10-06
 **Current phase:** Screenshot/showcase polish on `feat/mobile-showcase-polish`, based on PR #26 final `497b5920cc3c152d1047bebcbdf4ec082210bb9b` (Backend run37046671558 and Mobile run37046671375 success). Original vector launcher, illustrated animated empty states and dedicated local demo accounts/media implemented. No image-generation service/dependency added. Vercel preparation is paused for this user-requested visual checkpoint; no cloud deployment exists.
 
 **Current acceptance boundary:** The user explicitly deferred the previous native visual review and authorized this implementation without further questions. Native PR #26 code built/launched on iPhone 17 Pro on 2026-10-05 after preserving a corrupted Xcode build cache; the new visual checkpoint launch result is recorded in its handoff. Latest full visual/motion/keyboard/dark/physical/two-device acceptance is still pending. Android native build is unverified because no local Android SDK is installed. See `BRAND_ENTRY_SETTINGS_CHECKPOINT.md` and `design-qa.md`. This is not a released application; new photo features need native/provider acceptance, and push/supported notification settings/release readiness remain.
 
 ## Last verified branch / PR / commit
+
+- Showcase follow-up (2026-10-06): explicitly seeded the user's existing local `@attest` account (display name `haters`) through authenticated REST, without changing its credentials or revoking its session. Its actual list returns 8 conversations; DB verifies 56 text messages and one image. Seeder supports a supplied viewer bearer token with optional expected-user-ID validation, and only logs out the sessions it creates. The separate showcase account remains available. Native launch assets and Flutter opening now use the rounded teal/cream launcher artwork. No simulator opened or native build run for this follow-up; new native splash acceptance remains pending. Previous HEAD `fdd3c5973675a09afc4187c189318f193d4e3ebc` passed both Mobile CI jobs in run37370402984; follow-up HEAD/checks go in PR #27 metadata.
 
 - Current showcase: Draft [PR #27](https://github.com/Husseinabozina/chat_app/pull/27), `feat/mobile-showcase-polish`, implementation `939e845`, based on verified PR #26 final HEAD above. Native iPhone 17 Pro build/launch succeeded in 25.0s; existing account retained. New PR final HEAD/checks recorded in its metadata and handoff. Host analyzer and eight existing product-flow widget tests passed; actual artwork rendered in both themes and reduced motion, then checked at a short landscape viewport. Native visual acceptance remains separate.
 

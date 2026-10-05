@@ -113,6 +113,18 @@ async function main() {
     "utf8",
   );
   if (color) launcher = launcher.replaceAll("#285E67", color);
+  // The native launch screen and Flutter opening use the same rounded artwork.
+  const splashMark = launcher
+    .replace(
+      /(<svg[^>]*>)/,
+      '$1<defs><clipPath id="splash-corners"><rect width="1024" height="1024" rx="220"/></clipPath></defs><g clip-path="url(#splash-corners)">',
+    )
+    .replace("</svg>", "</g></svg>");
+  await writePng(
+    splashMark,
+    512,
+    path.join(mobile, "assets/art/mingle-launcher.png"),
+  );
   const ios = path.join(mobile, "ios/Runner/Assets.xcassets");
   const icons = JSON.parse(
     await fs.readFile(
@@ -147,7 +159,7 @@ async function main() {
       true,
     );
     await writePng(
-      mark,
+      splashMark,
       size * 2,
       path.join(
         mobile,
@@ -161,7 +173,7 @@ async function main() {
     ["@3x", 3],
   ]) {
     await writePng(
-      mark,
+      splashMark,
       112 * scale,
       path.join(ios, `LaunchImage.imageset/LaunchImage${suffix}.png`),
     );
