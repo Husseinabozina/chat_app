@@ -1,6 +1,6 @@
 # Showcase polish — 2026-10-05
 
-Branch `feat/mobile-showcase-polish`, base PR #26 final `497b5920cc3c152d1047bebcbdf4ec082210bb9b`.
+Draft PR #27, branch `feat/mobile-showcase-polish`, implementation `939e845`, base PR #26 final `497b5920cc3c152d1047bebcbdf4ec082210bb9b`.
 
 ## Changes
 
@@ -13,7 +13,7 @@ Branch `feat/mobile-showcase-polish`, base PR #26 final `497b5920cc3c152d1047beb
 
 Host analyzer clean. Eight existing product-flow widget tests passed; local artwork-render check passed for light/dark, reduced-motion settling and short landscape layout. Rendered previews were visually inspected. Local seeding completed successfully against the actual API and private object store. No paid image generation, new app dependency, backend API/migration or workflow changes.
 
-Exact published HEAD, CI and native build outcome are recorded in PR metadata and the local handoff, avoiding a self-referential commit hash. Existing iOS/macOS generated configuration changes and Podfile.lock remain excluded from the commit.
+Native iPhone 17 Pro build/launch succeeded in 25.0s with the existing account retained. This does not imply acceptance of every screen. Exact published HEAD and CI are recorded in PR metadata and the local handoff, avoiding a self-referential commit hash. Existing iOS/macOS generated configuration changes and Podfile.lock remain excluded from the commit.
 
 ## Capture guide / remaining work
 

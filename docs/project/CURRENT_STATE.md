@@ -9,7 +9,7 @@ Update this file before closing each future project checkpoint. Verify actual br
 
 ## Last verified branch / PR / commit
 
-- Current showcase: `feat/mobile-showcase-polish`, based on verified PR #26 final HEAD above. New PR final HEAD/checks recorded in its metadata and handoff. Host analyzer and eight existing product-flow widget tests passed; actual artwork rendered in both themes and reduced motion, then checked at a short landscape viewport. Native visual acceptance remains separate.
+- Current showcase: Draft [PR #27](https://github.com/Husseinabozina/chat_app/pull/27), `feat/mobile-showcase-polish`, implementation `939e845`, based on verified PR #26 final HEAD above. Native iPhone 17 Pro build/launch succeeded in 25.0s; existing account retained. New PR final HEAD/checks recorded in its metadata and handoff. Host analyzer and eight existing product-flow widget tests passed; actual artwork rendered in both themes and reduced motion, then checked at a short landscape viewport. Native visual acceptance remains separate.
 
 - Current push checkpoint: Draft [PR #26](https://github.com/Husseinabozina/chat_app/pull/26), initial implementation `fc61f3c2b81eaf908fd956be836f1e793adf473c`; [Backend CI #86](https://github.com/Husseinabozina/chat_app/actions/runs/37036404008) and [Mobile CI #36](https://github.com/Husseinabozina/chat_app/actions/runs/37036403953) completed/success. Follow-ups reconcile failed local preference saves and token rotation during registration, and keep preference operations serialized until compensating server revocation finishes. Intermediate commit `707de808edde5ae1b06209284a7c59e81672971d` passed Backend and both Mobile checks (runs 37046188612 / 37046188686). Final exact HEAD/checks are recorded in PR metadata. Actual provider/native notification delivery is not verified.
 
@@ -55,8 +55,9 @@ Integrated `master` HEAD: `5f77dbd50efd9ae12f17d809a63c2746f35fc9ee` (PR #14 rea
 | #24 | `fix/mobile-product-entry` | #23 branch | `06689b770171a607c7279320994e43a587cd07ad` | Draft; CI #33 success; native acceptance pending |
 | #25 | `feat/media-images` | #24 branch | `ce43154864b9520a4f7178c180e764801e00c6a3` | Draft; Backend CI #85 + Mobile CI #35 success; native/provider acceptance pending |
 | #26 | `feat/push-notifications` | #25 branch | `fc61f3c2b81eaf908fd956be836f1e793adf473c` (initial implementation) | Draft; Backend CI #86 + Mobile CI #36 success; final reconciliation checks in PR metadata; provider/native delivery pending |
+| #27 | `feat/mobile-showcase-polish` | #26 branch | `939e845` (implementation; final docs/checks in PR metadata) | Draft; launcher/empty artwork/local showcase; native build passed |
 
-Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21 → #22 → #23 → #24 → #25 → #26**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
+Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21 → #22 → #23 → #24 → #25 → #26 → #27**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
 
 Integrated earlier history:
 
