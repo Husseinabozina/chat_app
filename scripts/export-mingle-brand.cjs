@@ -106,8 +106,13 @@ async function main() {
     dartPaths.join("\n"),
   );
   await writePng(mark, 768, path.join(mobile, "assets/art/mingle-mark.png"));
-  const inner = mark.replace(/<svg[^>]*>/, "").replace("</svg>", "");
-  const launcher = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="${background}"/><g transform="translate(8 8) scale(${112 / viewBoxSize})">${inner}</g></svg>`;
+  // Launcher has its own optically balanced, small-size artwork.
+  // Keep the accepted in-app/splash mark independently editable.
+  let launcher = await fs.readFile(
+    path.join(mobile, "assets/brand/mingle-launcher.svg"),
+    "utf8",
+  );
+  if (color) launcher = launcher.replaceAll("#285E67", color);
   const ios = path.join(mobile, "ios/Runner/Assets.xcassets");
   const icons = JSON.parse(
     await fs.readFile(

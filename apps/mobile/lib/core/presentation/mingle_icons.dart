@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import 'mingle_empty_art.dart';
 import 'mingle_motion.dart';
 
 /// Mingle's original rounded vector vocabulary. These are decorative glyphs;
@@ -422,81 +423,9 @@ class _GlyphPainter extends CustomPainter {
       old.rtl != rtl;
 }
 
-/// One brief brand moment. It settles, rather than looping behind readable UI.
-class MingleHello extends StatefulWidget {
+/// Shared empty-conversation illustration.
+class MingleHello extends StatelessWidget {
   const MingleHello({super.key});
   @override
-  State<MingleHello> createState() => _MingleHelloState();
-}
-
-class _MingleHelloState extends State<MingleHello>
-    with SingleTickerProviderStateMixin {
-  late final _controller = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 900),
-  );
-  bool _started = false;
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (MingleMotion.reduced(context)) {
-      _controller.value = 1;
-    } else if (!_started) {
-      _controller.forward();
-    }
-    _started = true;
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => ExcludeSemantics(
-    child: SizedBox(
-      width: 116,
-      height: 90,
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, _) {
-          final t = Curves.easeInOutCubic.transform(_controller.value);
-          final scheme = Theme.of(context).colorScheme;
-          return Stack(
-            children: [
-              Positioned(
-                left: 18,
-                bottom: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    color: scheme.primaryContainer.withValues(alpha: .65),
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  child: MingleIcon(
-                    MingleGlyph.chats,
-                    size: 36,
-                    color: scheme.primary,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 12 + t * 58,
-                top: 32 - math.sin(t * math.pi / 2) * 28,
-                child: Transform.rotate(
-                  angle: -.2 + .2 * t,
-                  child: MingleIcon(
-                    MingleGlyph.plane,
-                    size: 33,
-                    color: scheme.primary,
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    ),
-  );
+  Widget build(BuildContext context) => const MingleEmptyArt();
 }

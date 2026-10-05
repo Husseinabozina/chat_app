@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <title>Mingle — a conversation taking flight</title>
+  <desc>A cream message bubble and folded paper plane on deep teal. No dating symbols.</desc>
+  <defs>
+    <linearGradient id="background" x2="1" y2="1"><stop stop-color="#285E67"/><stop offset="1" stop-color="#173C47"/></linearGradient>
+    <linearGradient id="paper" x2="0.8" y2="1"><stop stop-color="#FFFDF6"/><stop offset="1" stop-color="#F2E7DA"/></linearGradient>
+    <linearGradient id="wing" x2="1" y2="1"><stop stop-color="#FFC2AA"/><stop offset="1" stop-color="#ED897F"/></linearGradient>
+  </defs>
+  <path fill="url(#background)" d="M0 0H1024V1024H0Z"/>
+  <circle cx="880" cy="120" r="470" fill="#7CB9B3" opacity=".07"/>
+  <path d="M245 258H659C725 258 772 309 772 374V597C772 663 725 711 659 711H433L284 800L298 711H245C181 711 138 662 138 597V374C138 310 181 258 245 258Z" fill="#0C2E37" opacity=".22" transform="translate(0 18)"/>
+  <path d="M245 246H659C725 246 772 297 772 362V585C772 651 725 699 659 699H433L284 788L298 699H245C181 699 138 650 138 585V362C138 298 181 246 245 246Z" fill="url(#paper)"/>
+  <path d="M271 486H419M271 554H361" fill="none" stroke="#8EAEAB" stroke-width="30" stroke-linecap="round"/>
+  <path d="M461 365L826 194Q858 179 846 216L719 575Q710 600 693 581L613 486L554 536L560 438L463 390Q437 378 461 365Z" fill="#173C47" opacity=".15" transform="translate(0 12)"/>
+  <path d="M461 353L826 182Q858 167 846 204L719 563Q710 588 693 569L613 474L554 524L560 426L463 378Q437 366 461 353Z" fill="url(#wing)"/>
+  <path d="M463 378L800 218L560 426Z" fill="#FFF2E8"/>
+  <path d="M560 426L800 218L613 474L554 524Z" fill="#C86C69"/>
+  <path d="M560 426L800 218L579 452L554 524Z" fill="#F6AB99"/>
+</svg>
