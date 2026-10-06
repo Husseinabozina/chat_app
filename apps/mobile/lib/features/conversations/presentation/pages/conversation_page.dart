@@ -530,7 +530,9 @@ class _ConversationPageState extends State<ConversationPage>
                       ? const Center(child: CircularProgressIndicator())
                       : messages.isEmpty && outgoing.isEmpty
                       ? const StatusPanel(
-                          'Say hello to start the conversation.',
+                          'A quick hello. A new idea. Your conversation starts here.',
+                          title: 'Make the first message yours',
+                          brandMoment: true,
                         )
                       : ListView.builder(
                           controller: _scroll,

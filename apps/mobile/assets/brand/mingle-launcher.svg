@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><clipPath id="splash-corners"><rect width="1024" height="1024" rx="220"/></clipPath></defs><g clip-path="url(#splash-corners)">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
   <title>Mingle — a conversation taking flight</title>
   <desc>A cream message bubble and folded paper plane on deep teal. No dating symbols.</desc>
   <defs>
@@ -16,4 +16,4 @@
   <path id="highlight" d="M463 378L800 218L560 426Z" fill="#FFF2E8"/>
   <path id="fold" d="M560 426L800 218L613 474L554 524Z" fill="#C86C69"/>
   <path id="crease" d="M560 426L800 218L579 452L554 524Z" fill="#F6AB99"/>
-</g></svg>
+</svg>

@@ -166,7 +166,10 @@ class _ChatsPageState extends State<ChatsPage> {
                     : StatusPanel(
                         _query.isNotEmpty || _unread
                             ? 'No conversations found in loaded chats.'
-                            : 'No conversations yet. Find someone and say hello.',
+                            : 'Share an idea, make a plan, or just say hello.',
+                        title: _query.isEmpty && !_unread && s.failure == null
+                            ? 'Good conversations start here'
+                            : null,
                         action: widget.onFindPeople,
                         label: 'Find people',
                         brandMoment:

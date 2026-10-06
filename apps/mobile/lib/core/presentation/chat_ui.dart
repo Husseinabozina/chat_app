@@ -66,7 +66,7 @@ ThemeData backendTheme(Brightness brightness, {Color? logoColor}) {
   return base.copyWith(
     extensions: [
       logoColor == null
-          ? const MingleBrandPalette(Color(0xFFCA306C))
+          ? const MingleBrandPalette(Color(0xFF285E67))
           : MingleBrandPalette.fromColor(logoColor),
     ],
     pageTransitionsTheme: const PageTransitionsTheme(
@@ -288,36 +288,48 @@ class StatusPanel extends StatelessWidget {
     this.action,
     this.label = 'Retry',
     this.brandMoment = false,
+    this.title,
   });
   final String message;
   final VoidCallback? action;
   final String label;
   final bool brandMoment;
+  final String? title;
   @override
   Widget build(BuildContext context) => Center(
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (brandMoment)
-            const MingleHello()
-          else
-            const MingleIcon(MingleGlyph.chats, size: 42),
-          const SizedBox(height: 20),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
-          if (action != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: MinglePress(
-                child: FilledButton(onPressed: action, child: Text(label)),
+    child: SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (brandMoment)
+              const MingleHello()
+            else
+              const MingleIcon(MingleGlyph.chats, size: 42),
+            const SizedBox(height: 20),
+            if (title != null) ...[
+              Text(
+                title!,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
+              const SizedBox(height: 8),
+            ],
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
-        ],
+            if (action != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: MinglePress(
+                  child: FilledButton(onPressed: action, child: Text(label)),
+                ),
+              ),
+          ],
+        ),
       ),
     ),
   );

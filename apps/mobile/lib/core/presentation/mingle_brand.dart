@@ -5,22 +5,18 @@ import 'mingle_logo_paths.dart';
 class MingleBrandPalette extends ThemeExtension<MingleBrandPalette> {
   const MingleBrandPalette(
     this.logoColor, {
-    this.primaryStartColor = const Color(0xFFCD3470),
-    this.primaryEndColor = const Color(0xFFC72F6A),
-    this.highlightStartColor = const Color(0xFFFDD3E1),
-    this.highlightEndColor = const Color(0xFFFDD7E4),
-    this.foldStartColor = const Color(0xFFFDACC9),
-    this.foldEndColor = const Color(0xFFF7A5C2),
+    this.primaryStartColor = const Color(0xFF285E67),
+    this.primaryEndColor = const Color(0xFF173C47),
+    this.highlightStartColor = const Color(0xFFFFFDF6),
+    this.highlightEndColor = const Color(0xFFF2E7DA),
+    this.foldStartColor = const Color(0xFFFFC2AA),
+    this.foldEndColor = const Color(0xFFED897F),
   });
 
   factory MingleBrandPalette.fromColor(Color color) => MingleBrandPalette(
     color,
-    primaryStartColor: Color.lerp(color, Colors.white, .02)!,
-    primaryEndColor: Color.lerp(color, Colors.black, .015)!,
-    highlightStartColor: Color.lerp(color, Colors.white, .8)!,
-    highlightEndColor: Color.lerp(color, Colors.white, .82)!,
-    foldStartColor: Color.lerp(color, Colors.white, .65)!,
-    foldEndColor: Color.lerp(color, Colors.white, .6)!,
+    primaryStartColor: color,
+    primaryEndColor: Color.lerp(color, Colors.black, .3)!,
   );
 
   final Color logoColor;
@@ -86,7 +82,7 @@ class MingleBrandPalette extends ThemeExtension<MingleBrandPalette> {
         );
 }
 
-/// Native vector geometry is generated from assets/brand/mingle-mark.svg.
+/// Native vector geometry is generated from assets/brand/mingle-launcher.svg.
 /// The theme supplies independently editable gradient stops, not a flat tint.
 class MingleLogo extends StatelessWidget {
   const MingleLogo({this.size = 96, this.color, super.key});
@@ -96,7 +92,7 @@ class MingleLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = color == null
         ? Theme.of(context).extension<MingleBrandPalette>() ??
-              const MingleBrandPalette(Color(0xFFCA306C))
+              const MingleBrandPalette(Color(0xFF285E67))
         : MingleBrandPalette.fromColor(color!);
     return ExcludeSemantics(
       child: CustomPaint(
@@ -118,34 +114,79 @@ class _MingleLogoPainter extends CustomPainter {
       size.width / MingleLogoPaths.viewBoxSize,
       size.height / MingleLogoPaths.viewBoxSize,
     );
-    void layer(Path path, Color start, Color end) => canvas.drawPath(
+    void layer(
+      Path path,
+      Color start,
+      Color end, {
+      Alignment endAlignment = Alignment.bottomRight,
+    }) => canvas.drawPath(
       path,
       Paint()
         ..shader = LinearGradient(
           begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          end: endAlignment,
           colors: [start, end],
         ).createShader(path.getBounds()),
     );
-    layer(
-      MingleLogoPaths.bubble,
-      palette.primaryStartColor,
-      palette.primaryEndColor,
+    const bounds = Rect.fromLTWH(0, 0, 1024, 1024);
+    canvas.clipRRect(
+      RRect.fromRectAndRadius(bounds, const Radius.circular(220)),
     );
-    layer(
-      MingleLogoPaths.plane,
-      palette.primaryStartColor,
-      palette.primaryEndColor,
+    canvas.drawRect(
+      bounds,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [palette.primaryStartColor, palette.primaryEndColor],
+        ).createShader(bounds),
     );
-    layer(
-      MingleLogoPaths.highlight,
-      palette.highlightStartColor,
-      palette.highlightEndColor,
+    canvas.drawCircle(
+      const Offset(880, 120),
+      470,
+      Paint()..color = const Color(0xFF7CB9B3).withValues(alpha: .07),
     );
     canvas.save();
-    canvas.clipPath(MingleLogoPaths.highlight);
-    layer(MingleLogoPaths.fold, palette.foldStartColor, palette.foldEndColor);
+    canvas.translate(0, 18);
+    canvas.drawPath(
+      MingleLogoPaths.bubbleShadow,
+      Paint()..color = const Color(0xFF0C2E37).withValues(alpha: .22),
+    );
     canvas.restore();
+    layer(
+      MingleLogoPaths.bubble,
+      palette.highlightStartColor,
+      palette.highlightEndColor,
+      endAlignment: const Alignment(.6, 1),
+    );
+    canvas.drawPath(
+      MingleLogoPaths.lines,
+      Paint()
+        ..color = const Color(0xFF8EAEAB)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 30
+        ..strokeCap = StrokeCap.round,
+    );
+    canvas.save();
+    canvas.translate(0, 12);
+    canvas.drawPath(
+      MingleLogoPaths.planeShadow,
+      Paint()..color = const Color(0xFF173C47).withValues(alpha: .15),
+    );
+    canvas.restore();
+    layer(MingleLogoPaths.plane, palette.foldStartColor, palette.foldEndColor);
+    canvas.drawPath(
+      MingleLogoPaths.highlight,
+      Paint()..color = const Color(0xFFFFF2E8),
+    );
+    canvas.drawPath(
+      MingleLogoPaths.fold,
+      Paint()..color = const Color(0xFFC86C69),
+    );
+    canvas.drawPath(
+      MingleLogoPaths.crease,
+      Paint()..color = const Color(0xFFF6AB99),
+    );
     canvas.restore();
   }
 
