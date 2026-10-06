@@ -5,7 +5,7 @@ Updated: 2026-10-06. Status: preparation; no public deployment exists yet.
 ## Starting point
 
 - Verified PR #27 HEAD: `3fffa67aa3c0b4b00dcb8e90d8cf94019b459c29`, branch `feat/mobile-showcase-polish`.
-- Preparation branch: `feat/backend-vercel-deployment`, directly above #27. No merge or force push.
+- Preparation branch: `feat/backend-vercel-deployment`, [Draft PR #28](https://github.com/Husseinabozina/chat_app/pull/28), directly above #27. Implementation `302f58e8f0faf9726c0b208de7d4e3125bad0361`; no merge or force push.
 - Native platform migrations already present in the local checkout are excluded.
 
 ## Deployment design
@@ -48,6 +48,14 @@ Current image tickets use S3 presigned POST. Supabase's published S3 compatibili
 5. Verify public health, register/login/refresh/logout, two-account durable messages, realtime/reconnect and remote session revocation. Verify private image upload/download authorization and account isolation with the real storage provider.
 6. Promote the verified deployment and configure mobile `CHAT_API_BASE_URL` to its stable HTTPS origin. Do not commit secrets or silently switch the app to an unverified URL.
 7. Record exact deployment URL, commit and CI runs in `CURRENT_STATE.md` and PR metadata.
+
+## Verified preparation
+
+- Node 24.21.0 local read-only format, lint, typecheck and Nest build passed.
+- [Backend CI](https://github.com/Husseinabozina/chat_app/actions/runs/37479424513) completed/success on exact implementation `302f58e8f0faf9726c0b208de7d4e3125bad0361`: npm ci, format, lint, typecheck, build, migrations and all five suites, with realtime clients on two Nest instances connected through Redis.
+- [Mobile CI](https://github.com/Husseinabozina/chat_app/actions/runs/37479424101) quality passed; its integration and documentation follow-up results are recorded in PR #28 after completion.
+- Task-owned local API restarted on Node 24.21.0. Real health/database, temporary registration/login and existing showcase-account login passed; temporary account/session verification cleaned up by the helper. Demo accounts/messages remain intact.
+- Final documentation HEAD is recorded in PR metadata to avoid embedding the file's own commit hash. No cloud acceptance is inferred from local/CI verification.
 
 ## Outstanding acceptance
 

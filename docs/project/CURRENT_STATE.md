@@ -41,7 +41,9 @@ Update this file before closing each future project checkpoint. Verify actual br
 
 ## Active cloud checkpoint
 
-- Branch: `feat/backend-vercel-deployment`, directly above PR #27; new commit/PR/check results are recorded in its deployment checkpoint and GitHub metadata after publication.
+- Branch: `feat/backend-vercel-deployment`, Draft [PR #28](https://github.com/Husseinabozina/chat_app/pull/28), directly above PR #27. Verified implementation commit: `302f58e8f0faf9726c0b208de7d4e3125bad0361`.
+- [Backend CI](https://github.com/Husseinabozina/chat_app/actions/runs/37479424513) succeeded on that exact implementation commit, including the existing realtime suite configured across two Nest instances. Local format/lint/typecheck/build and actual register/login also passed with Node 24.21.0. The documentation follow-up has identical backend/mobile code; its final HEAD and checks are recorded in PR #28 metadata.
+- [Mobile CI](https://github.com/Husseinabozina/chat_app/actions/runs/37479424101) quality passed; integration/final documentation checks are recorded in PR #28 metadata after completion.
 - Node runtime for this work: official checksum-verified 24.21.0; dependencies require at least 24.15. Vercel runtime targets Node 24.
 - Redis 7 disposable CI services exercise the existing realtime suite with two Nest instances; CI permissions remain read-only. Tests never target the user's demo database.
 - Exact next checkpoint: obtain Vercel access and approved isolated database/Redis/private-storage configuration, run one-off cloud migrations, verify actual public auth/messages/realtime/media, then connect mobile to the verified stable HTTPS URL.
@@ -68,8 +70,9 @@ Integrated `master` HEAD: `5f77dbd50efd9ae12f17d809a63c2746f35fc9ee` (PR #14 rea
 | #25 | `feat/media-images` | #24 branch | `ce43154864b9520a4f7178c180e764801e00c6a3` | Draft; Backend CI #85 + Mobile CI #35 success; native/provider acceptance pending |
 | #26 | `feat/push-notifications` | #25 branch | `fc61f3c2b81eaf908fd956be836f1e793adf473c` (initial implementation) | Draft; Backend CI #86 + Mobile CI #36 success; final reconciliation checks in PR metadata; provider/native delivery pending |
 | #27 | `feat/mobile-showcase-polish` | #26 branch | `3fffa67aa3c0b4b00dcb8e90d8cf94019b459c29` | Draft; Mobile CI `37469221848` success; final shared in-app logo/native review pending |
+| #28 | `feat/backend-vercel-deployment` | #27 branch | `302f58e8f0faf9726c0b208de7d4e3125bad0361` (implementation; docs HEAD/checks in PR metadata) | Draft; Backend CI success; public deployment blocked on account/provider input |
 
-Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21 → #22 → #23 → #24 → #25 → #26 → #27**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
+Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21 → #22 → #23 → #24 → #25 → #26 → #27 → #28**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
 
 Integrated earlier history:
 
