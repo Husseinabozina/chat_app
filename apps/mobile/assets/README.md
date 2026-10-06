@@ -19,3 +19,7 @@ Fonts are bundled locally; no font network request or new runtime package is req
 Each family includes its SIL Open Font License and copyright notice. Cairo remains the report font; the app typography is a user-reviewable implementation choice for the approved rounded direction.
 
 Icons use Flutter's bundled Material outlined/rounded set. Platform chrome, keyboards and system safe areas remain platform-owned.
+
+## Current Mingle identity
+
+`brand/mingle-launcher.svg` is the canonical teal/cream/peach logo. `scripts/export-mingle-brand.cjs` generates the rounded `brand/mingle-mark.svg`, runtime PNGs, Dart vector paths and iOS/Android icon/launch assets. Settings, authentication, onboarding, About and Flutter splash share MingleLogo. Pass `BackendChatApp.logoColor` to change the runtime background; export an explicit #RRGGBB color to change native resources. Re-export after geometry edits, then format the generated Dart file.

@@ -66,7 +66,7 @@ ThemeData backendTheme(Brightness brightness, {Color? logoColor}) {
   return base.copyWith(
     extensions: [
       logoColor == null
-          ? const MingleBrandPalette(Color(0xFFCA306C))
+          ? const MingleBrandPalette(Color(0xFF285E67))
           : MingleBrandPalette.fromColor(logoColor),
     ],
     pageTransitionsTheme: const PageTransitionsTheme(
