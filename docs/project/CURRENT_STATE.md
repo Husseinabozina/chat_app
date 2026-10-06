@@ -3,7 +3,7 @@
 Update this file before closing each future project checkpoint. Verify actual branch heads and CI runs from GitHub before changing the state below. Record native acceptance separately from host/CI checks.
 
 **Updated:** 2026-10-06
-**Current phase:** Screenshot/showcase polish on `feat/mobile-showcase-polish`, based on PR #26 final `497b5920cc3c152d1047bebcbdf4ec082210bb9b` (Backend run37046671558 and Mobile run37046671375 success). Original vector launcher, illustrated animated empty states and dedicated local demo accounts/media implemented. No image-generation service/dependency added. Vercel preparation is paused for this user-requested visual checkpoint; no cloud deployment exists.
+**Current phase:** Vercel backend deployment preparation on `feat/backend-vercel-deployment`, above actual PR #27 HEAD `3fffa67aa3c0b4b00dcb8e90d8cf94019b459c29`. That baseline's Mobile CI run `37469221848` succeeded. Current preparation adds distributed Socket.IO delivery/session revocation through Redis, bounded PostgreSQL pools and native Vercel install/build configuration. Account/provider access is pending; no cloud deployment exists. See `VERCEL_DEPLOYMENT_CHECKPOINT.md`.
 
 **Current acceptance boundary:** The user explicitly deferred the previous native visual review and authorized this implementation without further questions. Native PR #26 code built/launched on iPhone 17 Pro on 2026-10-05 after preserving a corrupted Xcode build cache; the new visual checkpoint launch result is recorded in its handoff. Latest full visual/motion/keyboard/dark/physical/two-device acceptance is still pending. Android native build is unverified because no local Android SDK is installed. See `BRAND_ENTRY_SETTINGS_CHECKPOINT.md` and `design-qa.md`. This is not a released application; new photo features need native/provider acceptance, and push/supported notification settings/release readiness remain.
 
@@ -39,6 +39,16 @@ Update this file before closing each future project checkpoint. Verify actual br
 - Historical baseline: PR #18 code `b4a31c6c7c17e7f12062c83261d700d94d8cc60d` / documentation HEAD `01f5220bb8f80736749200331536ed7f4bcdee28`, Mobile CI #21 success, targeted native account/message/session smoke passed.
 - Automatic native build migrations remain local/unpublished, outside this PR. Do not stage the entire workspace.
 
+## Active cloud checkpoint
+
+- Branch: `feat/backend-vercel-deployment`, directly above PR #27; new commit/PR/check results are recorded in its deployment checkpoint and GitHub metadata after publication.
+- Node runtime for this work: official checksum-verified 24.21.0; dependencies require at least 24.15. Vercel runtime targets Node 24.
+- Redis 7 disposable CI services exercise the existing realtime suite with two Nest instances; CI permissions remain read-only. Tests never target the user's demo database.
+- Exact next checkpoint: obtain Vercel access and approved isolated database/Redis/private-storage configuration, run one-off cloud migrations, verify actual public auth/messages/realtime/media, then connect mobile to the verified stable HTTPS URL.
+- No Simulator opened, no merges, no force push. Pre-existing native platform migrations remain unstaged.
+- An inactive 2024 Supabase `chat-app` was identified read-only, not restored or altered. Cloud provider selection and any cost approval are pending.
+- Earlier local backend hot CPU/hang cause remains unknown. Node 24.9 was below current dependency engine requirements; runtime upgrade is not proof of root-cause resolution.
+
 ## Integrated baseline and PR stack
 
 Integrated `master` HEAD: `5f77dbd50efd9ae12f17d809a63c2746f35fc9ee` (PR #14 realtime contract merge). Latest checked active stack:
@@ -57,7 +67,7 @@ Integrated `master` HEAD: `5f77dbd50efd9ae12f17d809a63c2746f35fc9ee` (PR #14 rea
 | #24 | `fix/mobile-product-entry` | #23 branch | `06689b770171a607c7279320994e43a587cd07ad` | Draft; CI #33 success; native acceptance pending |
 | #25 | `feat/media-images` | #24 branch | `ce43154864b9520a4f7178c180e764801e00c6a3` | Draft; Backend CI #85 + Mobile CI #35 success; native/provider acceptance pending |
 | #26 | `feat/push-notifications` | #25 branch | `fc61f3c2b81eaf908fd956be836f1e793adf473c` (initial implementation) | Draft; Backend CI #86 + Mobile CI #36 success; final reconciliation checks in PR metadata; provider/native delivery pending |
-| #27 | `feat/mobile-showcase-polish` | #26 branch | `939e845` (implementation; final docs/checks in PR metadata) | Draft; launcher/empty artwork/local showcase; native build passed |
+| #27 | `feat/mobile-showcase-polish` | #26 branch | `3fffa67aa3c0b4b00dcb8e90d8cf94019b459c29` | Draft; Mobile CI `37469221848` success; final shared in-app logo/native review pending |
 
 Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21 → #22 → #23 → #24 → #25 → #26 → #27**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
 

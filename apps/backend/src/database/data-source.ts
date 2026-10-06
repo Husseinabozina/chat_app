@@ -5,6 +5,7 @@ import { loadEnvFile } from 'node:process';
 import { DataSource } from 'typeorm';
 
 import { databaseEntities } from './entities';
+import { databaseConnectionOptions } from './connection-options';
 import { InitialSchema2026093000000 } from './migrations/2026093000000-initial-schema';
 import { AuthSessionIndexes2026093000100 } from './migrations/2026093000100-auth-session-indexes';
 import { ConversationMessageIndexes2026093000200 } from './migrations/2026093000200-conversation-message-indexes';
@@ -16,7 +17,8 @@ try {
   // CI and production inject environment variables directly.
 }
 
-const databaseUrl = process.env.DATABASE_URL;
+const databaseUrl =
+  process.env.DATABASE_MIGRATION_URL || process.env.DATABASE_URL;
 
 if (!databaseUrl) {
   throw new Error('DATABASE_URL is required.');
@@ -25,6 +27,7 @@ if (!databaseUrl) {
 export const AppDataSource = new DataSource({
   type: 'postgres',
   url: databaseUrl,
+  ...databaseConnectionOptions(),
   entities: databaseEntities,
   migrations: [
     InitialSchema2026093000000,

@@ -4,7 +4,7 @@ NestJS API for the messaging platform. The current backend provides authenticati
 
 ## Stack
 
-- Node.js 24 (`.nvmrc` at the repository root)
+- Node.js 24 LTS, at least 24.15 (`.nvmrc` at the repository root)
 - NestJS 12 and TypeScript 6
 - PostgreSQL 17 and TypeORM with explicit migrations (`synchronize: false`)
 - Node's test runner against the compiled Nest application
@@ -42,9 +42,13 @@ node dist/database/migrate.js
 npm test
 ```
 
-`npm test` typechecks the E2E files, then runs the health, auth, user discovery, and messaging suites sequentially in separate Node processes. The tests load the compiled `dist/` application, so build before testing. The auth and messaging suites reset test data; use a dedicated test database.
+`npm test` typechecks the E2E files, then runs health, auth, user discovery, messaging and realtime suites sequentially in separate Node processes. The tests load the compiled `dist/` application, so build before testing. The suites reset test data; use a dedicated test database. With `REALTIME_REDIS_URL`, realtime coverage connects clients to two different Nest instances and checks cross-instance delivery, typing, authorization, reconnect recovery and session revocation.
 
 Backend CI performs the same ordered checks with `npm ci`, Node 24, and PostgreSQL 17. The workflow has read-only repository permissions.
+
+## Vercel deployment
+
+Use `apps/backend` as the Vercel project root, Node 24 and native NestJS detection (`src/main.ts`). `vercel.json` locks the install/build commands and Frankfurt region. Fluid compute is required for WebSockets. See [`VERCEL_DEPLOYMENT_CHECKPOINT.md`](../../docs/project/VERCEL_DEPLOYMENT_CHECKPOINT.md) for cloud dependencies, migration order and acceptance status. Deployment is not complete until the public endpoints are verified.
 
 ## Modules
 
