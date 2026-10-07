@@ -11,6 +11,7 @@ import { io, type Socket } from 'socket.io-client';
 
 import { AppModule } from '../dist/app.module.js';
 import { configureApp } from '../dist/bootstrap/configure-app.js';
+import { configureRealtime } from '../dist/bootstrap/configure-realtime.js';
 import { AppDataSource } from '../dist/database/data-source.js';
 
 interface SessionResponse {
@@ -48,8 +49,10 @@ interface Ack {
 }
 
 let app: INestApplication;
+let peerApp: INestApplication | undefined;
 let baseUrl: string;
 let realtimeUrl: string;
+let peerRealtimeUrl: string;
 let alice: SessionResponse;
 let bob: SessionResponse;
 let eve: SessionResponse;
@@ -71,11 +74,22 @@ before(async () => {
 
   app = await NestFactory.create(AppModule, { logger: false });
   configureApp(app);
+  await configureRealtime(app);
   await app.listen(0, '127.0.0.1');
 
   const address = app.getHttpServer().address() as { port: number };
   baseUrl = `http://127.0.0.1:${address.port}/v1`;
   realtimeUrl = `http://127.0.0.1:${address.port}/realtime`;
+  peerRealtimeUrl = realtimeUrl;
+  if (process.env.REALTIME_REDIS_URL) {
+    peerApp = await NestFactory.create(AppModule, { logger: false });
+    configureApp(peerApp);
+    await configureRealtime(peerApp);
+    await peerApp.listen(0, '127.0.0.1');
+    const peerAddress = peerApp.getHttpServer().address() as { port: number };
+    peerRealtimeUrl = `http://127.0.0.1:${peerAddress.port}/realtime`;
+    assert.notEqual(peerRealtimeUrl, realtimeUrl);
+  }
 
   alice = await register('realtime-alice@example.com');
   bob = await register('realtime-bob@example.com');
@@ -91,8 +105,8 @@ before(async () => {
   conversationId = direct.body.id;
 
   aliceSocket = await connectRealtime(alice.accessToken);
-  bobSocket = await connectRealtime(bob.accessToken);
-  eveSocket = await connectRealtime(eve.accessToken);
+  bobSocket = await connectRealtime(bob.accessToken, peerRealtimeUrl);
+  eveSocket = await connectRealtime(eve.accessToken, peerRealtimeUrl);
   mallorySocket = await connectRealtime(mallory.accessToken);
 });
 
@@ -101,7 +115,8 @@ after(async () => {
   bobSocket?.disconnect();
   eveSocket?.disconnect();
   mallorySocket?.disconnect();
-  await app.close();
+  await peerApp?.close();
+  await app?.close();
 });
 
 test('realtime rejects invalid authentication and revoked sessions', async () => {
@@ -271,7 +286,7 @@ test('REST message lifecycle publishes durable realtime events', async () => {
   mallorySocket.offAny(onUnrelatedEvent);
 
   bobSocket.disconnect();
-  bobSocket = await connectRealtime(bob.accessToken);
+  bobSocket = await connectRealtime(bob.accessToken, peerRealtimeUrl);
   const resynced = await request<{ items: MessageResponse[] }>(
     `/conversations/${conversationId}/messages`,
     { method: 'GET', accessToken: bob.accessToken },
@@ -397,8 +412,11 @@ async function register(email: string): Promise<SessionResponse> {
   return response.body;
 }
 
-async function connectRealtime(accessToken: string): Promise<Socket> {
-  const socket = io(realtimeUrl, {
+async function connectRealtime(
+  accessToken: string,
+  url = realtimeUrl,
+): Promise<Socket> {
+  const socket = io(url, {
     autoConnect: false,
     transports: ['websocket'],
     auth: { accessToken },

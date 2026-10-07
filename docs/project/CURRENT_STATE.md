@@ -2,8 +2,8 @@
 
 Update this file before closing each future project checkpoint. Verify actual branch heads and CI runs from GitHub before changing the state below. Record native acceptance separately from host/CI checks.
 
-**Updated:** 2026-10-06
-**Current phase:** Screenshot/showcase polish on `feat/mobile-showcase-polish`, based on PR #26 final `497b5920cc3c152d1047bebcbdf4ec082210bb9b` (Backend run37046671558 and Mobile run37046671375 success). Original vector launcher, illustrated animated empty states and dedicated local demo accounts/media implemented. No image-generation service/dependency added. Vercel preparation is paused for this user-requested visual checkpoint; no cloud deployment exists.
+**Updated:** 2026-10-07
+**Current phase:** PR #28 production deployment accepted on 2026-10-07: Node 24 / NestJS 12 on Vercel Fluid, Neon PostgreSQL, Upstash Redis and private Vercel Blob in Frankfurt. Public origin `https://chat-app-backend-two-tawny.vercel.app` verified for health/database, registration/login/refresh/logout, durable direct messages, authorization/idempotency/pagination/read/edit, private sanitized image upload/download, WebSocket delivery/reconnect/REST recovery and logout disconnect. Mobile cloud configuration is in `apps/mobile/config/cloud.json`; actual native cloud acceptance and push activation remain next. Local accounts/showcase data have not been transferred. See `VERCEL_DEPLOYMENT_CHECKPOINT.md`.
 
 **Current acceptance boundary:** The user explicitly deferred the previous native visual review and authorized this implementation without further questions. Native PR #26 code built/launched on iPhone 17 Pro on 2026-10-05 after preserving a corrupted Xcode build cache; the new visual checkpoint launch result is recorded in its handoff. Latest full visual/motion/keyboard/dark/physical/two-device acceptance is still pending. Android native build is unverified because no local Android SDK is installed. See `BRAND_ENTRY_SETTINGS_CHECKPOINT.md` and `design-qa.md`. This is not a released application; new photo features need native/provider acceptance, and push/supported notification settings/release readiness remain.
 
@@ -39,27 +39,42 @@ Update this file before closing each future project checkpoint. Verify actual br
 - Historical baseline: PR #18 code `b4a31c6c7c17e7f12062c83261d700d94d8cc60d` / documentation HEAD `01f5220bb8f80736749200331536ed7f4bcdee28`, Mobile CI #21 success, targeted native account/message/session smoke passed.
 - Automatic native build migrations remain local/unpublished, outside this PR. Do not stage the entire workspace.
 
+## Active cloud checkpoint
+
+- Branch `feat/backend-vercel-deployment`, [PR #28](https://github.com/Husseinabozina/chat_app/pull/28), directly above PR #27, base `3fffa67aa3c0b4b00dcb8e90d8cf94019b459c29`. No merge or force push.
+- Last verified deployed implementation: `345f26af3a31cae9805196682f627560b97341a2`. [Backend CI](https://github.com/Husseinabozina/chat_app/actions/runs/37568824601) and [Mobile CI](https://github.com/Husseinabozina/chat_app/actions/runs/37568824641) completed/success, including two-account REST/realtime integration. Final documentation/configuration HEAD/checks are recorded in PR metadata.
+- Vercel project `chat-app-backend`, deployment `dpl_DVAei46DKqeTReg4Wfdrsmr6RTY8` promoted; stable public origin `https://chat-app-backend-two-tawny.vercel.app`. Generated deployment/team aliases retain Vercel Authentication; protection was not disabled. CLI root is `apps/backend`; no Git integration yet.
+- Production-only Neon Free, Upstash Redis Free (automatic paid upgrades disabled) and private Blob provisioned in Frankfurt after explicit terms approval. All six migrations applied once to the initially empty cloud DB; no destructive production E2E reset. Cloud secrets are separate/private, push disabled.
+- Runtime acceptance fixes: Nest 12 Lambda `NODE_OPTIONS=--experimental-require-module`, explicit `pg` driver import and explicit optional WebSocket-module import for serverless tracing. No framework/auth/product rewrite.
+- Private Blob direct PUT grants are scoped to path/MIME/size/five minutes; immutable sanitized JPEGs retain owner/membership checks. Flutter supports PUT and existing S3 POST. Actual deployed REST/media/realtime flow passed; see deployment checkpoint for exact coverage.
+- Redis coordinates cross-instance user/session rooms and disconnects; bounded ignored commands use `waitUntil`. PostgreSQL remains durable. Short-lived REST access JWTs remain valid until TTL after logout; refresh sessions and sockets are revoked, and new socket handshakes check the session.
+- Cleanup removed only 12 task verification accounts, four conversations and six private objects after identity/membership checks. Local `@attest` and showcase data remain unchanged and have not been transferred; user selection is pending.
+- Mobile cloud run: from `apps/mobile`, `flutter run --dart-define-from-file=config/cloud.json` with Flutter 3.47.5 / Dart 3.13+. Restart the run to switch defines; no local services required. Native cloud build/picker/rendering is not claimed.
+- CI remains `contents: read`, locked install, format/lint/typecheck/build/migrations/tests with disposable PostgreSQL 17/Redis 7; no temporary diagnostics/artifacts. Node task runtime 24.21.0; dependencies require 24.15+.
+- No Simulator opened. Existing native platform migrations/Podfile.lock remain unstaged. Unrelated Vercel/Supabase projects untouched. Earlier local CPU hang root cause remains unknown; successful cloud acceptance is not a reliability/root-cause proof.
+
 ## Integrated baseline and PR stack
 
 Integrated `master` HEAD: `5f77dbd50efd9ae12f17d809a63c2746f35fc9ee` (PR #14 realtime contract merge). Latest checked active stack:
 
-| PR | Branch | Base | Verified HEAD | State |
-|---|---|---|---|---|
-| #15 | `feat/backend-realtime-foundation` | `master` | `456c842b157b30f4dd9728ba3869f7fa7b6a50d8` | Ready, unmerged |
-| #16 | `feat/mobile-api-realtime-foundation` | #15 branch | `b0a68f4908a60facea617655b358e478b22a7004` | Ready, unmerged |
-| #17 | `feat/mobile-repository-reconciliation` | #16 branch | `d1a1c683a63c9ace2b337d861bb83eef26e45763` | Ready, unmerged |
-| #18 | `feat/mobile-backend-product-flow` | #17 branch | `01f5220bb8f80736749200331536ed7f4bcdee28` (docs; code `b4a31c6`) | Draft, functional native acceptance incomplete |
-| #19 | `feat/mobile-pastel-visual-identity` | #18 branch | `abe502695e6f32512800e30c7ab09b4ec7e0a41a` | Draft; Mobile CI #23 success; pastel direction accepted by user |
-| #20 | `feat/mobile-motion-demo` | #19 branch | `313b800f0dd90128b5d92a7725552d5e61266802` (implementation) | Draft; CI #24 success; consolidated native acceptance pending |
-| #21 | `feat/mobile-brand-entry-settings` | #20 branch | `49cd87c75a666f6bc174794a4a27a36474f44705` | Draft; CI #27 success; native visual review explicitly deferred |
-| #22 | `fix/mobile-logo-fidelity` | #21 branch | `d89dd9e869f180d42cd9fa60ddee19c194199b2d` | Draft; CI #29 success; geometry superseded by #23 |
-| #23 | `fix/mobile-entry-visual-polish` | #22 branch | `1dd304b054e53b382fa98317a858ccbd8b66e60e` | Draft; CI #32 success; native acceptance pending |
-| #24 | `fix/mobile-product-entry` | #23 branch | `06689b770171a607c7279320994e43a587cd07ad` | Draft; CI #33 success; native acceptance pending |
-| #25 | `feat/media-images` | #24 branch | `ce43154864b9520a4f7178c180e764801e00c6a3` | Draft; Backend CI #85 + Mobile CI #35 success; native/provider acceptance pending |
-| #26 | `feat/push-notifications` | #25 branch | `fc61f3c2b81eaf908fd956be836f1e793adf473c` (initial implementation) | Draft; Backend CI #86 + Mobile CI #36 success; final reconciliation checks in PR metadata; provider/native delivery pending |
-| #27 | `feat/mobile-showcase-polish` | #26 branch | `939e845` (implementation; final docs/checks in PR metadata) | Draft; launcher/empty artwork/local showcase; native build passed |
+| PR  | Branch                                  | Base       | Verified HEAD                                                                                | State                                                                                                                       |
+| --- | --------------------------------------- | ---------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| #15 | `feat/backend-realtime-foundation`      | `master`   | `456c842b157b30f4dd9728ba3869f7fa7b6a50d8`                                                   | Ready, unmerged                                                                                                             |
+| #16 | `feat/mobile-api-realtime-foundation`   | #15 branch | `b0a68f4908a60facea617655b358e478b22a7004`                                                   | Ready, unmerged                                                                                                             |
+| #17 | `feat/mobile-repository-reconciliation` | #16 branch | `d1a1c683a63c9ace2b337d861bb83eef26e45763`                                                   | Ready, unmerged                                                                                                             |
+| #18 | `feat/mobile-backend-product-flow`      | #17 branch | `01f5220bb8f80736749200331536ed7f4bcdee28` (docs; code `b4a31c6`)                            | Draft, functional native acceptance incomplete                                                                              |
+| #19 | `feat/mobile-pastel-visual-identity`    | #18 branch | `abe502695e6f32512800e30c7ab09b4ec7e0a41a`                                                   | Draft; Mobile CI #23 success; pastel direction accepted by user                                                             |
+| #20 | `feat/mobile-motion-demo`               | #19 branch | `313b800f0dd90128b5d92a7725552d5e61266802` (implementation)                                  | Draft; CI #24 success; consolidated native acceptance pending                                                               |
+| #21 | `feat/mobile-brand-entry-settings`      | #20 branch | `49cd87c75a666f6bc174794a4a27a36474f44705`                                                   | Draft; CI #27 success; native visual review explicitly deferred                                                             |
+| #22 | `fix/mobile-logo-fidelity`              | #21 branch | `d89dd9e869f180d42cd9fa60ddee19c194199b2d`                                                   | Draft; CI #29 success; geometry superseded by #23                                                                           |
+| #23 | `fix/mobile-entry-visual-polish`        | #22 branch | `1dd304b054e53b382fa98317a858ccbd8b66e60e`                                                   | Draft; CI #32 success; native acceptance pending                                                                            |
+| #24 | `fix/mobile-product-entry`              | #23 branch | `06689b770171a607c7279320994e43a587cd07ad`                                                   | Draft; CI #33 success; native acceptance pending                                                                            |
+| #25 | `feat/media-images`                     | #24 branch | `ce43154864b9520a4f7178c180e764801e00c6a3`                                                   | Draft; Backend CI #85 + Mobile CI #35 success; native/provider acceptance pending                                           |
+| #26 | `feat/push-notifications`               | #25 branch | `fc61f3c2b81eaf908fd956be836f1e793adf473c` (initial implementation)                          | Draft; Backend CI #86 + Mobile CI #36 success; final reconciliation checks in PR metadata; provider/native delivery pending |
+| #27 | `feat/mobile-showcase-polish`           | #26 branch | `3fffa67aa3c0b4b00dcb8e90d8cf94019b459c29`                                                   | Draft; Mobile CI `37469221848` success; final shared in-app logo/native review pending                                      |
+| #28 | `feat/backend-vercel-deployment`        | #27 branch | `302f58e8f0faf9726c0b208de7d4e3125bad0361` (implementation; docs HEAD/checks in PR metadata) | Draft; Backend CI success; public deployment blocked on account/provider input                                              |
 
-Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21 → #22 → #23 → #24 → #25 → #26 → #27**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
+Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21 → #22 → #23 → #24 → #25 → #26 → #27 → #28**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
 
 Integrated earlier history:
 
@@ -199,14 +214,14 @@ Workflows retain `contents: read`; mobile integration uses an ephemeral database
 
 ## Pending initial-release work and later features
 
-Pending initial-release scope includes final UI/native acceptance (including newly implemented photos), push notification delivery/routing, supported notification settings and deployment. System/Light/Dark appearance selection and basic account Settings are now implemented with device persistence. Media/push require explicit contracts before implementation; they are not removed from V1 merely because they are deferred from this checkpoint.
+Pending initial-release scope includes final UI/native acceptance (including newly implemented photos), push notification delivery/routing, supported notification settings and release readiness. Cloud deployment is accepted in PR #28. System/Light/Dark appearance selection and basic account Settings are now implemented with device persistence. Media/push require explicit contracts before implementation; they are not removed from V1 merely because they are deferred from this checkpoint.
 
 Later/deferred work:
 
 - Public presence/last-seen, voice notes, reactions and conversation pinning require separate scope decisions.
 - Durable delivered-to-device receipts.
 - Durable mobile offline cache/outbox beyond in-memory retries.
-- Durable realtime event replay/transactional outbox and Redis/multi-instance adapter.
+- Durable realtime event replay/transactional outbox. Redis multi-instance coordination is implemented and cloud-verified in PR #28.
 - Groups, calls, stories and other excluded features remain outside the initial product scope.
 
 ## Known issues / technical debt
@@ -219,19 +234,17 @@ Later/deferred work:
 - Conversation summaries have no durable revision; conservative invalidation/refetch may add REST traffic.
 - Equal edit timestamps are resolved by REST refetch; independent revisions could reduce ambiguity.
 - Offline logout clears local state immediately; remote revocation remains best effort.
-- Production allowed-origin/CORS policy and socket handshake attempt throttling must be implemented before public deployment.
+- Public abuse controls, socket handshake attempt throttling and an explicit browser-origin policy for a future web client remain release-hardening work; the current supported client is native Flutter.
 - Publication is best effort after commit; a crash before emission can lose an event. REST resync is the V1 recovery path.
 
-- Media production debt: local MinIO is a development fixture; verify chosen provider signed-POST support, private bucket policy, cleanup scheduling and rollback-orphan reconciliation. Current upload count quota is per-hour but not serialized across concurrent grants; decoder concurrency is bounded per app instance.
+- Media production debt: private Blob direct PUT/signed GET and authorization are cloud-verified in PR #28; local MinIO remains a development fixture. Cleanup scheduling and rollback-orphan reconciliation remain pending. Upload count quota is per-hour but not serialized across concurrent grants; decoder concurrency is bounded per app instance.
 
 ## Exact next checkpoint
 
-User priority (2026-10-05): review/capture the showcase account and new launcher/empty state, then resume Vercel readiness. Recurring local backend 100% CPU hang remains unresolved: restarting restores health but is not a root-cause fix. Resolve/capture it before claiming deployment readiness. Login information is local-only in the showcase guide, never in Git. See `SHOWCASE_CHECKPOINT.md`.
-
-1. Manual Flutter hot restart (`R`) previews current product entry. Introduction appears once if revision2 has not been explicitly completed, then sign-in/restored account; no Settings replay. Native launcher/splash require rebuilding. Old automatic development completion flags are corrected once; saved sessions/theme are retained. Consolidated native acceptance remains separate.
-2. Activate implemented push through scoped FCM server credentials, APNs/signing configuration and actual delivery/account-routing acceptance. Firebase project is confirmed accessible; no server ADC or local signing identity is configured. Validate private photo picker/viewer on native devices. Public deployment must resolve allowed origins, storage cleanup/provider compatibility and single/multiple-server coordination.
-3. Consolidated native acceptance remains explicitly deferred by the user; collect the missing evidence when resumed, including Android once its SDK is available.
-4. Password recovery/social auth, localization, files/voice/presence/reactions require scope/contracts. No merges or force pushes without authorization.
+1. Resolve the pending local-showcase transfer/new-cloud-fixture selection. Preserve credentials/history locally until the user authorizes a transfer. Start the mobile app with `config/cloud.json`; the user owns native builds and Simulator interaction.
+2. Activate push through scoped FCM server credentials, APNs/signing and real delivery/account-routing acceptance. `PUSH_ENABLED=false` until verified. Native cloud photo-picker/viewer and two-device/background/reconnect acceptance remain separate.
+3. Complete release hardening: public abuse/handshake controls, storage cleanup/orphan reconciliation and supported settings, then consolidated iOS/Android/device acceptance. Android SDK is still unavailable locally. Earlier local CPU hang investigation remains open.
+4. Review the PR stack and merge only with explicit authorization. Password recovery/social auth, full localization, files/voice/presence/reactions remain separate scope decisions. Update this source of truth before closing every checkpoint.
 
 ## Current local quality evidence (2026-10-02)
 

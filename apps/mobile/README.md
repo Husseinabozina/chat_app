@@ -75,6 +75,30 @@ The backend path has fake-datasource/widget coverage plus a real two-account RES
 
 ## Development
 
+### Verified cloud backend
+
+The production origin is `https://chat-app-backend-two-tawny.vercel.app`.
+From `apps/mobile`, use Flutter 3.47.5 or newer with Dart 3.13:
+
+```bash
+flutter run --dart-define-from-file=config/cloud.json
+```
+
+The same configuration works with `flutter build ios` or `flutter build apk`.
+This public configuration contains only the API origin, no credentials.
+Cloud runs do not require local PostgreSQL, MinIO or the local API to run.
+Stop an existing local run and launch with this configuration; a hot reload does
+not change compile-time Dart defines. Sign in again when changing environments.
+Local accounts and showcase conversations have not been migrated to the new
+cloud database. A new account can register normally; existing local credentials
+will not work there until their migration is explicitly authorized.
+
+Actual hosted REST, WebSocket delivery/reconnect/logout and private photo checks
+passed on 2026-10-07. Native cloud picker/rendering and push delivery remain
+separate acceptance work. See the project deployment checkpoint for details.
+
+### Local development
+
 ```bash
 flutter pub get --enforce-lockfile
 dart format lib test
@@ -100,8 +124,8 @@ The current native iOS project keeps its CocoaPods integration (`flutter.config.
 
 1. Complete native device verification and visual acceptance of the backend UI.
 2. Review the open PR stack and integrate only after merge authorization.
-3. Public deployment hardening (allowed origins and socket handshake attempt throttling).
-4. Push registration/delivery/routing and cloud deployment, then native release acceptance. Durable offline persistence remains deferred.
+3. Review public deployment abuse controls and future browser-origin policy.
+4. Activate push credentials/delivery/routing, then native release acceptance. Cloud REST/realtime/private media are verified; durable offline persistence remains deferred.
 
 ## Opening flow
 

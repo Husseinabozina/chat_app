@@ -60,6 +60,15 @@ jobs:
     timeout-minutes: 15
 
     services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
       postgres:
         image: postgres:17-alpine
         env:
@@ -80,6 +89,8 @@ jobs:
       ACCESS_TOKEN_TTL_SECONDS: 900
       REFRESH_TOKEN_TTL_DAYS: 30
       REALTIME_TYPING_TTL_MS: 7000
+      REALTIME_REDIS_URL: redis://127.0.0.1:6379
+      REALTIME_REDIS_PREFIX: mingle-mobile-ci
       PORT: 3000
 
     steps:
