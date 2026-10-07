@@ -48,7 +48,9 @@ Backend CI performs the same ordered checks with `npm ci`, Node 24, and PostgreS
 
 ## Vercel deployment
 
-Use `apps/backend` as the Vercel project root, Node 24 and native NestJS detection (`src/main.ts`). `vercel.json` locks the install/build commands and Frankfurt region. Fluid compute is required for WebSockets. See [`VERCEL_DEPLOYMENT_CHECKPOINT.md`](../../docs/project/VERCEL_DEPLOYMENT_CHECKPOINT.md) for cloud dependencies, migration order and acceptance status. Deployment is not complete until the public endpoints are verified.
+Public origin: `https://chat-app-backend-two-tawny.vercel.app`. Actual health/database, auth, direct messages, realtime delivery/recovery/session disconnect and private media acceptance passed on 2026-10-07.
+
+Use `apps/backend` as the Vercel project root, Node 24 and native NestJS detection (`src/main.ts`). `vercel.json` locks the install/build commands and Frankfurt region. Fluid compute is required for WebSockets. Set production `NODE_OPTIONS=--experimental-require-module` for NestJS 12 in the hosted Lambda runtime. Explicit imports retain the dynamically loaded PostgreSQL driver and optional WebSocket module in serverless tracing. See [`VERCEL_DEPLOYMENT_CHECKPOINT.md`](../../docs/project/VERCEL_DEPLOYMENT_CHECKPOINT.md) for the exact deployment, cloud dependencies and remaining acceptance.
 
 Private Vercel Blob: set `MEDIA_PROVIDER=vercel-blob` and a production-only `BLOB_READ_WRITE_TOKEN`. Upload tickets use direct `PUT` with returned headers; S3 tickets retain multipart `POST`. Upload/download grants expire after five minutes. The API still verifies ownership, conversation membership, exact size and decoded image limits before storing a separate immutable sanitized JPEG. Cloud migrations use the direct database connection once, never application startup; Redis uses a TLS TCP URL, not its REST token.
 
@@ -69,4 +71,4 @@ src/
   users/
 ```
 
-The current REST endpoints and response contracts are documented in `docs/api/api-contract-v1.md`. Private media is implemented in PR #25: configure storage before photo use; existing text/auth works without a bucket. See `docs/project/MEDIA_CHECKPOINT.md`. Push registration/FCM adapter is implemented but requires explicit credentials/configuration and actual delivery acceptance; see `docs/project/PUSH_CHECKPOINT.md`. Public deployment remains pending.
+The current REST endpoints and response contracts are documented in `docs/api/api-contract-v1.md`. Private media is implemented in PR #25 and verified against private Vercel Blob in PR #28. See `docs/project/MEDIA_CHECKPOINT.md`. Push registration/FCM adapter is implemented but requires explicit credentials/configuration and actual delivery acceptance; see `docs/project/PUSH_CHECKPOINT.md`. Production `PUSH_ENABLED` remains false.

@@ -1,83 +1,77 @@
 # Vercel backend deployment checkpoint
 
-Updated: 2026-10-07. Status: cloud resources and schema provisioned; deployed API acceptance/promotion pending.
+Updated: 2026-10-07. Status: production REST, realtime and private media accepted; native cloud acceptance and push delivery remain separate.
 
-## Live provisioning progress — 2026-10-07
+## Verified production
 
-- Verified local/PR #28 HEAD: `a06148ff3309d7956a95f7a0127d250b4a05aa3d`. Backend CI `37479702684` and Mobile CI `37479702698` both completed/success on this exact HEAD.
-- Vercel CLI 62.7.0 authenticated to the intended Hobby team `abozina50-1441`. Created and linked only `chat-app-backend` (`prj_2cH9bcfiVAqWo9VHUaHUyoAfnJUY`); the existing unrelated project is untouched.
-- Selected NestJS preset, Node 24, `npm ci --no-audit --no-fund` and `npm run build`. CLI deployment directory is `apps/backend`, so the linked project's relative root is `.`. No Git integration has been created yet.
-- Created private Vercel Blob `chat-app-media` (`store_emnloA7kffpPunSE`), Frankfurt `fra1`, connected only to production. Blob integration into the existing S3 upload contract remains implementation/acceptance work; creation alone does not make media operational.
-- User explicitly approved marketplace terms/account-data sharing. Neon `free_v3` `chat-app-postgres` (`store_JlQHAQ5ySeCzQjJM`, external `small-water-21829944`), Frankfurt, built-in Neon Auth disabled, production only; Upstash Redis `free` `chat-app-realtime` (`store_hyynRjD43XVLW7Im`), Frankfurt, automatic paid upgrades disabled, production only. Both resources are ready and connected.
-- All six migrations succeeded using the direct cloud connection with certificate/hostname validation; initial public table count was zero. No production E2E truncation was run.
-- `MEDIA_PROVIDER=vercel-blob` enables additive PUT tickets and private downloads using `@vercel/blob` 2.8.1. Each pending upload is scoped to its random path, MIME type, declared maximum size and five-minute lifetime. Completion checks exact bytes/format/pixel budget and creates a different immutable JPEG key; replaying the pending PUT cannot modify finalized media. Existing S3/local contract stays compatible.
-- Actual provider acceptance passed: Redis TLS/PING; direct Blob PUT; bounded sanitized JPEG; signed GET; unsigned private GET denied. Only task-owned temporary provider fixtures were removed. Full deployed REST membership/owner isolation and native picker acceptance remain pending.
-- Redis adapter promises register with `@vercel/functions` 3.9.11 `waitUntil`, retaining bounded error handling after a Fluid HTTP response. Push remains disabled until credential/native-delivery acceptance.
-- `.vercel` and local environment files are ignored; no credentials are committed. Existing native mobile modifications remain unstaged. No deployment, promotion or mobile origin changes yet.
+- Branch `feat/backend-vercel-deployment`, [PR #28](https://github.com/Husseinabozina/chat_app/pull/28), directly above PR #27 (`feat/mobile-showcase-polish`, verified base `3fffa67aa3c0b4b00dcb8e90d8cf94019b459c29`). No merge or force push.
+- Deployed implementation: `345f26af3a31cae9805196682f627560b97341a2`.
+- [Backend CI](https://github.com/Husseinabozina/chat_app/actions/runs/37568824601) and [Mobile CI](https://github.com/Husseinabozina/chat_app/actions/runs/37568824641) completed/success on that exact implementation, including two-account REST/realtime integration. Final documentation/configuration HEAD and checks are recorded in PR metadata to avoid self-referential hashes.
+- Vercel project `chat-app-backend` (`prj_2cH9bcfiVAqWo9VHUaHUyoAfnJUY`), intended Hobby team `abozina50-1441`, Node 24 / NestJS preset / Fluid compute, runtime Frankfurt `fra1`.
+- Promoted deployment `dpl_DVAei46DKqeTReg4Wfdrsmr6RTY8`: `https://chat-app-backend-qrg2tgvz0-abozina50-1441.vercel.app`.
+- Stable public project domain: **https://chat-app-backend-two-tawny.vercel.app**. Unauthenticated `GET /v1/health` returned 200 with database up. The generated team/deployment aliases remain behind Vercel Authentication; deployment protection was not disabled. The verified public project domain was assigned to the same promoted artifact.
+- CLI deployment root is `apps/backend` (linked relative root `.`). No Git integration created yet; future monorepo Git integration must use `apps/backend`. The unrelated existing Vercel project is untouched.
 
-## Starting point
+## Cloud persistence and configuration
 
-- Verified PR #27 HEAD: `3fffa67aa3c0b4b00dcb8e90d8cf94019b459c29`, branch `feat/mobile-showcase-polish`.
-- Preparation branch: `feat/backend-vercel-deployment`, [Draft PR #28](https://github.com/Husseinabozina/chat_app/pull/28), directly above #27. Implementation `302f58e8f0faf9726c0b208de7d4e3125bad0361`; no merge or force push.
-- Native platform migrations already present in the local checkout are excluded.
+| Resource                             | Selection                                                                                  | Scope           |
+| ------------------------------------ | ------------------------------------------------------------------------------------------ | --------------- |
+| Neon PostgreSQL `chat-app-postgres`  | `free_v3`, Frankfurt, built-in Neon Auth disabled; `store_JlQHAQ5ySeCzQjJM`                | Production only |
+| Upstash Redis `chat-app-realtime`    | Free, Frankfurt; automatic paid upgrade/production pack disabled; `store_hyynRjD43XVLW7Im` | Production only |
+| Private Vercel Blob `chat-app-media` | Frankfurt; `store_emnloA7kffpPunSE`                                                        | Production only |
 
-## Deployment design
+Marketplace terms/account-data sharing were accepted after explicit user approval. No paid plan or automatic paid upgrade was enabled. These services remain subject to provider quotas; no unlimited-capacity claim.
 
-- NestJS 12 / TypeScript 6 / Node 24, existing REST contracts and PostgreSQL authorization remain authoritative.
-- Vercel project root: `apps/backend`. Existing `src/main.ts` uses native NestJS detection; no legacy catch-all handler or request-time migrations.
-- `npm ci --no-audit --no-fund` then `npm run build`. Frankfurt (`fra1`) is the proposed region, near the existing Supabase organization projects' region.
-- Current Vercel documentation supports WebSockets in public beta on all plans with Fluid compute. Existing mobile Socket.IO client already uses only the WebSocket transport. Function duration still causes disconnects; existing reconnect and REST recovery remain required.
-- Redis Pub/Sub adapter shares user/session-room publication and session disconnect across instances. Redis stores no durable message data. TLS and an explicit application/environment channel prefix are required on Vercel. Keep production and preview credentials isolated; a prefix alone is not a security boundary.
-- Ioredis 5.11.1 is pinned: current Ioredis 6 conflicts with TypeORM's optional peer range. No force/legacy-peer-deps workaround. Socket.IO's official documentation also recommends Ioredis over node-redis where subscription recovery is a concern.
-- Redis connection setup is bounded; shutdown closes connections. Unawaited adapter commands have rejection handling so Redis outages do not crash REST. Redis Pub/Sub has no durable replay: recover messages through REST. Immediate remote logout disconnect depends on Redis availability; existing JWT expiry and database session checks remain the authorization boundary.
-- PostgreSQL pools default to five connections per function instance, bounded connection/idle/query timeouts, and limited startup retries. Provider TLS must validate certificates; no `rejectUnauthorized: false` bypass.
-- `DATABASE_URL` is the runtime pooler connection. Optional `DATABASE_MIGRATION_URL` is a direct/session connection for one-off migrations. Run migrations once before promotion; never run destructive E2E suites against a deployed/demo database.
+All six migrations were applied once using Neon’s direct connection with certificate/hostname validation. The database was initially empty. Application startup never runs migrations, and no destructive E2E suite targeted the cloud or local demo database.
 
-## Required cloud configuration
+Secrets are stored in Vercel production configuration and private operator files, never Git. `DATABASE_URL` uses the runtime pooler, `DATABASE_POOL_MAX=3`, `REALTIME_REDIS_URL` is an authenticated TLS TCP URL, and `REALTIME_REDIS_PREFIX=chat-app:production:v1`. The access-token secret is newly generated for production. `MEDIA_PROVIDER=vercel-blob` selects private Blob; `PUSH_ENABLED=false` remains explicit.
 
-Provide secrets through Vercel environment settings, never Git:
+## Runtime problems and fixes
 
-| Variable | Purpose |
-|---|---|
-| `DATABASE_URL` | Managed PostgreSQL URL with provider TLS settings |
-| `DATABASE_POOL_MAX` | Per-instance pool; default 5, permitted 1–20 |
-| `DATABASE_MIGRATION_URL` | Optional migration connection; supply to migration operator only |
-| `ACCESS_TOKEN_SECRET` | New random production secret, at least 32 characters |
-| `REALTIME_REDIS_URL` | Authenticated `rediss://` TCP Redis endpoint; a REST-only token is insufficient |
-| `REALTIME_REDIS_PREFIX` | Stable production channel prefix shared across production instances |
-| `MEDIA_*` | Private compatible object store credentials and reachable signing endpoint |
-| `PUSH_ENABLED` | Keep false until cloud credentials and delivery acceptance exist |
+1. The initial build succeeded, but hosted execution raised `ERR_REQUIRE_ESM` for NestJS 12. Lambda disabled CommonJS `require(esm)`. Production `NODE_OPTIONS=--experimental-require-module` restores the support recommended by Nest’s migration guide. No framework downgrade or application-wide module conversion.
+2. TypeORM’s dynamic driver loading omitted `pg` from the serverless trace. Explicitly importing the existing dependency in `DatabaseModule` retains it. Database health and actual migrations/auth/message queries then passed.
+3. Public Socket.IO requests returned 404 while REST worked. Nest dynamically loads its optional `@nestjs/websockets/socket-module` and silently proceeds without it when loading fails. An explicit import in `configure-realtime.ts` retains that module in tracing; actual cloud WebSocket delivery/reconnect/logout then passed. No alternate realtime protocol or product behavior was introduced.
+4. The first acceptance helper incorrectly expected an already issued REST access JWT to be immediately invalid after logout. Existing REST authentication is stateless: access JWTs expire on their configured TTL (15 minutes); logout revokes refresh sessions and connected sockets, while new socket handshakes check the database session. Corrected the verification assertion to the existing refresh-revocation contract. No authentication architecture was changed.
 
-Runtime filesystem and local MinIO/PostgreSQL cannot serve as cloud persistence. Database/provider selection is pending. An inactive Supabase project named `chat-app`, created in 2024, was discovered read-only; it has not been restored, modified or assumed to belong to this application. Other projects have not been changed.
+## Private media and distributed publication
 
-Current image tickets use S3 presigned POST. Supabase's published S3 compatibility list documents PUT but does not establish presigned POST compatibility. Verify the chosen storage provider or implement/verify an additive upload transport before claiming photo deployment works. No provider migration or upload-contract change has been made here.
+- Pinned `@vercel/blob` 2.8.1 and `@vercel/functions` 3.9.11 with a normal lockfile update. No force/legacy-peer-deps workaround.
+- Blob upload grants authorize direct PUT to one random pending path, declared MIME/maximum size and a five-minute lifetime. Retrying can overwrite that pending object only. Completion still checks ownership/membership, exact bytes, image format/pixel budget, then writes a different immutable sanitized JPEG key.
+- Private five-minute GET URLs are issued only after the existing API authorization. Direct uploads avoid relaying image bodies through the Function. Flutter understands PUT tickets while retaining local/S3 multipart POST support.
+- Redis Pub/Sub coordinates user/session rooms across instances; PostgreSQL remains the durable source of truth. Ignored Redis adapter commands register their bounded promises with Vercel `waitUntil` so publication can finish after an HTTP response. This is not a durable event outbox.
+- WebSocket connections can expire with Function duration. The existing reconnect and REST recovery path remains required; Pub/Sub offers no durable replay.
 
-## Verification and publication order
+## Actual acceptance
 
-1. Read actual base/head and preserve the user's native changes.
-2. Run read-only format/lint/typecheck/build checks. CI remains `npm ci → format:check → lint → typecheck → build → migrations → npm test` with disposable PostgreSQL 17 and Redis 7 services.
-3. Sign into Vercel, select the account/project and provision approved isolated cloud dependencies; confirm any provider cost before provisioning.
-4. Run migrations on the selected cloud database. Deploy a preview and check actual Vercel bundling/decorator metadata, native Argon2/Sharp dependencies and function size.
-5. Verify public health, register/login/refresh/logout, two-account durable messages, realtime/reconnect and remote session revocation. Verify private image upload/download authorization and account isolation with the real storage provider.
-6. Promote the verified deployment and configure mobile `CHAT_API_BASE_URL` to its stable HTTPS origin. Do not commit secrets or silently switch the app to an unverified URL.
-7. Record exact deployment URL, commit and CI runs in `CURRENT_STATE.md` and PR metadata.
+Verified against the promoted public HTTPS origin, with disposable fictional accounts:
 
-## Verified preparation
+- Health/database, native Argon2 registration/login, DTO validation, profile writes.
+- Direct-conversation uniqueness, persisted text messages, same-client-ID idempotent retry, cursor pagination, read state, edit and outsider isolation.
+- Real direct Blob PUT, native Sharp sanitization, completion-owner isolation, private image messages, member download and outsider/unsigned denial.
+- Authenticated WebSocket connection/event delivery, reconnect plus REST recovery, logout socket disconnect and revoked refresh denial.
+- Provider checks also verified Redis TLS/PING and private storage behavior.
 
-- Node 24.21.0 local read-only format, lint, typecheck and Nest build passed.
-- [Backend CI](https://github.com/Husseinabozina/chat_app/actions/runs/37479424513) completed/success on exact implementation `302f58e8f0faf9726c0b208de7d4e3125bad0361`: npm ci, format, lint, typecheck, build, migrations and all five suites, with realtime clients on two Nest instances connected through Redis.
-- [Mobile CI](https://github.com/Husseinabozina/chat_app/actions/runs/37479424101) quality passed; its integration and documentation follow-up results are recorded in PR #28 after completion.
-- Task-owned local API restarted on Node 24.21.0. Real health/database, temporary registration/login and existing showcase-account login passed; temporary account/session verification cleaned up by the helper. Demo accounts/messages remain intact.
-- Final documentation HEAD is recorded in PR metadata to avoid embedding the file's own commit hash. No cloud acceptance is inferred from local/CI verification.
+Removed only the task-created verification fixtures: 12 accounts, four conversations and six private objects. Identity and conversation membership checks preceded cleanup; no unrelated local/cloud data was removed. Existing local `@attest` and showcase accounts/history remain intact and have **not** been copied to cloud. Account/data transfer choice is still pending user response.
 
-## Outstanding acceptance
+Host backend format/lint/typecheck/build and Flutter analyzer passed. CI remains read-only and reproducible: `npm ci → format:check → lint → typecheck → build → migrations → npm test`, using disposable PostgreSQL 17/Redis 7. No diagnostic workflow steps or temporary artifact uploads.
 
-- First Vercel runtime attempt failed with `ERR_REQUIRE_ESM`: the hosted Lambda runtime disabled CommonJS `require(esm)` for Nest 12. Configured production `NODE_OPTIONS=--experimental-require-module`, as documented by Nest for Lambda; the next invocation passed this boundary. It then exposed omitted `pg` in the serverless file trace because TypeORM loads drivers dynamically. An explicit `pg` import retains that existing dependency in the deployment. No framework downgrade or application-wide module conversion.
-- Vercel account access and approved Neon/Upstash/private Blob provisioning are complete.
-- The cloud database schema and direct-provider checks are complete. Actual deployed API/realtime/media verification and promotion remain pending.
-- No preview/production URL exists and mobile continues using its existing local configuration.
-- The local backend's earlier hot CPU/unresponsive event was recovered by restarting. Its root cause was not established; local Node 24.9 was below current dependency engine requirements. Task runtime 24.21.0 was downloaded from nodejs.org and checksum verified. This does not prove the hang's root cause or cloud reliability.
-- Native Simulator is not opened for this checkpoint, per the user's request.
-- Actual CI outcome is recorded in the PR/checkpoint update after publication; do not infer success from prior PR #27.
+## Run mobile on cloud
 
-Sources checked on 2026-10-06: [Vercel NestJS](https://vercel.com/docs/frameworks/backend/nestjs), [Vercel WebSockets](https://vercel.com/docs/functions/websockets), [Socket.IO Redis adapter](https://socket.io/docs/v4/redis-adapter/), [Supabase S3 compatibility](https://supabase.com/docs/guides/storage/s3/compatibility).
+`apps/mobile/config/cloud.json` contains the verified public origin only. From `apps/mobile`, using Flutter 3.47.5 / Dart 3.13 or newer:
+
+```bash
+flutter run --dart-define-from-file=config/cloud.json
+```
+
+Use the same define file for native builds. Restart the Flutter run to change compile-time configuration; hot reload alone does not switch origins. Cloud runs need no local API/PostgreSQL/MinIO. Debug’s ordinary local default remains available. Sign in again when changing environments; old local accounts are absent from the new database until explicitly transferred.
+
+## Remaining checkpoint boundaries
+
+- No Simulator access or iOS/native build in this checkpoint, as requested. Private picker/viewer, physical/two-device, background and release acceptance remain separate. Pre-existing iOS/macOS migrations and `Podfile.lock` remain local/unpublished.
+- Push server credentials, APNs/signing and actual notification/account-routing acceptance remain incomplete; push is disabled honestly.
+- Local-account/showcase transfer is awaiting the user’s selection. Cloud deployment does not imply that local accounts/history were copied.
+- Scheduled media cleanup/orphan reconciliation, public abuse controls (including handshake attempt limits), future browser-origin policy, durable notification/event outboxes and offline persistence remain debt/release work. Current scope is the native messaging client.
+- The earlier local hot CPU/unresponsive event recovered on restart; its root cause remains unproven. Cloud acceptance does not establish long-term reliability or resolve that local investigation.
+- Future deploys: inspect actual HEAD/CI, stage production, verify the exact artifact, promote and verify the stable project domain, then update this checkpoint and `CURRENT_STATE.md`. Never run destructive test suites against cloud/demo data.
+
+Sources checked 2026-10-07: [NestJS migration guide](https://docs.nestjs.com/migration-guide), [Vercel NestJS](https://vercel.com/docs/frameworks/backend/nestjs), [Vercel WebSockets](https://vercel.com/docs/functions/websockets), [signed Blob URLs](https://vercel.com/docs/vercel-blob/vercel-signed-urls), [Functions waitUntil](https://vercel.com/docs/functions/functions-api-reference/vercel-functions-package).
