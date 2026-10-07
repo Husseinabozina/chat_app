@@ -1,4 +1,6 @@
 import { type INestApplication } from '@nestjs/common';
+// Nest loads this optional module dynamically; retain it in serverless tracing.
+import '@nestjs/websockets/socket-module';
 
 import { RedisIoAdapter } from '../realtime/redis-io.adapter';
 
