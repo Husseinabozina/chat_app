@@ -1,87 +1,98 @@
 <div align="center">
-  <img src="site/assets/brand.svg" alt="Chat App" width="80" />
-  <h1>Chat App — Messaging, thoughtfully built</h1>
-  <p>A focused one-to-one messaging product and an in-progress Flutter + NestJS engineering case study.</p>
-  <p><strong>Design direction → domain boundaries → REST foundations → realtime → connected Flutter experience</strong></p>
+  <img alt="Mingle logo" src="site/assets/favicon.svg" width="88" height="88" />
+  <h1>Mingle — A softer place to connect</h1>
+  <p>An expressive Flutter messenger, documented from early product thinking to its next full-stack milestone.</p>
+  <p><strong>Real iOS simulator captures · Flutter · NestJS · PostgreSQL · CI</strong></p>
   <p>
-    <a href="https://husseinabozina.github.io/chat_app/"><img src="https://img.shields.io/badge/PROJECT_SHOWCASE-C65777?style=for-the-badge&logo=githubpages&logoColor=white" alt="Project showcase (available after Pages deployment)" /></a>
-    <a href="docs/project/CURRENT_STATE.md"><img src="https://img.shields.io/badge/READ_PROJECT_STATUS-403445?style=for-the-badge" alt="Project status" /></a>
-  </p>
-  <p>
-    <img src="https://img.shields.io/badge/Flutter-Mobile-02569B?logo=flutter&logoColor=white" alt="Flutter" />
-    <img src="https://img.shields.io/badge/NestJS-API-E0234E?logo=nestjs&logoColor=white" alt="NestJS" />
-    <img src="https://img.shields.io/badge/PostgreSQL-17-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL" />
-    <a href="https://github.com/Husseinabozina/chat_app/actions/workflows/mobile-ci.yml"><img src="https://github.com/Husseinabozina/chat_app/actions/workflows/mobile-ci.yml/badge.svg" alt="Mobile CI" /></a>
-    <a href="https://github.com/Husseinabozina/chat_app/actions/workflows/backend-ci.yml"><img src="https://github.com/Husseinabozina/chat_app/actions/workflows/backend-ci.yml/badge.svg" alt="Backend CI" /></a>
+    <a href="https://husseinabozina.github.io/chat_app/"><img src="https://img.shields.io/badge/EXPLORE_LIVE_SHOWCASE-142F35?style=for-the-badge" alt="Live portfolio website" /></a>
+    <a href="docs/project/CURRENT_STATE.md"><img src="https://img.shields.io/badge/VERIFIED_BUILD_STATUS-C97482?style=for-the-badge" alt="Verified project state" /></a>
   </p>
 </div>
 
-<a href="https://husseinabozina.github.io/chat_app/"><img src="site/assets/cover.svg" alt="Chat App design-direction cover (illustrative, not a screenshot)" width="100%" /></a>
+## The app, as captured
 
-> **Work in progress.** The current Flutter app still runs the legacy Firebase-backed chat flow; the new NestJS/PostgreSQL backend is implemented separately. The custom mobile-backend integration and Socket.IO realtime transport are not shipped. The showcase uses clearly labelled illustrative UI based on an approved design direction, **not runtime screenshots**.
+The new [live product case study](https://husseinabozina.github.io/chat_app/) uses **real photos and two screen recordings** provided from a running iPhone 17 Pro simulator build, rather than recreated or fabricated interfaces.
+
+<table>
+  <tr>
+    <td align="center"><img src="site/assets/chats.webp" alt="Mingle populated chats screen" width="205" /><br/><strong>Conversations</strong></td>
+    <td align="center"><img src="site/assets/conversation.webp" alt="Mingle direct messages" width="205" /><br/><strong>Direct messages</strong></td>
+    <td align="center"><img src="site/assets/profile.webp" alt="Mingle profile" width="205" /><br/><strong>Profile</strong></td>
+    <td align="center"><img src="site/assets/empty-state.webp" alt="Mingle no-conversations state" width="205" /><br/><strong>Empty state</strong></td>
+  </tr>
+</table>
+
+Additional screenshots cover **launch, sign in, sign up, profile setup and people discovery**. Two optimized H.264 videos show the actual simulator flow; they are embedded with accessible native controls on the showcase site. Personal email text in the sign-up capture has been redacted for public display.
+
+> **Implementation boundary:** User-supplied local simulator captures document a recent Mingle UI build. They are **not evidence that these same screens are merged into this GitHub repository's current `master` branch**. The version-controlled Flutter client still uses its legacy Firebase-backed chat experience. The separately implemented custom NestJS/PostgreSQL REST backend is not yet wired to the mobile UI; the approved Socket.IO protocol is not yet implemented. The project is in development, not a released public messaging service.
 
 ## Product direction
 
-A warm, focused messenger for **one-to-one conversations**, with the eventual experience covering sign-in, profiles, user discovery, conversations and clear text-message states. The planned aesthetic is soft pastel minimal: cream, blush, rounded surfaces, quiet backgrounds and abstract avatars — **not a dating app**.
+A small, intentionally focused messenger for one-to-one conversations, user discovery, profiles, messaging, thoughtful empty states and reliable sending/reading flows. Mingle's visual direction is **soft pastel minimal / playful social messaging** — friendly, expressive and distinctly not a dating app.
 
-The product scope is documented in [product vision](docs/product/product-vision.md), [feature scope](docs/product/feature-scope.md) and [approved design direction](docs/design/approved-ui-direction.md).
+- [Product vision](docs/product/product-vision.md)
+- [Product scope](docs/product/feature-scope.md)
+- [Approved design language](docs/design/approved-ui-direction.md)
+- [High-fidelity screen plan](docs/design/high-fidelity-screen-plan.md)
 
-## Engineering status
+## Engineering
 
-| Area | Current reality |
+| Area | Verified repository status |
 | --- | --- |
-| Flutter client | Feature-first auth and chat, Cubit, repository contracts, Firebase behind data adapters. Legacy messaging still active. |
-| NestJS API | Auth, profile/user discovery, direct conversations, durable text messages, pagination, read pointers, edit and soft delete. |
-| PostgreSQL | Explicit TypeORM migrations and backend integration/E2E tests. |
-| Realtime | Socket.IO protocol contract approved; implementation **pending**. |
-| Client integration | Custom REST/realtime Flutter adapters and new multi-conversation UI **pending**. |
-| CI | Separate mobile and backend validation workflows. |
-| Website | Responsive static case study with illustrative concepts and honest implementation boundaries. |
+| Flutter client | Feature-first architecture, Cubit, domain repository contracts, Firebase adapters; legacy Firebase chat behaviour remains active. |
+| NestJS REST API | Authentication, user search, direct conversations, durable text messaging, reply/edit/delete, read pointers, pagination and idempotency. |
+| PostgreSQL | Explicit TypeORM migrations, no schema synchronization, tested backend data access. |
+| Realtime | Socket.IO transport and event contract documented; gateway/publisher/E2E implementation is the next backend checkpoint. |
+| Integration | Flutter REST/realtime adapters and redesigned multi-conversation flow **not yet merged**. |
+| CI | Independent mobile and backend pipelines plus portfolio site validation/Pages deployment. |
 
-The authoritative checkpoint log is **[CURRENT_STATE.md](docs/project/CURRENT_STATE.md)**.
+**[Read CURRENT_STATE.md for the dated checkpoint log and the exact next work item.](docs/project/CURRENT_STATE.md)**
 
-## Repository layout
+### Monorepo layout
 
 ```text
 apps/
-  mobile/           Flutter client
-  backend/          NestJS API + PostgreSQL
-docs/
-  api/              API and realtime contracts
-  architecture/     system decisions, data model, ADRs
-  design/           approved UI direction and high-fidelity planning
-  product/          vision, user flows and feature scope
-  project/          milestone and status log
-  PORTFOLIO_SITE.md presentation and publishing notes
+  mobile/                 Flutter / Dart application
+  backend/                NestJS / TypeScript API
 infra/
-  docker-compose.yml
-index.html          static portfolio entry point
-site/               site styles, interaction and illustrations
-.github/workflows/  backend, mobile and showcase checks
+  docker-compose.yml      PostgreSQL local services
+docs/
+  api/                    REST and realtime contracts
+  architecture/           data model and ADRs
+  design/                 visual direction and screen plans
+  product/                vision, user flows and scope
+  project/                verified project status
+  PORTFOLIO_SITE.md       showcase notes / media provenance
+index.html                static portfolio page
+site/
+  assets/                 real edited simulator captures and videos
+  styles.css
+  main.js
+  check.mjs
 ```
 
-## Run locally
+## Run the software locally
 
-Start PostgreSQL from the repository root:
+Start the PostgreSQL service from the repository root:
 
 ```bash
 docker compose -f infra/docker-compose.yml up -d
 ```
 
-Run the NestJS API:
+Start the NestJS API:
 
 ```bash
 cd apps/backend
 cp .env.example .env
-# Set ACCESS_TOKEN_SECRET to a strong local secret (32+ characters)
+# Provide a strong local ACCESS_TOKEN_SECRET (at least 32 characters)
 npm ci
 npm run db:migrate
 npm run start:dev
 ```
 
-The local API health check is `GET http://localhost:3000/v1/health`.
+API health endpoint: `GET http://localhost:3000/v1/health`
 
-Run Flutter separately:
+Run the Flutter application **separately** with your Firebase setup:
 
 ```bash
 cd apps/mobile
@@ -89,29 +100,22 @@ flutter pub get
 flutter run
 ```
 
-**Note:** Flutter currently uses Firebase, not the custom REST API. Its Firebase setup must be configured for a local run. See [mobile](apps/mobile/README.md) and [backend](apps/backend/README.md) documentation.
-
-Preview the portfolio site from the repository root:
+Preview the static showcase:
 
 ```bash
 python3 -m http.server 4173
-# open http://localhost:4173
+# Open http://localhost:4173/
 node --check site/main.js
 node site/check.mjs
 ```
 
-## Quality and deployment
+## Delivery & quality
 
-- **Mobile CI:** Dart formatting, Flutter analyzer and tests.
-- **Backend CI:** formatting, lint, type checking, compiled build, migrations and E2E tests.
-- **Site CI:** JavaScript syntax, asset and link checks; GitHub Pages publish on `master`.
+- Mobile CI: formatting, analyzer and Flutter tests.
+- Backend CI: format, lint, typecheck, build, migrations and compiled-app E2E tests.
+- Portfolio CI: static asset and content checks, GitHub Pages deployment from `master`.
+- Responsive portfolio, reduced-motion support, interactive screenshot gallery and actual simulator MP4 playback.
 
-[Portfolio publishing guide](docs/PORTFOLIO_SITE.md) explains the first-time GitHub Pages setting and the rule against advertising screenshots/APKs that do not yet exist.
+The showcase is a **portfolio site**, not a publicly hosted chat service or APK. See [portfolio and media notes](docs/PORTFOLIO_SITE.md) for publishing details.
 
-## Next checkpoint
-
-Implement the approved backend Socket.IO gateway, authenticated session rooms, versioned post-commit events, typing TTL and compiled-app E2E coverage. **Do not** treat presence, push, media or Flutter realtime adapters as implemented in this step.
-
-See [current state](docs/project/CURRENT_STATE.md) for the precise verified baseline and the next work item.
-
-<div align="center"><sub>A personal product and engineering project. Site illustrations are concepts, not app captures.</sub></div>
+<div align="center"><sub>Flutter · NestJS · Small moments, carefully built.</sub></div>
