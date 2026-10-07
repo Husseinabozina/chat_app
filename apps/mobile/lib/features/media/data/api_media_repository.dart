@@ -82,19 +82,30 @@ final class ApiMediaRepository implements MediaRepository {
     final ticket = attempt.grant;
     if (!attempt.uploaded) {
       final target = ticket['upload'] as Map<String, dynamic>;
-      final request = http.MultipartRequest(
-        'POST',
-        Uri.parse(target['url'] as String),
-      );
-      request.fields.addAll(
-        (target['fields'] as Map<String, dynamic>).map(
-          (k, v) => MapEntry(k, v as String),
-        ),
-      );
-      // The signed form Content-Type field declares the image type; file is last.
-      request.files.add(
-        http.MultipartFile.fromBytes('file', photo.bytes, filename: 'image'),
-      );
+      final url = Uri.parse(target['url'] as String);
+      final http.BaseRequest request;
+      if (target['method'] == 'PUT') {
+        final upload = http.Request('PUT', url);
+        upload.headers.addAll(
+          (target['headers'] as Map<String, dynamic>).map(
+            (k, v) => MapEntry(k, v as String),
+          ),
+        );
+        upload.bodyBytes = photo.bytes;
+        request = upload;
+      } else {
+        final upload = http.MultipartRequest('POST', url);
+        upload.fields.addAll(
+          (target['fields'] as Map<String, dynamic>).map(
+            (k, v) => MapEntry(k, v as String),
+          ),
+        );
+        // The signed form declares the image type; file is last.
+        upload.files.add(
+          http.MultipartFile.fromBytes('file', photo.bytes, filename: 'image'),
+        );
+        request = upload;
+      }
       try {
         final response = await httpClient
             .send(request)

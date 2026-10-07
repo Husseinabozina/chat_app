@@ -11,7 +11,15 @@ import {
 } from '@aws-sdk/client-s3';
 import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { get, put, issueSignedToken, presignUrl } from '@vercel/blob';
 import sharp from 'sharp';
+
+type UploadTarget = {
+  url: string;
+  method?: 'PUT';
+  fields?: Record<string, string>;
+  headers?: Record<string, string>;
+};
 @Injectable()
 export class ObjectStorageService implements OnModuleDestroy {
   onModuleDestroy(): void {
@@ -21,8 +29,17 @@ export class ObjectStorageService implements OnModuleDestroy {
   private readonly client: S3Client | null;
   private readonly signingClient: S3Client | null;
   private readonly bucket: string;
+  private readonly blob: boolean;
+  private readonly blobToken: string | undefined;
   private activeImages = 0;
   constructor(config: ConfigService) {
+    const provider = config.get<string>('MEDIA_PROVIDER') ?? 's3';
+    if (!['s3', 'vercel-blob'].includes(provider))
+      throw new Error('Unsupported MEDIA_PROVIDER.');
+    this.blob = provider === 'vercel-blob';
+    this.blobToken = config.get<string>('BLOB_READ_WRITE_TOKEN');
+    if (this.blob && !this.blobToken)
+      throw new Error('Private Blob credentials are not configured.');
     this.bucket = config.get<string>('MEDIA_BUCKET') ?? '';
     const accessKeyId = config.get<string>('MEDIA_ACCESS_KEY');
     const secretAccessKey = config.get<string>('MEDIA_SECRET_KEY');
@@ -36,15 +53,16 @@ export class ObjectStorageService implements OnModuleDestroy {
       requestHandler: { requestTimeout: 15000, connectionTimeout: 5000 },
       maxAttempts: 2,
     };
-    this.client = this.bucket
-      ? new S3Client({
-          ...options,
-          endpoint: config.get<string>('MEDIA_ENDPOINT'),
-        })
-      : null;
+    this.client =
+      this.bucket && !this.blob
+        ? new S3Client({
+            ...options,
+            endpoint: config.get<string>('MEDIA_ENDPOINT'),
+          })
+        : null;
     const publicEndpoint = config.get<string>('MEDIA_PUBLIC_ENDPOINT');
     this.signingClient =
-      this.bucket && publicEndpoint
+      this.bucket && publicEndpoint && !this.blob
         ? new S3Client({ ...options, endpoint: publicEndpoint })
         : this.client;
   }
@@ -53,7 +71,41 @@ export class ObjectStorageService implements OnModuleDestroy {
       throw new ServiceUnavailableException('Image storage is not configured.');
     return this.client;
   }
-  authorize(key: string, mimeType: string, sizeBytes: number) {
+  private blobOptions() {
+    return { token: this.blobToken, abortSignal: AbortSignal.timeout(15000) };
+  }
+  async authorize(
+    key: string,
+    mimeType: string,
+    sizeBytes: number,
+  ): Promise<UploadTarget> {
+    if (this.blob) {
+      const validUntil = Date.now() + 300000;
+      const token = await issueSignedToken({
+        ...this.blobOptions(),
+        pathname: key,
+        operations: ['put'],
+        allowedContentTypes: [mimeType],
+        maximumSizeInBytes: sizeBytes,
+        validUntil,
+      });
+      const { presignedUrl } = await presignUrl(token, {
+        operation: 'put',
+        pathname: key,
+        access: 'private',
+        validUntil,
+        allowedContentTypes: [mimeType],
+        maximumSizeInBytes: sizeBytes,
+        addRandomSuffix: false,
+        // A retry can replace only its pending object, never the sanitized image.
+        allowOverwrite: true,
+      });
+      return {
+        url: presignedUrl,
+        method: 'PUT',
+        headers: { 'Content-Type': mimeType },
+      };
+    }
     this.storage();
     return createPresignedPost(this.signingClient!, {
       Bucket: this.bucket,
@@ -78,18 +130,7 @@ export class ObjectStorageService implements OnModuleDestroy {
       );
     this.activeImages++;
     try {
-      const client = this.storage();
-      const object = await client.send(
-        new GetObjectCommand({ Bucket: this.bucket, Key: inputKey }),
-      );
-      if (
-        !object.Body ||
-        object.ContentLength !== expectedSize ||
-        expectedSize > 6291456
-      )
-        throw new Error('Image size mismatch');
-      const bytes = await object.Body.transformToByteArray();
-      if (bytes.length !== expectedSize) throw new Error('Image size mismatch');
+      const bytes = await this.readInput(inputKey, expectedSize);
       const image = sharp(bytes, {
         limitInputPixels: 24000000,
         failOn: 'warning',
@@ -107,21 +148,93 @@ export class ObjectStorageService implements OnModuleDestroy {
         .flatten({ background: '#FFF8F5' })
         .jpeg({ quality: 85 })
         .toBuffer({ resolveWithObject: true });
-      await client.send(
-        new PutObjectCommand({
-          Bucket: this.bucket,
-          Key: outputKey,
-          Body: data,
-          ContentType: 'image/jpeg',
-          CacheControl: 'private, max-age=300',
-        }),
-      );
+      if (this.blob) {
+        await put(outputKey, data, {
+          ...this.blobOptions(),
+          access: 'private',
+          contentType: 'image/jpeg',
+          addRandomSuffix: false,
+          allowOverwrite: false,
+          cacheControlMaxAge: 300,
+        });
+      } else
+        await this.storage().send(
+          new PutObjectCommand({
+            Bucket: this.bucket,
+            Key: outputKey,
+            Body: data,
+            ContentType: 'image/jpeg',
+            CacheControl: 'private, max-age=300',
+          }),
+        );
       return { width: info.width, height: info.height };
     } finally {
       this.activeImages--;
     }
   }
-  download(key: string) {
+  private async readInput(
+    key: string,
+    expectedSize: number,
+  ): Promise<Uint8Array> {
+    if (expectedSize < 1 || expectedSize > 6291456)
+      throw new Error('Image size mismatch');
+    if (this.blob) {
+      const object = await get(key, {
+        ...this.blobOptions(),
+        access: 'private',
+        useCache: false,
+      });
+      if (
+        !object ||
+        object.statusCode !== 200 ||
+        object.blob.size !== expectedSize
+      ) {
+        if (object?.statusCode === 200) await object.stream.cancel();
+        throw new Error('Image size mismatch');
+      }
+      const reader = object.stream.getReader();
+      const chunks: Uint8Array[] = [];
+      let size = 0;
+      try {
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          size += value.length;
+          if (size > expectedSize) throw new Error('Image size mismatch');
+          chunks.push(value);
+        }
+      } finally {
+        await reader.cancel();
+      }
+      if (size !== expectedSize) throw new Error('Image size mismatch');
+      return Buffer.concat(chunks, size);
+    }
+    const object = await this.storage().send(
+      new GetObjectCommand({ Bucket: this.bucket, Key: key }),
+    );
+    if (!object.Body || object.ContentLength !== expectedSize)
+      throw new Error('Image size mismatch');
+    const bytes = await object.Body.transformToByteArray();
+    if (bytes.length !== expectedSize) throw new Error('Image size mismatch');
+    return bytes;
+  }
+  async download(key: string) {
+    if (this.blob) {
+      const validUntil = Date.now() + 300000;
+      const token = await issueSignedToken({
+        ...this.blobOptions(),
+        pathname: key,
+        operations: ['get'],
+        validUntil,
+      });
+      const { presignedUrl } = await presignUrl(token, {
+        operation: 'get',
+        pathname: key,
+        access: 'private',
+        validUntil,
+      });
+      return presignedUrl;
+    }
     return getSignedUrl(
       this.signingClient ?? this.storage(),
       new GetObjectCommand({

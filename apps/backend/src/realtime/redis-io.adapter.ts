@@ -2,6 +2,7 @@ import { type INestApplicationContext, Logger } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { Redis } from 'ioredis';
+import { waitUntil } from '@vercel/functions';
 
 /** Shares delivery and session revocation across server instances, not durable data. */
 export class RedisIoAdapter extends IoAdapter {
@@ -69,11 +70,15 @@ export class RedisIoAdapter extends IoAdapter {
         if (!ignoredCommands.has(String(property))) return value.bind(target);
         return (...args: unknown[]) => {
           const result = Reflect.apply(value, target, args) as Promise<unknown>;
-          return result.catch(() =>
+          const pending = result.catch(() =>
             this.log.warn(
               'Realtime Redis command failed; recover durable state through REST.',
             ),
           );
+          // Keep publication alive after the HTTP response on Fluid compute.
+          // Outside a Vercel invocation the helper does not extend any lifetime.
+          if (process.env.VERCEL === '1') waitUntil(pending);
+          return pending;
         };
       },
     });

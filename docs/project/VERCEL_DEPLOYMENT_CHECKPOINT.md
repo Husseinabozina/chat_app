@@ -1,6 +1,19 @@
 # Vercel backend deployment checkpoint
 
-Updated: 2026-10-06. Status: preparation; no public deployment exists yet.
+Updated: 2026-10-07. Status: cloud resources and schema provisioned; deployed API acceptance/promotion pending.
+
+## Live provisioning progress — 2026-10-07
+
+- Verified local/PR #28 HEAD: `a06148ff3309d7956a95f7a0127d250b4a05aa3d`. Backend CI `37479702684` and Mobile CI `37479702698` both completed/success on this exact HEAD.
+- Vercel CLI 62.7.0 authenticated to the intended Hobby team `abozina50-1441`. Created and linked only `chat-app-backend` (`prj_2cH9bcfiVAqWo9VHUaHUyoAfnJUY`); the existing unrelated project is untouched.
+- Selected NestJS preset, Node 24, `npm ci --no-audit --no-fund` and `npm run build`. CLI deployment directory is `apps/backend`, so the linked project's relative root is `.`. No Git integration has been created yet.
+- Created private Vercel Blob `chat-app-media` (`store_emnloA7kffpPunSE`), Frankfurt `fra1`, connected only to production. Blob integration into the existing S3 upload contract remains implementation/acceptance work; creation alone does not make media operational.
+- User explicitly approved marketplace terms/account-data sharing. Neon `free_v3` `chat-app-postgres` (`store_JlQHAQ5ySeCzQjJM`, external `small-water-21829944`), Frankfurt, built-in Neon Auth disabled, production only; Upstash Redis `free` `chat-app-realtime` (`store_hyynRjD43XVLW7Im`), Frankfurt, automatic paid upgrades disabled, production only. Both resources are ready and connected.
+- All six migrations succeeded using the direct cloud connection with certificate/hostname validation; initial public table count was zero. No production E2E truncation was run.
+- `MEDIA_PROVIDER=vercel-blob` enables additive PUT tickets and private downloads using `@vercel/blob` 2.8.1. Each pending upload is scoped to its random path, MIME type, declared maximum size and five-minute lifetime. Completion checks exact bytes/format/pixel budget and creates a different immutable JPEG key; replaying the pending PUT cannot modify finalized media. Existing S3/local contract stays compatible.
+- Actual provider acceptance passed: Redis TLS/PING; direct Blob PUT; bounded sanitized JPEG; signed GET; unsigned private GET denied. Only task-owned temporary provider fixtures were removed. Full deployed REST membership/owner isolation and native picker acceptance remain pending.
+- Redis adapter promises register with `@vercel/functions` 3.9.11 `waitUntil`, retaining bounded error handling after a Fluid HTTP response. Push remains disabled until credential/native-delivery acceptance.
+- `.vercel` and local environment files are ignored; no credentials are committed. Existing native mobile modifications remain unstaged. No deployment, promotion or mobile origin changes yet.
 
 ## Starting point
 
@@ -59,8 +72,8 @@ Current image tickets use S3 presigned POST. Supabase's published S3 compatibili
 
 ## Outstanding acceptance
 
-- Vercel login/account access, organization/database choice and provider credentials are pending user input.
-- No cloud database, Redis or object store has been created here; no cloud migrations have run.
+- Vercel account access and approved Neon/Upstash/private Blob provisioning are complete.
+- The cloud database schema and direct-provider checks are complete. Actual deployed API/realtime/media verification and promotion remain pending.
 - No preview/production URL exists and mobile continues using its existing local configuration.
 - The local backend's earlier hot CPU/unresponsive event was recovered by restarting. Its root cause was not established; local Node 24.9 was below current dependency engine requirements. Task runtime 24.21.0 was downloaded from nodejs.org and checksum verified. This does not prove the hang's root cause or cloud reliability.
 - Native Simulator is not opened for this checkpoint, per the user's request.

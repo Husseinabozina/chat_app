@@ -50,6 +50,8 @@ Backend CI performs the same ordered checks with `npm ci`, Node 24, and PostgreS
 
 Use `apps/backend` as the Vercel project root, Node 24 and native NestJS detection (`src/main.ts`). `vercel.json` locks the install/build commands and Frankfurt region. Fluid compute is required for WebSockets. See [`VERCEL_DEPLOYMENT_CHECKPOINT.md`](../../docs/project/VERCEL_DEPLOYMENT_CHECKPOINT.md) for cloud dependencies, migration order and acceptance status. Deployment is not complete until the public endpoints are verified.
 
+Private Vercel Blob: set `MEDIA_PROVIDER=vercel-blob` and a production-only `BLOB_READ_WRITE_TOKEN`. Upload tickets use direct `PUT` with returned headers; S3 tickets retain multipart `POST`. Upload/download grants expire after five minutes. The API still verifies ownership, conversation membership, exact size and decoded image limits before storing a separate immutable sanitized JPEG. Cloud migrations use the direct database connection once, never application startup; Redis uses a TLS TCP URL, not its REST token.
+
 ## Modules
 
 ```text
