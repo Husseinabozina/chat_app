@@ -72,6 +72,7 @@ Current image tickets use S3 presigned POST. Supabase's published S3 compatibili
 
 ## Outstanding acceptance
 
+- First Vercel runtime attempt failed with `ERR_REQUIRE_ESM`: the hosted Lambda runtime disabled CommonJS `require(esm)` for Nest 12. Configured production `NODE_OPTIONS=--experimental-require-module`, as documented by Nest for Lambda; the next invocation passed this boundary. It then exposed omitted `pg` in the serverless file trace because TypeORM loads drivers dynamically. An explicit `pg` import retains that existing dependency in the deployment. No framework downgrade or application-wide module conversion.
 - Vercel account access and approved Neon/Upstash/private Blob provisioning are complete.
 - The cloud database schema and direct-provider checks are complete. Actual deployed API/realtime/media verification and promotion remain pending.
 - No preview/production URL exists and mobile continues using its existing local configuration.

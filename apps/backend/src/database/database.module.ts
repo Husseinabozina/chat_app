@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+// TypeORM loads this driver dynamically; retain it in the serverless file trace.
+import 'pg';
 
 import { databaseEntities } from './entities';
 import { databaseConnectionOptions } from './connection-options';
