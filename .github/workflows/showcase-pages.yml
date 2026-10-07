@@ -1,0 +1,63 @@
+name: Chat App showcase
+
+on:
+  pull_request:
+    paths:
+      - "index.html"
+      - "site/**"
+      - ".nojekyll"
+      - ".github/workflows/showcase-pages.yml"
+  push:
+    branches: [master]
+    paths:
+      - "index.html"
+      - "site/**"
+      - ".nojekyll"
+      - ".github/workflows/showcase-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-chat-app-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Check JavaScript and site references
+        run: |
+          node --check site/main.js
+          node site/check.mjs
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stage static site only
+        run: |
+          mkdir -p _site
+          cp index.html .nojekyll _site/
+          cp -R site _site/site
+          rm -f _site/site/check.mjs
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
