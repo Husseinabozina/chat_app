@@ -1,52 +1,49 @@
-# Chat App portfolio site
+# Mingle portfolio site — source, boundaries and delivery
 
-The responsive static site is served from `index.html` with supporting assets in `site/`. It is a **portfolio presentation**, not the running Flutter application.
+## Purpose
 
-## Verified content boundary
+The Mingle showcase is an independently authored, responsive static case study using **real simulator captures** supplied by the project owner (October 6, 2026). It replaces the earlier concept-only page. It should lead with the actual product visuals and video rather than unsupported claims about unimplemented app behaviour.
 
-- **Mobile today:** Flutter client uses its legacy Firebase-backed messaging flow.
-- **Backend today:** NestJS/PostgreSQL supports authentication, user discovery, one-to-one conversations, durable REST text messages, read pointers, edits and soft deletes.
-- **Not yet integrated:** Flutter mobile and the custom backend.
-- **Not yet shipped:** Socket.IO realtime backend, multi-conversation redesign, media, push and production deployment.
-- **Illustrations:** The phone UI on the page is created with HTML/CSS to present the **approved** visual direction from `docs/design/approved-ui-direction.md`. These are not runtime screenshots.
+## Media provenance
 
-Keep these statements synchronized with `docs/project/CURRENT_STATE.md` after major milestones. Replace illustrative UI with actual verified screenshots only once the new Flutter screens are running and captured.
+- Seven source iPhone 17 Pro simulator PNGs provided in the conversation: splash, sign-in, sign-up, profile setup, empty chats, populated chats and profile.
+- Two original `.mov` simulator screen recordings (approximately 15.14 and 4.56 seconds) supplied in the same exchange.
+- Three screenshot stills (`conversation.webp`, `people.webp`, `unread.webp`) extracted from the footage for the gallery and video poster states.
+- Screenshots resized to 659 px wide for web delivery; WebP lossily compressed for fast loading. Video encoded to H.264 MP4, 540 px wide at 24fps (no audio stream in supplied videos).
+- **Privacy:** The source registration screenshot contained an email address. Its published derivative `site/assets/sign-up.webp` replaces that field text with a privacy label. Do not upload the unredacted original PNG.
 
-## Development
+## Distinguish portfolio evidence from version-controlled runtime
 
-From the repository root:
+The screenshots and recordings reflect a recent **user-supplied local simulator build**. They are not a claim that the new UI flows have been merged into the GitHub `master` baseline described in [CURRENT_STATE.md](project/CURRENT_STATE.md). Current repository facts:
+
+- Flutter client is feature-first and still uses its legacy Firebase-backed chat experience.
+- NestJS/PostgreSQL REST backend implements auth, user discovery, direct conversations, durable text messaging and read states.
+- The custom backend has **not yet** been integrated into the active Flutter mobile client.
+- Socket.IO realtime backend is planned in an approved protocol contract, but **not implemented**.
+- There is no safe and verified public APK for download at this checkpoint.
+
+Update these statements and the root README when implementation milestones move forward. Do not create fictitious app screens, fake performance stats or misleading production-readiness badges.
+
+## Structure / publishing
+
+The top-level `index.html` loads static CSS/JavaScript from `site/`. The showcase Pages GitHub Action validates it and stages only the root entry point, `.nojekyll` and `site/` assets on pushes to `master`. No backend secrets or mobile source files are published through Pages.
+
+Run local validations from the repository root:
 
 ```sh
-python3 -m http.server 4173
-# open http://localhost:4173/
 node --check site/main.js
 node site/check.mjs
 ```
 
-The site has no build dependencies. The optional Google Fonts request uses fallback system fonts when offline.
+Deploy destination (after the workflow succeeds): `https://husseinabozina.github.io/chat_app/`.
 
-## GitHub Pages publishing
+## Accessibility and usability
 
-`.github/workflows/showcase-pages.yml` validates pull requests and publishes on a push to `master` or manual run. It stages **only** the static site files rather than exposing the backend/source tree as public Pages content.
+- Actual original images are interactive gallery items with a modal and arrow-key navigation, not CSS placeholders.
+- Videos are native `<video controls>` elements; audio and autoplay are deliberately disabled.
+- Responsive viewport support; skip navigation, alt text, visible focus and `prefers-reduced-motion`.
+- Product typography and palette are echoed, while site layout uses a more editorial, restrained treatment to avoid competing with screenshots.
 
-For first-time publishing, in **Settings → Pages**, select **GitHub Actions** as the build/deployment source and ensure Actions has permission to deploy Pages. Merge the PR and verify the workflow has completed successfully, then visit:
+## Later checkpoints
 
-**https://husseinabozina.github.io/chat_app/**
-
-This URL is an intended destination and must not be represented as live until the Pages workflow has succeeded.
-
-## Add actual Flutter screenshots later
-
-1. Capture the running product using sample/non-private content, and review each image.
-2. Add suitable optimized image files to `site/assets/screens/`.
-3. Replace the illustrative preview or add an accessible gallery, keeping clear labels between product concepts and real application captures.
-4. Update the main README and link the published site from the shared `app-showroom` catalog after verifying it is reachable.
-
-An Android download link should appear **only** when a tested APK actually exists and its backend/Firebase configuration is safe for a public demo. Never advertise an APK solely because a Flutter project can be built.
-
-## Site checklist
-
-- Responsive layout (phone, tablet and desktop).
-- Keyboard-accessible screen selector and reduced-motion support.
-- Documented in-progress status, current/next milestones and source links.
-- No fake APK, false realtime claim or unverified implementation screenshots.
+As the repo's mobile UI catches up with the recorded local demo, add traceable in-repository screenshot capture recipes, safe demo fixtures and feature checks. Only surface a demo APK when tested and appropriate for public access.

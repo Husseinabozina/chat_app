@@ -1,101 +1,104 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#fbf7f4">
-  <meta name="description" content="Chat App — a thoughtful one-to-one messenger and an honest, in-progress Flutter + NestJS engineering case study.">
+  <meta name="theme-color" content="#102d33">
+  <meta name="description" content="Mingle — a softer place to connect. An iOS simulator showcase and an in-progress Flutter and NestJS engineering case study by Hussein Abozina.">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Chat App | Messaging, thoughtfully built">
-  <meta property="og:description" content="A soft, human-centred messaging experience and the engineering behind it.">
-  <meta property="og:image" content="https://husseinabozina.github.io/chat_app/site/assets/cover.svg">
-  <meta property="og:url" content="https://husseinabozina.github.io/chat_app/">
-  <title>Chat App — A messaging product in the making</title>
-  <link rel="icon" href="site/assets/brand.svg" type="image/svg+xml">
+  <meta property="og:title" content="Mingle — a softer place to connect">
+  <meta property="og:description" content="Discover Mingle through real iOS captures, product walkthroughs, and an honest look at the engineering behind it.">
+  <meta property="og:image" content="https://husseinabozina.github.io/chat_app/site/assets/chats.webp">
+  <title>Mingle — A softer place to connect</title>
+  <link rel="icon" type="image/svg+xml" href="site/assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght,SOFT,WONK@9..144,400,30,1;9..144,500,30,1;9..144,600,30,1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="site/styles.css">
   <script src="site/main.js" defer></script>
 </head>
 <body>
-  <a class="skip-link" href="#content">Skip to content</a>
-  <div class="announcement"><span class="status-dot"></span><span>An evolving engineering case study</span><a href="#progress">Explore current progress <span aria-hidden="true">↗</span></a></div>
-  <header class="site-header wrap">
-    <a class="brand" href="#top" aria-label="Chat App home"><span class="brand-symbol" aria-hidden="true">✳</span><span>chat<span class="brand-period">.</span>app</span><small>working title</small></a>
-    <nav class="nav-links" aria-label="Main navigation"><a href="#experience">Experience</a><a href="#preview">Design</a><a href="#engineering">Engineering</a><a href="#progress">Progress</a></nav>
-    <a class="nav-source" href="https://github.com/Husseinabozina/chat_app" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="header" id="top">
+    <div class="shell header-inner">
+      <a class="brand" href="#top" aria-label="Mingle — home"><span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none"><path d="M8 11c0-2.76 2.24-5 5-5h14c2.76 0 5 2.24 5 5v13c0 2.76-2.24 5-5 5H17L10 35v-6.5a5 5 0 0 1-2-4V11Z" fill="#FFF8F3"/><path d="m18 18 15-10-5.5 20-4-7.1L18 18Z" fill="#F7A29E" stroke="#E47D85" stroke-width="1.4" stroke-linejoin="round"/><path d="M17 22h5M17 26h3" stroke="#3C7D83" stroke-width="2.2" stroke-linecap="round"/></svg></span><span class="brand-name">mingle<span>.</span></span></a>
+      <nav aria-label="Main navigation" class="nav">
+        <a href="#story">The idea</a>
+        <a href="#screens">App screens</a>
+        <a href="#motion">In motion</a>
+        <a href="#engineering">Under the hood</a>
+      </nav>
+      <a class="nav-action" href="https://github.com/Husseinabozina/chat_app" target="_blank" rel="noopener noreferrer">Explore the build <span aria-hidden="true">↗</span></a>
+    </div>
   </header>
 
-  <main id="content">
-    <section class="hero wrap" id="top">
-      <div class="hero-copy">
-        <p class="eyebrow"><span class="mini-spark">✳</span> FLUTTER × NESTJS · PRODUCT & ENGINEERING</p>
-        <h1>Good chats.<br><em>Better connections.</em></h1>
-        <p class="hero-intro">Messaging should feel effortless, friendly and a little more human. Meet a focused one-to-one messenger, shaped through thoughtful design and built with serious engineering foundations.</p>
-        <div class="actions"><a class="btn btn-primary" href="#preview">Explore the experience <span aria-hidden="true">↗</span></a><a class="btn btn-outline" href="https://github.com/Husseinabozina/chat_app" target="_blank" rel="noopener noreferrer">Browse source ↗</a></div>
-        <p class="hero-caveat"><span class="status-dot"></span> In development — this page illustrates the approved design direction, not a released app.</p>
-      </div>
-      <div class="hero-art" aria-label="Illustrated mobile messaging interface, not an app screenshot">
-        <div class="orb orb-peach"></div><div class="orb orb-lilac"></div><div class="orbit-line"></div>
-        <span class="art-spark star-one" aria-hidden="true">✳</span><span class="art-spark star-two" aria-hidden="true">✦</span>
-        <div class="note-card note-top"><span class="note-icon">✉</span><div><strong>A little hello</strong><small>goes a long way</small></div></div>
-        <div class="phone tilt-left" aria-hidden="true">
-          <div class="phone-notch"></div><div class="phone-screen">
-            <div class="phone-header"><div><span class="label">Your space</span><h3>Chats <span>✳</span></h3></div><div class="icon-circle">＋</div></div>
-            <div class="search-field">⌕ <span>Search conversations</span></div>
-            <div class="chips"><span class="chip on">All chats</span><span class="chip">Unread</span></div>
-            <div class="chat-list">
-              <div class="chat-row"><span class="avatar a-peach">S</span><div class="chat-detail"><strong>Sam Rivera</strong><p>That sounds amazing! ✨</p></div><div class="chat-meta">9:41<span class="unread">2</span></div></div>
-              <div class="chat-row"><span class="avatar a-violet">A</span><div class="chat-detail"><strong>Alex Morgan</strong><p>See you tomorrow ☀</p></div><div class="chat-meta">8:20</div></div>
-              <div class="chat-row"><span class="avatar a-green">P</span><div class="chat-detail"><strong>Project Circle</strong><p>Perfect, thanks!</p></div><div class="chat-meta">Yesterday</div></div>
-            </div>
-            <div class="phone-nav"><span class="selected">▣ <small>Chats</small></span><span>♧ <small>People</small></span><span>◉ <small>Profile</small></span></div>
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-pattern" aria-hidden="true"></div>
+      <div class="shell hero-grid">
+        <div class="hero-copy">
+          <p class="overline overline-light"><span class="overline-rule"></span> INTRODUCING MINGLE <span class="bullet">/</span> A FLUTTER EXPERIENCE</p>
+          <h1 id="hero-title">A little hello<br>can go a <em>long way.</em></h1>
+          <p class="hero-lead">An expressive, easygoing place for real conversations. Thoughtfully designed in soft pastels. Built with Flutter — and growing into a full-stack messaging product.</p>
+          <div class="hero-buttons">
+            <a class="button button-salmon" href="#screens">Explore the app <span aria-hidden="true">↘</span></a>
+            <a class="text-action" href="#motion"><span class="play-badge" aria-hidden="true">▶</span> See it in motion</a>
           </div>
+          <div class="hero-proof"><span class="proof-tiny-star" aria-hidden="true">✳</span><p><strong>Real product captures.</strong><br>From an iPhone 17 Pro simulator · October 2026</p></div>
         </div>
-        <div class="note-card note-bottom"><span class="note-icon note-heart">♡</span><div><strong>Simple by design.</strong><small>Made for real conversations.</small></div></div>
-        <p class="visual-disclaimer">Illustrative UI concept · not a runtime capture</p>
+        <div class="hero-visual" aria-label="Mingle app screenshots from iPhone simulator">
+          <div class="hero-disk"></div>
+          <svg class="plane-doodle" viewBox="0 0 178 125" aria-hidden="true"><path d="M10 77c22 42 54 42 65 16 10-23-2-40-18-29-15 10 3 35 37 16 20-11 34-27 44-44" stroke="#E5B7AE" stroke-width="2.1" stroke-linecap="round" stroke-dasharray="4 7" fill="none"/><path d="m127 33 35-20-10 38-9-16-16-2Z" fill="#F2A096"/></svg>
+          <figure class="device device-main"><img src="site/assets/chats.webp" width="659" height="1434" alt="Mingle chats screen displaying conversations, search, unread filter and navigation" fetchpriority="high" decoding="async"><figcaption>Chats · populated state</figcaption></figure>
+          <figure class="device device-back"><img src="site/assets/conversation.webp" width="540" height="1173" alt="A one-to-one Mingle conversation with pink and cream message bubbles" decoding="async"><figcaption>One-to-one chat</figcaption></figure>
+          <div class="floating-note" aria-hidden="true"><span>✦</span><p>Good chats.<br><strong>Brighter days.</strong></p></div>
+        </div>
+      </div>
+      <div class="hero-foot shell"><span>DESIGNED TO FEEL DIFFERENT</span><span class="hero-foot-line"></span><span>SCROLL TO DISCOVER <b aria-hidden="true">↓</b></span></div>
+    </section>
+
+    <section class="intro shell" id="story" aria-labelledby="intro-title">
+      <div class="intro-side"><span class="chapter">01 / THE IDEA</span><div class="asterisk" aria-hidden="true">✳</div></div>
+      <div class="intro-main"><p class="small-kicker">THE SMALL MOMENTS MATTER</p><h2 id="intro-title">Messaging that feels a little more <em>personal.</em></h2><div class="intro-sub"><p>Not another noisy social network. Mingle puts conversations first — with gentle details, meaningful empty states and an interface that makes getting in touch feel natural.</p><p>The design celebrates warmth without losing the clarity a chat app needs. The screenshots below come from the supplied running simulator build, not invented UI mockups.</p></div></div>
+    </section>
+
+    <section class="screens-section" id="screens" aria-labelledby="screens-title">
+      <div class="shell">
+        <div class="section-topline"><span class="chapter">02 / INSIDE THE APP</span><span>REAL iOS SIMULATOR CAPTURES — TAP TO EXPLORE</span></div>
+        <div class="screens-heading"><h2 id="screens-title">See how it <em>feels.</em></h2><p>From the first hello to a familiar conversation. Every screen shown here is from the supplied Mingle demo — no pretend interfaces, no placeholder message lists.</p></div>
+        <div class="screen-showcase">
+          <button type="button" class="screen-tile tile-chats" data-image="chats" aria-label="View chats screen fullscreen"><span class="tile-top"><b>01</b><span>Conversations</span></span><img src="site/assets/chats.webp" alt="Mingle chats home, with actual conversations and an unread badge" width="659" height="1434" loading="lazy"><span class="tile-bottom">Chats home <span aria-hidden="true">↗</span></span></button>
+          <button type="button" class="screen-tile tile-chat" data-image="conversation" aria-label="View one-to-one chat fullscreen"><span class="tile-top"><b>02</b><span>Keep talking</span></span><img src="site/assets/conversation.webp" alt="Mingle direct chat featuring incoming and outgoing messages" width="540" height="1173" loading="lazy"><span class="tile-bottom">One-to-one messages <span aria-hidden="true">↗</span></span></button>
+          <button type="button" class="screen-tile tile-profile" data-image="profile" aria-label="View profile screen fullscreen"><span class="tile-top"><b>03</b><span>Your corner</span></span><img src="site/assets/profile.webp" alt="Mingle profile screen with avatar, edit profile, settings and sign out" width="659" height="1434" loading="lazy"><span class="tile-bottom">Profile & settings <span aria-hidden="true">↗</span></span></button>
+        </div>
+        <div class="screen-thumbs" role="group" aria-label="Explore additional Mingle screens">
+          <button class="thumbnail" type="button" data-image="splash"><img src="site/assets/splash.webp" alt="Mingle splash screen" loading="lazy"><span>01 · Launch <b>↗</b></span></button>
+          <button class="thumbnail" type="button" data-image="sign-in"><img src="site/assets/sign-in.webp" alt="Mingle sign-in screen" loading="lazy"><span>02 · Sign in <b>↗</b></span></button>
+          <button class="thumbnail" type="button" data-image="sign-up"><img src="site/assets/sign-up.webp" alt="Mingle registration validation state with private email hidden" loading="lazy"><span>03 · Sign up <b>↗</b></span></button>
+          <button class="thumbnail" type="button" data-image="profile-setup"><img src="site/assets/profile-setup.webp" alt="Complete your profile form" loading="lazy"><span>04 · Profile setup <b>↗</b></span></button>
+          <button class="thumbnail" type="button" data-image="empty-state"><img src="site/assets/empty-state.webp" alt="Mingle friendly no-conversations empty state" loading="lazy"><span>05 · Empty chats <b>↗</b></span></button>
+          <button class="thumbnail" type="button" data-image="people"><img src="site/assets/people.webp" alt="Mingle user discovery empty state from simulator recording" loading="lazy"><span>06 · Discover <b>↗</b></span></button>
+        </div>
+        <p class="media-caption">Screens shown above are user-provided simulator captures. Registration screenshot is privacy-redacted. Sample conversations and accounts are for demonstration.</p>
       </div>
     </section>
 
-    <div class="feature-strip"><div class="wrap strip-inner"><span>✳ <strong>Soft pastel UI</strong></span><span>↗ <strong>1:1 conversations</strong></span><span>◇ <strong>Modular architecture</strong></span><span>⌘ <strong>Documented development</strong></span></div></div>
-
-    <section id="experience" class="section section-journey wrap">
-      <div class="section-head"><p class="eyebrow">THE PRODUCT IDEA</p><h2>Less noise. <em>More meaning.</em></h2><p>A deliberately focused messenger. The planned product journey centres on finding people, connecting one to one and making each message feel clear and calm.</p></div>
-      <div class="experience-grid">
-        <article class="experience-card peach-card"><span class="step">01 / DISCOVER</span><div class="feature-art cloud" aria-hidden="true">⌕<span>✳</span></div><h3>Find your people.</h3><p>Search, discover profiles and start a conversation without the clutter of a social feed.</p><small>Approved product scope · future mobile UI</small></article>
-        <article class="experience-card violet-card"><span class="step">02 / CONNECT</span><div class="feature-art bubbles" aria-hidden="true"><i>hello!</i><i>hey there ✨</i></div><h3>Keep it flowing.</h3><p>One-to-one threads, readable messages and thoughtful states for sending, reading and replying.</p><small>Legacy Firebase messaging works · new flow planned</small></article>
-        <article class="experience-card cream-card"><span class="step">03 / FEEL AT HOME</span><div class="feature-art swatches" aria-hidden="true"><i></i><i></i><i></i><span>✦</span></div><h3>A softer digital space.</h3><p>Warm surfaces, simple navigation and a friendly interface that stays out of the way.</p><small>Visual direction approved · implementation pending</small></article>
+    <section class="motion-section" id="motion" aria-labelledby="motion-title">
+      <div class="shell motion-grid">
+        <div class="motion-copy"><span class="chapter light-chapter">03 / IN MOTION</span><h2 id="motion-title">It's better<br>when you <em>see it.</em></h2><p>A static screen only tells half the story. Explore the real interaction recordings sent with the project — from chat navigation to the little states that give Mingle its personality.</p><div class="motion-legend"><div><span>01</span><div><strong>Explore the conversation</strong><small>15-second simulator walkthrough</small></div></div><div><span>02</span><div><strong>The empty-state details</strong><small>4.5-second simulator walkthrough</small></div></div></div><p class="motion-footnote">Both clips are native simulator recordings, optimized for streaming. Tap play to watch; audio is not included in the recordings.</p></div>
+        <div class="motion-media"><figure class="video-frame video-main"><video controls preload="metadata" playsinline poster="site/assets/conversation.webp" aria-label="Real Mingle chat app simulator recording showing conversations and navigation"><source src="site/assets/walkthrough.mp4" type="video/mp4">Your browser does not support HTML5 video.</video><figcaption><span>LIVE DEMO / 01</span><strong>Conversations in action</strong></figcaption></figure><figure class="video-frame video-secondary"><video controls preload="metadata" playsinline poster="site/assets/unread.webp" aria-label="Mingle simulator recording showing unread and empty conversation states"><source src="site/assets/states.mp4" type="video/mp4">Your browser does not support HTML5 video.</video><figcaption><span>LIVE DEMO / 02</span><strong>Little interactions</strong></figcaption></figure></div>
       </div>
     </section>
 
-    <section id="preview" class="section design-section">
-      <div class="wrap design-layout">
-        <div class="design-content"><p class="eyebrow">DESIGN EXPLORATION</p><h2>Every detail,<br><em>a little more human.</em></h2><p>Soft blush, creamy neutrals and expressive rounded forms set the direction for the upcoming mobile redesign. Preview the intended screens below.</p>
-          <div class="preview-controls" role="group" aria-label="Choose a concept screen"><button class="preview-tab active" type="button" aria-pressed="true" data-preview="chats"><span>01</span> Chats home</button><button class="preview-tab" type="button" aria-pressed="false" data-preview="message"><span>02</span> Conversation</button><button class="preview-tab" type="button" aria-pressed="false" data-preview="people"><span>03</span> Discover people</button></div>
-          <div class="design-footnote"><span>ⓘ</span> These are coded illustrations of the documented design direction, not screenshots of the current Flutter app.</div>
-        </div>
-        <div class="design-display">
-          <div class="design-decor d1"></div><div class="design-decor d2"></div>
-          <div class="preview-phone">
-            <div class="preview-island" aria-hidden="true"></div>
-            <section class="preview-pane active" data-pane="chats" aria-label="Chats home concept"><div class="preview-top"><div class="preview-brand">Good morning ☀</div><h3>Chats<span>.</span></h3><p>Make a little room for connection.</p></div><div class="preview-search">⌕ &nbsp; Search conversations</div><div class="preview-filters"><b>All</b><span>Unread</span></div><div class="preview-row"><i class="preview-avatar av1">J</i><div><b>Jamie</b><p>That was so much fun ✨</p></div><small>10:24 <b>1</b></small></div><div class="preview-row"><i class="preview-avatar av2">R</i><div><b>River</b><p>Let's catch up soon!</p></div><small>Yesterday</small></div><div class="preview-row"><i class="preview-avatar av3">M</i><div><b>Morgan</b><p>Thanks for the update</p></div><small>Mon</small></div><div class="preview-bottom">▣ &nbsp; Chats <span>♧ &nbsp; People</span><span>◉ &nbsp; Me</span></div></section>
-            <section class="preview-pane" data-pane="message" aria-label="Conversation concept" hidden><div class="message-top"><span>‹</span><i class="preview-avatar av2">R</i><div><b>River</b><small>Conversation</small></div><span>⋯</span></div><div class="chat-date">TODAY</div><div class="bubble incoming">Hey! How's your day going? <small>10:12</small></div><div class="bubble outgoing">Really well, thanks for asking ☀ <small>10:14 ✓</small></div><div class="bubble incoming">Love to hear that. Any plans later? <small>10:16</small></div><div class="bubble outgoing">Just a quiet evening and a good book 📖 <small>10:17 ✓</small></div><div class="message-compose"><span>＋</span><span>Message…</span><b>➤</b></div></section>
-            <section class="preview-pane" data-pane="people" aria-label="People discovery concept" hidden><div class="preview-top people-top"><div class="preview-brand">Find a friendly face ✳</div><h3>People<span>.</span></h3><p>Good conversations start somewhere.</p></div><div class="preview-search">⌕ &nbsp; Search by name or username</div><h4>Suggested connections</h4><div class="people-row"><i class="preview-avatar av3">A</i><div><b>Alex</b><small>@alex</small></div><span>Say hi ↗</span></div><div class="people-row"><i class="preview-avatar av1">S</i><div><b>Sam</b><small>@samsays</small></div><span>Say hi ↗</span></div><div class="people-row"><i class="preview-avatar av2">T</i><div><b>Taylor</b><small>@taylor</small></div><span>Say hi ↗</span></div><div class="preview-bottom">▣ &nbsp; Chats <span>♧ &nbsp; People</span><span>◉ &nbsp; Me</span></div></section>
-          </div><span class="display-star" aria-hidden="true">✳</span>
-        </div>
-      </div>
-    </section>
+    <section class="details-section shell" aria-labelledby="details-title"><div class="details-label"><span class="chapter">04 / THE DETAILS</span><h2 id="details-title">A thoughtful<br><em>little world.</em></h2><p>Three product moments worth getting right.</p></div><div class="details-list"><article><span class="detail-number">01</span><div><h3>Make a first impression.</h3><p>Friendly sign-in and profile setup give everyone a simple way to show up as themselves.</p></div><img src="site/assets/profile-setup.webp" loading="lazy" alt="Cropped Mingle profile setup form" width="659" height="1434"></article><article><span class="detail-number">02</span><div><h3>Know what comes next.</h3><p>A clear bottom navigation, visible search and well-defined unread states keep things effortless.</p></div><img src="site/assets/chats.webp" loading="lazy" alt="Mingle conversations and unread indicator" width="659" height="1434"></article><article><span class="detail-number">03</span><div><h3>Find a reason to say hello.</h3><p>Even an empty conversation list carries warmth, with gentle illustration and one obvious next step.</p></div><img src="site/assets/empty-state.webp" loading="lazy" alt="Mingle chat empty state and Find people action" width="659" height="1434"></article></div></section>
 
-    <section id="engineering" class="section engineering wrap"><div class="section-head"><p class="eyebrow">UNDER THE SURFACE</p><h2>Built with intention.<br><em>Documented with care.</em></h2><p>A monorepo separates a Flutter mobile client, a NestJS REST service and the design/product decisions that guide the work. Here's what's actually in place today.</p></div>
-      <div class="tech-map"><div class="tech-node"><div class="tech-symbol">F</div><h3>Flutter mobile</h3><p>Feature-first presentation, domain contracts, Cubit and a working legacy Firebase-backed chat flow.</p><span class="tech-status current">Existing client</span></div><div class="tech-join" aria-hidden="true"><span>↔</span><small>integration pending</small></div><div class="tech-node"><div class="tech-symbol nest">N</div><h3>NestJS REST API</h3><p>Auth, discovery, direct conversations, durable text messages, read pointers and message lifecycle endpoints.</p><span class="tech-status current">Backend implemented</span></div><div class="tech-join lower-join" aria-hidden="true"><span>↓</span></div><div class="tech-node database"><div class="tech-symbol db">▤</div><h3>PostgreSQL</h3><p>Explicit migrations, durable data, authorization checks and integration-tested REST behaviour.</p><span class="tech-status current">Integrated with API</span></div></div>
-      <div class="engineering-notes"><div><span class="note-label">TECHNICAL BOUNDARY</span><strong>REST + Postgres = durable source of truth.</strong><p>The Socket.IO transport is approved in documentation, but it is <em>not implemented</em> in the current backend or active Flutter client.</p></div><div><span class="note-label">QUALITY & REVIEW</span><strong>Two CI pipelines, independent checks.</strong><p>Flutter format, analyze and tests; backend formatting, lint, typecheck, build, migrations and E2E checks.</p></div></div>
-    </section>
+    <section class="engineering-section" id="engineering" aria-labelledby="engineering-title"><div class="shell"><div class="section-topline technical-topline"><span class="chapter">05 / THE ENGINEERING</span><span>HONEST BUILD STATUS · IN PROGRESS</span></div><div class="engineering-heading"><h2 id="engineering-title">Pretty on the outside.<br><em>Considered underneath.</em></h2><p>Mingle isn't just a UI exercise. The repository documents the path toward an end-to-end messaging product — and makes a clear distinction between what's working and what's next.</p></div><div class="tech-board"><article class="tech-column"><div class="tech-head"><span>01 / THE MOBILE CLIENT</span><b class="tech-tag built">EXISTS TODAY</b></div><h3>Flutter <span>↗</span></h3><p>Feature-first client architecture, Cubit state management, and repository boundaries. The current running chat still uses Firebase.</p><div class="tech-foot">Flutter · Dart · Firebase adapters</div></article><div class="tech-connector" aria-label="Flutter to NestJS integration is pending"><span>↔</span><small>INTEGRATION<br>IN PROGRESS</small></div><article class="tech-column"><div class="tech-head"><span>02 / THE CUSTOM API</span><b class="tech-tag built">REST BUILT</b></div><h3>NestJS <span>↗</span></h3><p>Authentication, user discovery, direct conversations, durable messages, reads, edits, deletes, and cursor pagination.</p><div class="tech-foot">TypeScript · REST · PostgreSQL 17</div></article></div><div class="engineering-bottom"><div><p class="small-kicker">THE NEXT CHECKPOINT</p><h3>Realtime, the right way.</h3><p>The Socket.IO contract is documented, but it is not implemented or connected to the Flutter app yet. REST and PostgreSQL are the durable source of truth.</p></div><div class="engineering-links"><a href="https://github.com/Husseinabozina/chat_app/blob/master/docs/project/CURRENT_STATE.md" target="_blank" rel="noopener noreferrer">Read the verified project status <span>↗</span></a><a href="https://github.com/Husseinabozina/chat_app/tree/master/docs/architecture" target="_blank" rel="noopener noreferrer">Explore architecture docs <span>↗</span></a></div></div></div></section>
 
-    <section id="progress" class="section progress-section"><div class="wrap"><div class="section-head"><p class="eyebrow">BUILD IN PUBLIC</p><h2>The journey, <em>so far.</em></h2><p>Honest progress matters more than a polished list of unshipped features. Follow the documented milestones and planned next step.</p></div><div class="progress-grid"><article class="milestone complete"><span class="mark">✓</span><small>01 · COMPLETED</small><h3>Product & UI direction</h3><p>Research, V1 scope, user flows, system architecture and approved pastel visual direction.</p></article><article class="milestone complete"><span class="mark">✓</span><small>02 · COMPLETED</small><h3>API foundation</h3><p>NestJS + PostgreSQL authentication, users, conversations and durable text message REST flows.</p></article><article class="milestone live"><span class="mark">↗</span><small>03 · NEXT CHECKPOINT</small><h3>Realtime backbone</h3><p>Implement the approved Socket.IO gateway, event envelopes, typing events and E2E tests.</p></article><article class="milestone upcoming"><span class="mark">◌</span><small>04 · PLANNED</small><h3>Mobile integration</h3><p>Connect Flutter to the custom backend and complete the approved multi-conversation UI.</p></article></div><p class="progress-link">For the verified status, milestones and deferred work, see <a href="https://github.com/Husseinabozina/chat_app/blob/master/docs/project/CURRENT_STATE.md" target="_blank" rel="noopener noreferrer">CURRENT_STATE.md ↗</a></p></div></section>
-
-    <section class="final-cta wrap"><div class="cta-art" aria-hidden="true">✳</div><div><p class="eyebrow">FOLLOW THE BUILD</p><h2>There's more to the story.</h2><p>Explore the source, architecture and the next engineering chapter.</p></div><div class="cta-actions"><a class="btn btn-dark" href="https://github.com/Husseinabozina/chat_app" target="_blank" rel="noopener noreferrer">View on GitHub ↗</a><a class="subtle-link" href="https://github.com/Husseinabozina/chat_app/tree/master/docs" target="_blank" rel="noopener noreferrer">Read the docs ↗</a></div></section>
+    <section class="closing shell"><p class="small-kicker">ONE PROJECT. MANY SMALL DETAILS.</p><h2>Here's to better<br><em>conversations.</em></h2><p>A growing product, built one thoughtful decision at a time.</p><a href="https://github.com/Husseinabozina/chat_app" class="button button-dark" target="_blank" rel="noopener noreferrer">Explore the code <span aria-hidden="true">↗</span></a><div class="closing-plane" aria-hidden="true"><svg viewBox="0 0 208 120"><path d="M0 80c36 50 77-28 97-24 31 5 13 50 53 21 18-12 25-23 31-41" fill="none" stroke="#D38A97" stroke-width="2.5" stroke-dasharray="6 7"/><path d="m153 30 52-24-17 52-13-24-22-4Z" fill="#F1AAA1" stroke="#D38A97" stroke-width="1.5"/></svg></div></section>
   </main>
-  <footer class="site-footer"><div class="wrap footer-row"><span class="brand footer-brand"><span class="brand-symbol">✳</span> chat<span class="brand-period">.</span>app</span><span>A personal Flutter + NestJS engineering project. Design concepts are illustrative.</span><a href="#top">Back to top ↑</a></div></footer>
+
+  <footer class="footer"><div class="shell footer-inner"><a class="brand" href="#top"><span class="logo-mark" aria-hidden="true">✳</span><span class="brand-name">mingle<span>.</span></span></a><p>Made with Flutter, curiosity, and an eye for the details.</p><div><a href="https://github.com/Husseinabozina/chat_app" target="_blank" rel="noopener noreferrer">GitHub ↗</a><span>© 2026 · Independent portfolio project</span></div></div></footer>
+
+  <dialog class="lightbox" aria-label="Mingle screenshot preview"><div class="dialog-inner"><button type="button" class="dialog-close" aria-label="Close screenshot preview">×</button><img class="dialog-img" src="" alt=""><div class="dialog-footer"><button type="button" class="dialog-prev" aria-label="Previous screenshot">←</button><div><strong class="dialog-title"></strong><small class="dialog-counter"></small></div><button type="button" class="dialog-next" aria-label="Next screenshot">→</button></div></div></dialog>
 </body>
 </html>
