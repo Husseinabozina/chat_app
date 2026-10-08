@@ -93,6 +93,11 @@ Local accounts and showcase conversations have not been migrated to the new
 cloud database. A new account can register normally; existing local credentials
 will not work there until their migration is explicitly authorized.
 
+A separate fictional cloud showcase is available as `@mingle_demo`, with
+12 peers, eight conversations, 56 text messages and an image. Its password is
+provided in the operator-local guide, never in Git. Log in to that account to
+see its conversations; other accounts have their own independent inboxes.
+
 Actual hosted REST, WebSocket delivery/reconnect/logout and private photo checks
 passed on 2026-10-07. Native cloud picker/rendering and push delivery remain
 separate acceptance work. See the project deployment checkpoint for details.

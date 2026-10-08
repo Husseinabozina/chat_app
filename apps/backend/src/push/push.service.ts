@@ -1,13 +1,14 @@
 import { Injectable, Logger, type OnModuleDestroy } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { waitUntil } from '@vercel/functions';
 import { DeviceTokenEntity } from '../database/entities';
 import { FcmProviderService } from './fcm-provider.service';
 
 @Injectable()
 export class PushService implements OnModuleDestroy {
   private readonly logger = new Logger(PushService.name);
-  private readonly pending: string[] = [];
+  private readonly pending: Array<{ id: string; finish: () => void }> = [];
   private readonly active = new Set<Promise<void>>();
   private closing = false;
   constructor(
@@ -20,13 +21,17 @@ export class PushService implements OnModuleDestroy {
       this.logger.warn('Notification queue capacity reached.');
       return;
     }
-    this.pending.push(messageId);
+    let finish!: () => void;
+    const completion = new Promise<void>((resolve) => (finish = resolve));
+    // Register against the originating request, including jobs waiting for a slot.
+    if (process.env.VERCEL === '1') waitUntil(completion);
+    this.pending.push({ id: messageId, finish });
     this.drain();
   }
   private drain() {
     while (!this.closing && this.pending.length && this.active.size < 2) {
-      const id = this.pending.shift()!;
-      const work = this.deliver(id)
+      const job = this.pending.shift()!;
+      const work = this.deliver(job.id)
         .catch(() => {
           this.logger.warn(
             'Notification delivery failed; durable message is preserved.',
@@ -34,6 +39,7 @@ export class PushService implements OnModuleDestroy {
         })
         .finally(() => {
           this.active.delete(work);
+          job.finish();
           this.drain();
         });
       this.active.add(work);
@@ -97,7 +103,7 @@ export class PushService implements OnModuleDestroy {
   }
   async onModuleDestroy() {
     this.closing = true;
-    this.pending.length = 0;
+    for (const job of this.pending.splice(0)) job.finish();
     await Promise.allSettled([...this.active]);
   }
 }
