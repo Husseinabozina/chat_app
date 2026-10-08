@@ -5,6 +5,14 @@ Mingle uses a pastel pink/cream identity, original icons and restrained motion.
 This repository follows the journey from product/design decisions to working
 accounts, messaging, private photos, automated checks and cloud deployment.
 
+## See the app
+
+[Open the live product showcase](https://husseinabozina.github.io/chat_app/).
+PR #29 and #30 published the portfolio with supplied screenshots and recordings.
+They are already merged separately into `master`; this app/backend checkpoint
+continues the stack above PR #28. The showcase media records a local app build,
+not native acceptance of the latest cloud configuration.
+
 ## What works today
 
 - Persisted first-run onboarding, branded opening, login/registration and secure session restoration.

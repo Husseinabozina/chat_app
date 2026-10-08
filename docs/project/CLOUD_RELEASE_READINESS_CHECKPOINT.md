@@ -7,6 +7,9 @@ Branch `feat/cloud-release-readiness`, above PR #28
 `67a5b10170a616164898b5ade0655621bc7b829c`.
 Fresh baseline Backend CI run `37643337414` and Mobile CI run
 `37643337450` both succeeded. PR #28 is open/Ready for review.
+This checkpoint is PR #31. Portfolio PRs #29/#30 were merged independently into
+`master` by the other project conversation; they contain the site/media rather
+than a newer app/backend runtime. The root README links their live showcase.
 
 ## Changes
 
@@ -35,6 +38,14 @@ Fresh baseline Backend CI run `37643337414` and Mobile CI run
 ## Verification and boundaries
 
 Local Node 24 formatting/lint/source and test typechecking/build passed.
+Implementation `8d7db4c10e2ede90c48518591a99b8a9a4e4337c` passed Backend CI
+`37729000280` and both Mobile CI jobs in `37729000332`. Existing complete
+compiled-app E2E and two-account REST/realtime acceptance remain green.
+Production artifact `dpl_LVuvky8EzijF1ivoKxwhmPd1pdQF` was health-verified,
+promoted and assigned the stable public origin. Fresh public auth/durable
+messages/idempotency/cursors/read/edit, private Sharp/Blob/membership denial,
+Socket.IO reconnect/REST recovery and logout checks all passed. Verification
+fixtures were cleaned by exact recorded identity; the cloud showcase remains.
 Final exact HEAD, GitHub CI runs and deployment acceptance are recorded in PR
 metadata after publication to avoid a self-referential commit hash.
 The local health-suite attempt could not start with unavailable local database
