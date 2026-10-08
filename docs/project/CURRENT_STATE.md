@@ -3,12 +3,14 @@
 Update this file before closing each future project checkpoint. Verify branch heads and CI runs from GitHub before changing the status below.
 
 **Updated:** 2026-09-30  
-**Current phase:** Realtime architecture contract approved. Realtime/WebSocket implementation is the next checkpoint and has not started yet.
+**Current phase:** Realtime Backend Foundation implemented on PR #15 and verified; awaiting review/merge. Flutter REST/realtime integration is the next product checkpoint.
 
 ## Last verified integrated baseline
 
 - Default branch: `master`
-- Integrated application baseline before this docs checkpoint: `171f020a831ad2c09b437e4e619312f0b7232eb5`
+- Integrated master HEAD: `5f77dbd50efd9ae12f17d809a63c2746f35fc9ee` (PR #14 realtime contract merge).
+- Last verified feature branch/PR/commit: `feat/backend-realtime-foundation` / [PR #15](https://github.com/Husseinabozina/chat_app/pull/15) / `4f96acd914c8ef0038aa3d6ee88781fad53ade03`.
+- Backend CI on that feature commit: [run #80](https://github.com/Husseinabozina/chat_app/actions/runs/36740011258), passed on Node 24 with PostgreSQL 17.
 - Backend CI: [run #73](https://github.com/Husseinabozina/chat_app/actions/runs/36724138035), passed on the integrated backend baseline `c84e4ff5294867de0d6da392dccc071ca076901b`.
 - Latest mobile-changing master SHA: `e03d990fda545463ff259513fb668494dec8b1ec`
 - Mobile CI: [run #12](https://github.com/Husseinabozina/chat_app/actions/runs/36723604090), passed on that exact mobile-changing master SHA.
@@ -29,8 +31,11 @@ The active pre-realtime stack is integrated on `master` with merge commits:
 9. #11 Read + message lifecycle
 10. #12 Backend quality reconciliation
 11. #13 Integrated-state documentation
+12. #14 Realtime V1 architecture contract
 
 PR #5 and PR #8 are closed as superseded and their branches remain available for reference.
+
+PR #15 is open on `feat/backend-realtime-foundation` against `master`; it has not been merged.
 
 ## Completed checkpoints
 
@@ -52,6 +57,8 @@ PR #5 and PR #8 are closed as superseded and their branches remain available for
 - Sender-owned edit and soft delete.
 - Reproducible Backend CI with Prettier, ESLint, typecheck, build, migrations, and compiled-app E2E tests.
 - Health/PostgreSQL E2E coverage.
+- On PR #15: authenticated Socket.IO `/realtime` gateway, user/session rooms, post-commit message/conversation/read events, transient typing, and session-scoped disconnect after logout.
+- On PR #15: compiled-app realtime E2E coverage for auth, revocation, event delivery, isolation, summaries, read monotonicity, typing expiry/disconnect, and REST resync after reconnect.
 
 ### Mobile
 
@@ -66,7 +73,7 @@ The running mobile product still uses legacy Firebase chat behavior. Custom REST
 
 ### Realtime architecture
 
-The V1 realtime contract is now locked in `docs/api/realtime-contract-v1.md`.
+The V1 realtime contract is locked in `docs/api/realtime-contract-v1.md`. PR #15 implements the first backend slice without changing the durable REST/PostgreSQL source of truth.
 
 Key decisions:
 
@@ -107,7 +114,7 @@ ADR 0002 records the Socket.IO transport choice.
 
 ### Backend
 
-Backend CI [run #73](https://github.com/Husseinabozina/chat_app/actions/runs/36724138035) passed on the latest integrated backend code before docs-only realtime planning changes.
+Backend CI [run #80](https://github.com/Husseinabozina/chat_app/actions/runs/36740011258) passed on PR #15 commit `4f96acd914c8ef0038aa3d6ee88781fad53ade03`. The latest integrated backend code on `master` previously passed [run #73](https://github.com/Husseinabozina/chat_app/actions/runs/36724138035).
 
 Pipeline:
 
@@ -117,7 +124,7 @@ Pipeline:
 
 Mobile CI [run #12](https://github.com/Husseinabozina/chat_app/actions/runs/36723604090) passed on the latest integrated mobile-changing commit.
 
-The realtime architecture checkpoint is docs-only and does not alter backend/mobile runtime code.
+PR #14 was docs-only; PR #15 changes backend runtime code and has its own green Backend CI. Mobile runtime remains at the prior verified baseline.
 
 ## Deferred features
 
@@ -138,28 +145,11 @@ The realtime architecture checkpoint is docs-only and does not alter backend/mob
 - Avatar storage-key design remains deferred to media storage.
 - Product edit/delete time-window policy remains undecided.
 - Mobile still runs legacy Firebase behavior.
-- Realtime implementation/tests have not started yet.
+- Production allowed-origin/CORS policy and handshake attempt throttling still need implementation before public deployment. The current backend checkpoint is for local/single-instance integration.
+- Realtime publication is best effort after commit; a crash between commit and emission can lose an event. REST resynchronization is the V1 recovery path.
 
 ## Exact next checkpoint
 
-**Realtime Backend Foundation implementation.**
+**Flutter REST/realtime data integration**, after PR #15 review/merge. Replace the legacy Firebase chat data path behind the existing mobile repository contracts with authenticated REST and Socket.IO datasources. Preserve REST as the durable authority, implement reconnect resynchronization and event deduplication, and keep presentation/domain layers free of transport types. Decide the screen-level rollout separately; do not combine it with presence, push, media, Redis, or durable event replay.
 
-Implement only the approved first realtime slice:
-
-1. install NestJS Socket.IO realtime dependencies
-2. create the `realtime` module/gateway and protocol DTOs
-3. authenticate handshake with existing JWT + active refresh-session validation
-4. join internal user/session rooms
-5. implement versioned event envelope
-6. introduce `RealtimePublisher` boundary
-7. publish post-commit:
-   - `message.created`
-   - `message.updated`
-   - `message.deleted`
-   - `conversation.updated`
-   - `read.updated`
-8. implement transient `typing.start` / `typing.stop` with membership validation + TTL
-9. add realtime E2E coverage using the compiled app and real PostgreSQL
-10. keep CI green
-
-Do not implement presence, push, media, Redis, durable event replay, or Flutter realtime adapters in this checkpoint.
+Before any public backend deployment, complete the allowed-origin/CORS policy and handshake attempt throttling noted above.
