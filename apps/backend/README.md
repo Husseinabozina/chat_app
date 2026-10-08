@@ -72,3 +72,11 @@ src/
 ```
 
 The current REST endpoints and response contracts are documented in `docs/api/api-contract-v1.md`. Private media is implemented in PR #25 and verified against private Vercel Blob in PR #28. See `docs/project/MEDIA_CHECKPOINT.md`. Push registration/FCM adapter is implemented but requires explicit credentials/configuration and actual delivery acceptance; see `docs/project/PUSH_CHECKPOINT.md`. Production `PUSH_ENABLED` remains false.
+
+For a non-Google server such as Vercel, configure `FCM_PROJECT_ID` and the
+encrypted server-only `FCM_SERVICE_ACCOUNT_JSON` secret for that exact project.
+The existing local `GOOGLE_APPLICATION_CREDENTIALS`/ADC path remains supported.
+Never commit a service-account key or include it in Flutter configuration.
+Enable push only after provider authorization and native delivery acceptance.
+Bounded best-effort jobs use Vercel request continuations; this is not a durable
+notification outbox.

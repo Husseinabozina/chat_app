@@ -2,9 +2,11 @@ import { Injectable, type OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   applicationDefault,
+  cert,
   deleteApp,
   initializeApp,
   type App,
+  type Credential,
 } from 'firebase-admin/app';
 import { getMessaging } from 'firebase-admin/messaging';
 import { Agent } from 'node:https';
@@ -22,18 +24,45 @@ export class FcmProviderService implements OnModuleDestroy {
   constructor(config: ConfigService) {
     const projectId = config.get<string>('FCM_PROJECT_ID');
     this.projectId = projectId;
-    this.configured =
-      config.get<string>('PUSH_ENABLED') === 'true' && !!projectId;
+    this.configured = config.get<string>('PUSH_ENABLED') === 'true';
+    if (this.configured && !projectId)
+      throw new Error('FCM_PROJECT_ID is required when push is enabled.');
     this.app = this.configured
       ? initializeApp(
           {
             projectId,
-            credential: applicationDefault(),
+            credential: this.credential(config, projectId!),
             httpAgent: this.agent,
           },
           'mingle-push',
         )
       : null;
+  }
+  private credential(config: ConfigService, projectId: string): Credential {
+    const raw = config.get<string>('FCM_SERVICE_ACCOUNT_JSON');
+    if (!raw) return applicationDefault();
+    try {
+      const value: unknown = JSON.parse(raw);
+      if (!value || typeof value !== 'object') throw new Error();
+      const account = value as Record<string, unknown>;
+      if (
+        account.type !== 'service_account' ||
+        account.project_id !== projectId ||
+        typeof account.client_email !== 'string' ||
+        typeof account.private_key !== 'string'
+      )
+        throw new Error();
+      return cert({
+        projectId,
+        clientEmail: account.client_email,
+        privateKey: account.private_key,
+      });
+    } catch {
+      // Credential parsers can echo input; expose a fixed message only.
+      throw new Error(
+        'Invalid FCM service account for the configured project.',
+      );
+    }
   }
   async send(
     token: string,

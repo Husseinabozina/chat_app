@@ -2,12 +2,16 @@
 
 Update this file before closing each future project checkpoint. Verify actual branch heads and CI runs from GitHub before changing the state below. Record native acceptance separately from host/CI checks.
 
-**Updated:** 2026-10-07
-**Current phase:** PR #28 production deployment accepted on 2026-10-07: Node 24 / NestJS 12 on Vercel Fluid, Neon PostgreSQL, Upstash Redis and private Vercel Blob in Frankfurt. Public origin `https://chat-app-backend-two-tawny.vercel.app` verified for health/database, registration/login/refresh/logout, durable direct messages, authorization/idempotency/pagination/read/edit, private sanitized image upload/download, WebSocket delivery/reconnect/REST recovery and logout disconnect. Mobile cloud configuration is in `apps/mobile/config/cloud.json`; actual native cloud acceptance and push activation remain next. Local accounts/showcase data have not been transferred. See `VERCEL_DEPLOYMENT_CHECKPOINT.md`.
+**Updated:** 2026-10-08
+**Current phase:** Cloud release readiness above verified PR #28. Root README reconciled with the custom NestJS backend and active Flutter app. A new fictional cloud showcase is seeded; existing local accounts remain separate. FCM server-secret support and request-lifetime handling are implemented; production push remains disabled pending credentials/native delivery. Production Node 24 / NestJS 12 on Vercel Fluid, Neon PostgreSQL, Upstash Redis and private Blob is accepted at `https://chat-app-backend-two-tawny.vercel.app`. See `CLOUD_RELEASE_READINESS_CHECKPOINT.md` and `VERCEL_DEPLOYMENT_CHECKPOINT.md`. The user prohibits Simulator interaction for this checkpoint.
 
 **Current acceptance boundary:** The user explicitly deferred the previous native visual review and authorized this implementation without further questions. Native PR #26 code built/launched on iPhone 17 Pro on 2026-10-05 after preserving a corrupted Xcode build cache; the new visual checkpoint launch result is recorded in its handoff. Latest full visual/motion/keyboard/dark/physical/two-device acceptance is still pending. Android native build is unverified because no local Android SDK is installed. See `BRAND_ENTRY_SETTINGS_CHECKPOINT.md` and `design-qa.md`. This is not a released application; new photo features need native/provider acceptance, and push/supported notification settings/release readiness remain.
 
 ## Last verified branch / PR / commit
+
+- Current branch `feat/cloud-release-readiness`, [PR #31](https://github.com/Husseinabozina/chat_app/pull/31), directly above PR #28 actual HEAD `67a5b10170a616164898b5ade0655621bc7b829c`. Implementation `8d7db4c10e2ede90c48518591a99b8a9a4e4337c` passed [Backend CI](https://github.com/Husseinabozina/chat_app/actions/runs/37729000280) and both [Mobile CI](https://github.com/Husseinabozina/chat_app/actions/runs/37729000332) jobs. Final documentation HEAD/checks are recorded in PR metadata after publication.
+- Deployed implementation `8d7db4c` is production artifact `dpl_LVuvky8EzijF1ivoKxwhmPd1pdQF`, promoted to the same stable public origin. Fresh public health/auth/durable messaging/private media/Socket.IO recovery and logout acceptance passed. Production push remains disabled; actual provider/native delivery is not claimed.
+- New cloud showcase `@mingle_demo`: 12 fictional peers, eight conversations, 56 text messages and an image. Authenticated REST seed succeeded; credentials are private/operator-local. No local real-account migration and no Simulator/native execution.
 
 - Showcase follow-up (2026-10-06): explicitly seeded the user's existing local `@attest` account (display name `haters`) through authenticated REST, without changing its credentials or revoking its session. Its actual list returns 8 conversations; DB verifies 56 text messages and one image. Seeder supports a supplied viewer bearer token with optional expected-user-ID validation, and only logs out the sessions it creates. The separate showcase account remains available. Native launch assets and Flutter opening now use the rounded teal/cream launcher artwork. Follow-up: Settings/auth/onboarding/About now share this same vector through MingleLogo; its background color remains centrally configurable. The launcher SVG is the canonical geometry source; the mark SVG/PNG and Dart paths are generated from it. No simulator opened or native build run for this follow-up; new native splash acceptance remains pending. Previous HEAD `3e7ee3c238efbb8e44c8a96a2a91722ae98d0b20` passed both Mobile CI jobs in run37374286592; follow-up HEAD/checks go in PR #27 metadata.
 
@@ -57,24 +61,25 @@ Update this file before closing each future project checkpoint. Verify actual br
 
 Integrated `master` HEAD: `5f77dbd50efd9ae12f17d809a63c2746f35fc9ee` (PR #14 realtime contract merge). Latest checked active stack:
 
-| PR  | Branch                                  | Base       | Verified HEAD                                                                                | State                                                                                                                       |
-| --- | --------------------------------------- | ---------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| #15 | `feat/backend-realtime-foundation`      | `master`   | `456c842b157b30f4dd9728ba3869f7fa7b6a50d8`                                                   | Ready, unmerged                                                                                                             |
-| #16 | `feat/mobile-api-realtime-foundation`   | #15 branch | `b0a68f4908a60facea617655b358e478b22a7004`                                                   | Ready, unmerged                                                                                                             |
-| #17 | `feat/mobile-repository-reconciliation` | #16 branch | `d1a1c683a63c9ace2b337d861bb83eef26e45763`                                                   | Ready, unmerged                                                                                                             |
-| #18 | `feat/mobile-backend-product-flow`      | #17 branch | `01f5220bb8f80736749200331536ed7f4bcdee28` (docs; code `b4a31c6`)                            | Draft, functional native acceptance incomplete                                                                              |
-| #19 | `feat/mobile-pastel-visual-identity`    | #18 branch | `abe502695e6f32512800e30c7ab09b4ec7e0a41a`                                                   | Draft; Mobile CI #23 success; pastel direction accepted by user                                                             |
-| #20 | `feat/mobile-motion-demo`               | #19 branch | `313b800f0dd90128b5d92a7725552d5e61266802` (implementation)                                  | Draft; CI #24 success; consolidated native acceptance pending                                                               |
-| #21 | `feat/mobile-brand-entry-settings`      | #20 branch | `49cd87c75a666f6bc174794a4a27a36474f44705`                                                   | Draft; CI #27 success; native visual review explicitly deferred                                                             |
-| #22 | `fix/mobile-logo-fidelity`              | #21 branch | `d89dd9e869f180d42cd9fa60ddee19c194199b2d`                                                   | Draft; CI #29 success; geometry superseded by #23                                                                           |
-| #23 | `fix/mobile-entry-visual-polish`        | #22 branch | `1dd304b054e53b382fa98317a858ccbd8b66e60e`                                                   | Draft; CI #32 success; native acceptance pending                                                                            |
-| #24 | `fix/mobile-product-entry`              | #23 branch | `06689b770171a607c7279320994e43a587cd07ad`                                                   | Draft; CI #33 success; native acceptance pending                                                                            |
-| #25 | `feat/media-images`                     | #24 branch | `ce43154864b9520a4f7178c180e764801e00c6a3`                                                   | Draft; Backend CI #85 + Mobile CI #35 success; native/provider acceptance pending                                           |
-| #26 | `feat/push-notifications`               | #25 branch | `fc61f3c2b81eaf908fd956be836f1e793adf473c` (initial implementation)                          | Draft; Backend CI #86 + Mobile CI #36 success; final reconciliation checks in PR metadata; provider/native delivery pending |
-| #27 | `feat/mobile-showcase-polish`           | #26 branch | `3fffa67aa3c0b4b00dcb8e90d8cf94019b459c29`                                                   | Draft; Mobile CI `37469221848` success; final shared in-app logo/native review pending                                      |
-| #28 | `feat/backend-vercel-deployment`        | #27 branch | `302f58e8f0faf9726c0b208de7d4e3125bad0361` (implementation; docs HEAD/checks in PR metadata) | Draft; Backend CI success; public deployment blocked on account/provider input                                              |
+| PR  | Branch                                  | Base       | Verified HEAD                                                                                 | State                                                                                                                       |
+| --- | --------------------------------------- | ---------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| #15 | `feat/backend-realtime-foundation`      | `master`   | `456c842b157b30f4dd9728ba3869f7fa7b6a50d8`                                                    | Ready, unmerged                                                                                                             |
+| #16 | `feat/mobile-api-realtime-foundation`   | #15 branch | `b0a68f4908a60facea617655b358e478b22a7004`                                                    | Ready, unmerged                                                                                                             |
+| #17 | `feat/mobile-repository-reconciliation` | #16 branch | `d1a1c683a63c9ace2b337d861bb83eef26e45763`                                                    | Ready, unmerged                                                                                                             |
+| #18 | `feat/mobile-backend-product-flow`      | #17 branch | `01f5220bb8f80736749200331536ed7f4bcdee28` (docs; code `b4a31c6`)                             | Draft, functional native acceptance incomplete                                                                              |
+| #19 | `feat/mobile-pastel-visual-identity`    | #18 branch | `abe502695e6f32512800e30c7ab09b4ec7e0a41a`                                                    | Draft; Mobile CI #23 success; pastel direction accepted by user                                                             |
+| #20 | `feat/mobile-motion-demo`               | #19 branch | `313b800f0dd90128b5d92a7725552d5e61266802` (implementation)                                   | Draft; CI #24 success; consolidated native acceptance pending                                                               |
+| #21 | `feat/mobile-brand-entry-settings`      | #20 branch | `49cd87c75a666f6bc174794a4a27a36474f44705`                                                    | Draft; CI #27 success; native visual review explicitly deferred                                                             |
+| #22 | `fix/mobile-logo-fidelity`              | #21 branch | `d89dd9e869f180d42cd9fa60ddee19c194199b2d`                                                    | Draft; CI #29 success; geometry superseded by #23                                                                           |
+| #23 | `fix/mobile-entry-visual-polish`        | #22 branch | `1dd304b054e53b382fa98317a858ccbd8b66e60e`                                                    | Draft; CI #32 success; native acceptance pending                                                                            |
+| #24 | `fix/mobile-product-entry`              | #23 branch | `06689b770171a607c7279320994e43a587cd07ad`                                                    | Draft; CI #33 success; native acceptance pending                                                                            |
+| #25 | `feat/media-images`                     | #24 branch | `ce43154864b9520a4f7178c180e764801e00c6a3`                                                    | Draft; Backend CI #85 + Mobile CI #35 success; native/provider acceptance pending                                           |
+| #26 | `feat/push-notifications`               | #25 branch | `fc61f3c2b81eaf908fd956be836f1e793adf473c` (initial implementation)                           | Draft; Backend CI #86 + Mobile CI #36 success; final reconciliation checks in PR metadata; provider/native delivery pending |
+| #27 | `feat/mobile-showcase-polish`           | #26 branch | `3fffa67aa3c0b4b00dcb8e90d8cf94019b459c29`                                                    | Draft; Mobile CI `37469221848` success; final shared in-app logo/native review pending                                      |
+| #28 | `feat/backend-vercel-deployment`        | #27 branch | `67a5b10170a616164898b5ade0655621bc7b829c`                                                    | Ready for review; Backend/Mobile CI success; public REST/media/realtime deployment accepted                                 |
+| #31 | `feat/cloud-release-readiness`          | #28 branch | `8d7db4c10e2ede90c48518591a99b8a9a4e4337c` (implementation; final docs/checks in PR metadata) | README reconciliation, cloud showcase and push runtime readiness; native delivery pending                                   |
 
-Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21 → #22 → #23 → #24 → #25 → #26 → #27 → #28**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint.
+Proposed merge order: **#15 → #16 → #17 → #18 → #19 → #20 → #21 → #22 → #23 → #24 → #25 → #26 → #27 → #28 → #31**, after review and explicit merge authorization. Use merge commits to preserve ancestry; after each merge retarget the next PR to `master` and verify its diff/checks. No merge or force push is included in this checkpoint. Portfolio PRs #29/#30 were separately merged into `master` by the other project conversation; preserve their live site/media and reconcile the root README when this stack is integrated.
 
 Integrated earlier history:
 
@@ -154,6 +159,15 @@ PR #5 and PR #8 were closed as superseded by the main project conversation; thei
 - No architecture/product scope change is justified by visual cleanup alone.
 
 ## Current CI and verification
+
+### PR #31 — cloud release readiness (2026-10-08)
+
+Implementation `8d7db4c10e2ede90c48518591a99b8a9a4e4337c`: Backend run
+`37729000280` and Mobile run `37729000332` both completed/success, including
+the new credential/queued-continuation regression coverage and two-account
+REST/realtime integration. Workflows and lockfiles are unchanged. Deployed
+public REST, private media and realtime acceptance also passed. Final docs
+HEAD/checks are in PR metadata. No Simulator/native build was performed.
 
 ### PR #25 / #24
 
@@ -241,7 +255,7 @@ Later/deferred work:
 
 ## Exact next checkpoint
 
-1. Resolve the pending local-showcase transfer/new-cloud-fixture selection. Preserve credentials/history locally until the user authorizes a transfer. Start the mobile app with `config/cloud.json`; the user owns native builds and Simulator interaction.
+1. Cloud showcase is available through `@mingle_demo`; credentials are private/operator-local. Preserve existing local credentials/history. Start the mobile app with `config/cloud.json`; the user owns native builds and Simulator interaction. No agent Simulator activity is authorized.
 2. Activate push through scoped FCM server credentials, APNs/signing and real delivery/account-routing acceptance. `PUSH_ENABLED=false` until verified. Native cloud photo-picker/viewer and two-device/background/reconnect acceptance remain separate.
 3. Complete release hardening: public abuse/handshake controls, storage cleanup/orphan reconciliation and supported settings, then consolidated iOS/Android/device acceptance. Android SDK is still unavailable locally. Earlier local CPU hang investigation remains open.
 4. Review the PR stack and merge only with explicit authorization. Password recovery/social auth, full localization, files/voice/presence/reactions remain separate scope decisions. Update this source of truth before closing every checkpoint.

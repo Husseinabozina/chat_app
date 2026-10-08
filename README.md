@@ -1,69 +1,134 @@
-# Realtime Messaging Platform
+# Mingle
 
-A zero-to-hero portfolio product that documents and implements the complete journey from product research and UX through backend, Flutter, testing, CI/CD, deployment, monitoring, and production documentation.
+A friendly messaging app built with **Flutter and our own NestJS backend**.
+Mingle uses a pastel pink/cream identity, original icons and restrained motion.
+This repository follows the journey from product/design decisions to working
+accounts, messaging, private photos, automated checks and cloud deployment.
 
-> The product name is not final yet. The repository name remains `chat_app` during the foundation phase.
+## See the app
 
-## Monorepo
+[Open the live product showcase](https://husseinabozina.github.io/chat_app/).
+PR #29 and #30 published the portfolio with supplied screenshots and recordings.
+They are already merged separately into `master`; this app/backend checkpoint
+continues the stack above PR #28. The showcase media records a local app build,
+not native acceptance of the latest cloud configuration.
+
+## What works today
+
+- Persisted first-run onboarding, branded opening, login/registration and secure session restoration.
+- People search, public profiles and profile editing with photos.
+- Unique direct conversations, text/photo messages and paginated history.
+- Replies, copy/edit/soft delete, stable-ID retries, unread counts and read state.
+- Realtime message changes and typing, reconnect recovery and logout disconnect.
+- System/light/dark appearance, reduced-motion and account settings.
+- Private image uploads with server validation and membership-checked downloads.
+
+The active app uses the backend in this repository. The former Firebase chat
+prototype is archived behind `lib/main_legacy.dart`. Firebase Cloud Messaging
+provides the notification integration; our auth, API and message database are
+implemented by our own backend. Push registration/routing is implemented, but
+production push remains disabled until server credentials and native delivery
+are verified.
+
+## Backend and hosting
+
+| Component                                | Role                                                                 |
+| ---------------------------------------- | -------------------------------------------------------------------- |
+| Node 24 / NestJS 12 / TypeScript 6       | Our authentication, profiles, messaging, media and realtime code     |
+| PostgreSQL / explicit TypeORM migrations | Durable accounts, sessions, conversations, messages and read state   |
+| Socket.IO                                | Transient delivery and typing; REST remains the durable command path |
+| Vercel Fluid                             | Hosts our backend                                                    |
+| Neon PostgreSQL                          | Hosted database                                                      |
+| Upstash Redis                            | Coordination between backend instances                               |
+| Private Vercel Blob                      | Validated, private image storage                                     |
+
+Verified public API: `https://chat-app-backend-two-tawny.vercel.app`.
+Health: [`GET /v1/health`](https://chat-app-backend-two-tawny.vercel.app/v1/health).
+Hosted REST, private photos and realtime flows were verified on 2026-10-07.
+The cloud showcase contains fictional profiles and conversations. Local
+accounts are a separate environment and have not been migrated.
+
+**This is a working portfolio project, not a completed store release.** Native
+cloud/photo/push acceptance, public abuse controls and media cleanup remain.
+Groups, calls, voice notes, social login and password recovery are not implemented.
+See [CURRENT_STATE](docs/project/CURRENT_STATE.md) for the exact verified HEAD,
+PR dependencies, acceptance boundaries and next checkpoint. Update it before
+closing each checkpoint.
+
+## Repository
 
 ```text
-apps/
-  mobile/      Flutter client
-  backend/     NestJS API + realtime backend
-
-docs/
-  product/
-  design/
-  architecture/
-  api/
-
-infra/
-  docker-compose.yml
+apps/mobile/       Flutter client
+apps/backend/      Custom NestJS API + realtime gateway
+docs/product/      Scope and product decisions
+docs/design/       UI direction and references
+docs/architecture/ Contracts and architecture decisions
+docs/project/      Verified state and checkpoint reports
+infra/             Local development services
+scripts/           Brand tooling and explicit showcase seeders
 ```
 
-## Current status
+## Run the mobile app against the cloud
 
-[Current project state](docs/project/CURRENT_STATE.md) records the verified branch, PR stack, completed checkpoints, CI, deferred work, and exact next checkpoint. Keep that file updated before closing each checkpoint.
+Use **Flutter 3.47.5+ / Dart 3.13+**. From `apps/mobile`:
 
-The backend now has auth, user discovery, direct conversations, durable text messages, read pointers, and message lifecycle REST behavior. The Flutter client has a feature-first structure and still runs its legacy Firebase-backed chat behavior. Realtime/WebSocket transport has not been integrated into the active backend chain.
+```bash
+flutter pub get --enforce-lockfile
+flutter run --dart-define-from-file=config/cloud.json
+```
 
-## Development
+Use the correct SDK executable if your global Flutter is older. The cloud
+configuration contains only the public origin. Local servers are unnecessary
+for cloud runs. Stop and restart a run when changing its API configuration;
+hot reload does not update compile-time defines. Log in with a cloud account.
+Showcase credentials are operator-local and never committed to Git.
 
-### PostgreSQL
+## Local backend development
+
+Use Node 24, Docker and a disposable development database:
 
 ```bash
 docker compose -f infra/docker-compose.yml up -d
-```
-
-### Backend
-
-```bash
 cd apps/backend
 cp .env.example .env
-npm ci
+npm ci --no-audit --no-fund
 npm run db:migrate
 npm run start:dev
 ```
 
-Health endpoint:
-
-```text
-GET http://localhost:3000/v1/health
-```
-
-### Flutter
+Configure optional Redis/private storage through `.env` as described in the
+[backend README](apps/backend/README.md). To connect Flutter to the local API:
 
 ```bash
-cd apps/mobile
-flutter pub get
-flutter run
+flutter run --dart-define=CHAT_API_BASE_URL=http://127.0.0.1:3000
 ```
 
-See the backend and mobile READMEs for current development and quality commands.
+Android emulators use `10.0.2.2`; physical devices require a reachable host.
+Secrets belong in ignored environment files or hosting secrets.
 
-## Engineering workflow
+## Quality gates
 
-- One logical verified change per meaningful commit.
-- One coherent feature/foundation unit per branch/PR.
-- No direct feature development on `master`.
-- Product and architecture contracts are updated when implementation decisions materially change them.
+Backend CI is read-only and uses:
+
+```text
+npm ci → format:check → lint → typecheck → build → migrations → npm test
+```
+
+The E2E runner tests the compiled Nest app, with database suites in separate
+processes. **Backend E2E resets fixture data: use only a disposable test DB,
+never the cloud database or a developer's saved accounts.** Mobile CI checks
+locked dependencies, formatting, analysis and tests, then a two-account
+REST/realtime integration against disposable backend services. These checks
+do not prove native notification delivery or final device appearance.
+
+## Project references
+
+- [Mobile commands and behavior](apps/mobile/README.md)
+- [Backend commands and API](apps/backend/README.md)
+- [Cloud deployment checkpoint](docs/project/VERCEL_DEPLOYMENT_CHECKPOINT.md)
+- [Cloud release readiness](docs/project/CLOUD_RELEASE_READINESS_CHECKPOINT.md)
+- [Product/UI acceptance checklist](docs/project/UI_UX_ACCEPTANCE_CHECKLIST.md)
+
+Work is published through stacked PRs. The default branch displays only merged
+checkpoints; open PRs contain subsequent implementation. Review/merge requires
+explicit authorization; this checkpoint does not merge the stack.
